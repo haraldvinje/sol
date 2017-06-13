@@ -16,12 +16,23 @@ public class WorldContainer {
     private static int ENTITY_COUNT = 32;
 
     public static final int COMPMASK_ENTITY_EXISTS = 1 << 0,
-                            COMPMASK_POSITION = 1 << 1;
+                            COMPMASK_POSITION = 1 << 1,
+                            COMPMASK_VELOCITY = 1 << 2,
+                            COMPMASK_COLLISION = 1 << 3;
+
+
 
 
     private int[] entityMask; //the main container for entities
 
     private Map<Integer, PositionComp> positionComps = new HashMap<Integer, PositionComp>();
+
+    private Map<Integer, VelocityComp> velocityComps = new HashMap<Integer, VelocityComp>();
+
+    private Map<Integer, CollisionComp> collisionComps = new HashMap<Integer, CollisionComp>();
+
+    private MechanicsSystem mechSystem;
+
 
 
     public WorldContainer() {
@@ -29,10 +40,39 @@ public class WorldContainer {
 
     }
 
+    public void init(){
+
+        mechSystem = new MechanicsSystem(this);
+        mechSystem.init();
+
+    }
+
+    public void updateSystems(){
+        mechSystem.updateComponents();
+    }
+
+
+
+    public Map<Integer, PositionComp> getPositionComps() {
+        return positionComps;
+    }
+
+    public Map<Integer, VelocityComp> getVelocityComps() {
+        return velocityComps;
+    }
+
+    public Map<Integer, CollisionComp> getCollisionComps() {
+        return collisionComps;
+    }
+
+    public MechanicsSystem getMechanicsSystem(){
+        return this.mechSystem;
+    }
 
 
     public int createEntity() {
         for (int i = 0; i < ENTITY_COUNT; i++) {
+            System.out.println(entityExists(i));
             if (!entityExists(i)) {
                 resetEntity(i);
                 return i;
@@ -47,9 +87,26 @@ public class WorldContainer {
         pc.setY(y);
         positionComps.put(entity, pc);
     }
-    public PositionComp getPositionComponent(int entity) {
-        return positionComps.get(entity);
+
+    public void createVelocityComp(int entity, float vx, float vy){
+        VelocityComp vc = new VelocityComp();
+        vc.setVx(vx);
+        vc.setVy(vy);
+        velocityComps.put(entity, vc);
     }
+
+    public void createCollisionComp(int entity, Shape shape){
+        CollisionComp cc = new CollisionComp();
+        cc.setShape(shape);
+        collisionComps.put(entity, cc);
+    }
+
+
+    public PositionComp getPositionComponent(int entity) {return positionComps.get(entity);}
+
+    public VelocityComp getVelocityComponent(int entity) {return velocityComps.get(entity);}
+
+    public CollisionComp getCollisionComponent(int entity) {return collisionComps.get(entity);}
 
     public boolean entityExists(int entity) {
         return hasComponent(entity, COMPMASK_ENTITY_EXISTS);

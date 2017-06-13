@@ -1,5 +1,6 @@
 package game;
 
+import engine.Circle;
 import engine.WorldContainer;
 
 /**
@@ -16,14 +17,35 @@ public class Game {
 
 
     private int player;
+    private int sandbag;
 
 
     public void init() {
         wc = new WorldContainer();
 
-        player = wc.createEntity();
+
+        this.player = wc.createEntity();
+
         wc.createPositionComp(player, 100, 100);
+        wc.createVelocityComp(player, 0,0);
+        Circle c1 = new Circle();
+        c1.setRadius(10);
+        wc.createCollisionComp(player, c1);
+
+        this.sandbag = wc.createEntity();
+
+        wc.createPositionComp(sandbag, 109, 109);
+        wc.createVelocityComp(sandbag, 0,0);
+        Circle c2 = new Circle();
+        c2.setRadius(10);
+        wc.createCollisionComp(sandbag, c2);
+
+        wc.init();
+
+        System.out.println(5 & 4);
+
     }
+
 
     /**
      * blocking while the game runs
@@ -45,9 +67,11 @@ public class Game {
         }
 
     }
-
     public void update() {
-        System.out.println( wc.getPositionComponent(player).getX());
+/*        System.out.println(wc.getPositionComps());
+        System.out.println(wc.getVelocityComps());
+        System.out.println(wc.getCollisionComps());
+        wc.updateSystems();*/
     }
 
 
