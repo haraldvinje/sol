@@ -28,5 +28,5 @@ dependencies {
 }
 
 // Define the main class for the application
-mainClassName = 'Main'
+mainClassName = 'game.Main'
 
