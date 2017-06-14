@@ -7,6 +7,7 @@ import engine.PositionComp;
 import engine.WorldContainer;
 import engine.graphics.LightShader;
 import engine.graphics.VertexArray;
+import engine.graphics.VertexArrayComp;
 import engine.graphics.VertexArrayUtils;
 import engine.window.Window;
 import utils.maths.Mat4;
@@ -23,12 +24,14 @@ public class Game {
     private LightShader shader;
     private WorldContainer wc;
 
+
     private VertexArray vao;
 
     private long lastTime;
 
-
     private int player;
+
+
 
 
     public void init() {
@@ -37,10 +40,16 @@ public class Game {
         shader = new LightShader();
         wc = new WorldContainer();
 
+
+        //assign component types
+        wc.assignComponentType(PositionComp.class);
+        wc.assignComponentType(VertexArrayComp.class);
+
+
         player = wc.createEntity();
         wc.addComponent(player, new PositionComp(100, 100));
+        wc.addComponent(player, new VertexArrayComp( VertexArrayUtils.createRectangle(32, 32)));
 
-        vao = VertexArrayUtils.createRectangle(200, 200);
 
     }
 
@@ -72,6 +81,14 @@ public class Game {
 
         //render
         Mat4 projectionTransform = Mat4.orthographic(0, 1600, 900, 0, 10, -10);
+
+        VertexArray vao = ((VertexArrayComp) wc.getComponent(player, VertexArrayComp.class) ).getVao();
+
+
+        shader.bind();
+        vao.bind();
+
+        shader.setLightPoint(new Vec3(100f, 100f, -100f));
 
         shader.bind();
         shader.setLightPoint(new Vec3(600f, 600f, 2f));
