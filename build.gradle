@@ -12,21 +12,56 @@ apply plugin: 'java'
 // Apply the application plugin to add support for building an application
 apply plugin: 'application'
 
+
+project.ext.lwjglVersion = "3.1.2"
+
+project.ext.set('nativeLibsDir', "$buildDir/libs/natives")
+
 // In this section you declare where to find the dependencies of your project
 repositories {
     // Use jcenter for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
-    jcenter()
+    //jcenter()
+
+    mavenCentral()
+}
+
+configurations {
+    nativeBundle
 }
 
 dependencies {
     // This dependency is found on compile classpath of this component and consumers.
     compile 'com.google.guava:guava:21.0'
 
+    // LWJGL
+    compile "org.lwjgl:lwjgl:${lwjglVersion}"
+    nativeBundle "org.lwjgl:lwjgl:${lwjglVersion}:natives-windows@jar"
+    compile "org.lwjgl:lwjgl-glfw:${lwjglVersion}"
+    nativeBundle "org.lwjgl:lwjgl-glfw:${lwjglVersion}:natives-windows@jar"
+    compile "org.lwjgl:lwjgl-opengl:${lwjglVersion}"
+    nativeBundle "org.lwjgl:lwjgl-opengl:${lwjglVersion}:natives-windows@jar"
+    //compile "org.lwjgl:lwjgl-glfw:${lwjglVersion}:natives-windows"
+
+
     // Use JUnit test framework
     testCompile 'junit:junit:4.12'
 }
 
+task extractNativeBundle(type: Sync) {
+    from {
+        configurations.nativeBundle.collect { zipTree(it) }
+    }
+    into file(project.nativeLibsDir)
+}
+
+
+run {
+    systemProperty 'java.library.path', project.nativeLibsDir
+}
+
+
 // Define the main class for the application
 mainClassName = 'game.Main'
+
 

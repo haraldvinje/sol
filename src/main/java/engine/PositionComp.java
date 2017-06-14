@@ -7,6 +7,11 @@ public class PositionComp implements Component {
 
     private float x, y;
 
+    public PositionComp(float x, float y) {
+        setX(x);
+        setY(y);
+    }
+
     public float getX() {
         return x;
     }
@@ -22,4 +27,10 @@ public class PositionComp implements Component {
     public void setY(float y) {
         this.y = y;
     }
+
+
+//    @Override
+//    public int getMask() {
+//        return WorldContainer.COMPMASK_POSITION;
+//    }
 }
