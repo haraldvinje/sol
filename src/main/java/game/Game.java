@@ -1,10 +1,14 @@
 package game;
 
 
+import engine.Circle;
+
+
 import static org.lwjgl.opengl.GL11.*;
 
 import engine.PositionComp;
 import engine.UserInput;
+
 import engine.WorldContainer;
 import engine.graphics.LightShader;
 import engine.graphics.VertexArray;
@@ -37,6 +41,7 @@ public class Game {
 
 
     private int player;
+    private int sandbag;
 
 
 
@@ -49,6 +54,26 @@ public class Game {
         wc = new WorldContainer();
 
 
+/*
+        wc.createPositionComp(player, 100, 100);
+        wc.createVelocityComp(player, 0,0);
+        Circle c1 = new Circle();
+        c1.setRadius(10);
+        wc.createCollisionComp(player, c1);
+
+        this.sandbag = wc.createEntity();
+
+        wc.createPositionComp(sandbag, 109, 109);
+        wc.createVelocityComp(sandbag, 0,0);
+        Circle c2 = new Circle();
+        c2.setRadius(10);
+        wc.createCollisionComp(sandbag, c2);
+
+        wc.init();
+
+        System.out.println(5 & 4);
+*/
+      
         //assign component types
         wc.assignComponentType(PositionComp.class);
         wc.assignComponentType(VertexArrayComp.class);
@@ -61,6 +86,7 @@ public class Game {
 
 
     }
+
 
     /**
      * blocking while the game runs
@@ -87,8 +113,13 @@ public class Game {
         window.close();
 
     }
-
     public void update() {
+
+/*        System.out.println(wc.getPositionComps());
+        System.out.println(wc.getVelocityComps());
+        System.out.println(wc.getCollisionComps());
+        wc.updateSystems();*/
+  
         //System.out.println( ((PositionComp)wc.getComponent(player, WorldContainer.COMPMASK_POSITION)).getX() );
 
         window.pollEvents();
