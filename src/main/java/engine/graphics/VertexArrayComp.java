@@ -1,9 +1,12 @@
 package engine.graphics;
 
+import engine.Component;
+import engine.WorldContainer;
+
 /**
  * Created by eirik on 13.06.2017.
  */
-public class VertexArrayComp {
+public class VertexArrayComp implements Component{
 
     private VertexArray vao;
 
@@ -18,4 +21,5 @@ public class VertexArrayComp {
     public void setVao(VertexArray vao) {
         this.vao = vao;
     }
+
 }

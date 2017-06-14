@@ -8,6 +8,7 @@ import engine.UserInput;
 import engine.WorldContainer;
 import engine.graphics.LightShader;
 import engine.graphics.VertexArray;
+import engine.graphics.VertexArrayComp;
 import engine.graphics.VertexArrayUtils;
 import engine.window.Window;
 import org.lwjgl.opengl.GL11;
@@ -22,18 +23,22 @@ public class Game {
     private static final float FRAME_INTERVAL = 1.0f/60.0f;
 
 
-    private long lastTime;
-
 
     private Window window;
     private UserInput userInput;
     private LightShader shader;
 
+
+    private VertexArray vao;
+
+    private long lastTime;
+
     private WorldContainer wc;
 
 
-    private VertexArray vao;
     private int player;
+
+
 
 
     public void init() {
@@ -44,10 +49,16 @@ public class Game {
         wc = new WorldContainer();
 
 
+        //assign component types
+        wc.assignComponentType(PositionComp.class);
+        wc.assignComponentType(VertexArrayComp.class);
+
+
+
         player = wc.createEntity();
         wc.addComponent(player, new PositionComp(100, 100));
+        wc.addComponent(player, new VertexArrayComp( VertexArrayUtils.createRectangle(32, 32)));
 
-        vao = VertexArrayUtils.createRectangle(200, 200);
 
     }
 
@@ -82,12 +93,18 @@ public class Game {
 
         window.pollEvents();
 
-        System.out.println(vao.getIndicesCount());
-
         //render
         glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
         Mat4 projectionTransform = Mat4.orthographic(0, 1600, 900, 0, 10, -10);
+
+        VertexArray vao = ((VertexArrayComp) wc.getComponent(player, VertexArrayComp.class) ).getVao();
+
+
+        shader.bind();
+        vao.bind();
+
+        shader.setLightPoint(new Vec3(100f, 100f, -100f));
 
         shader.bind();
         vao.bind();

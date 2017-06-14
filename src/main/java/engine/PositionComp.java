@@ -29,8 +29,8 @@ public class PositionComp implements Component {
     }
 
 
-    @Override
-    public int getMask() {
-        return WorldContainer.COMPMASK_POSITION;
-    }
+//    @Override
+//    public int getMask() {
+//        return WorldContainer.COMPMASK_POSITION;
+//    }
 }

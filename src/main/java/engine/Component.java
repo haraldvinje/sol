@@ -5,5 +5,5 @@ package engine;
  */
 public interface Component {
 
-    public int getMask();
+    //public int getMask();
 }
