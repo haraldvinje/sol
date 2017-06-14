@@ -22,9 +22,4 @@ public class VertexArrayComp implements Component{
         this.vao = vao;
     }
 
-
-//    @Override
-//    public int getMask() {
-//        return WorldContainer.COMPMASK_VERTEX_ARRAY;
-//    }
 }
