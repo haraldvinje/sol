@@ -3,6 +3,10 @@ package engine.window;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
+
+import org.lwjgl.glfw.GLFWCursorPosCallbackI;
+import org.lwjgl.glfw.GLFWKeyCallbackI;
+import org.lwjgl.glfw.GLFWMouseButtonCallbackI;
 import org.lwjgl.glfw.GLFWVidMode;
 
 import org.lwjgl.opengl.GL;
@@ -13,7 +17,6 @@ import static org.lwjgl.opengl.GL11.*;
  * Created by eirik on 13.06.2017.
  */
 public class Window {
-
 
     private boolean GLFWinitialized = false;
     private boolean GLinitialized = false;
@@ -96,6 +99,27 @@ public class Window {
 
     public void swapBuffers() {
         glfwSwapBuffers(windowId);
+    }
+
+    public void close() {
+        glfwDestroyWindow(windowId);
+    }
+
+
+    public boolean shouldClosed() {
+        return glfwWindowShouldClose(windowId);
+    }
+
+    public void setMouseButtonCallback(GLFWMouseButtonCallbackI call) {
+        glfwSetMouseButtonCallback( windowId, call);
+    }
+
+    public void setCursorPosCallback(GLFWCursorPosCallbackI call) {
+        glfwSetCursorPosCallback( windowId, call);
+    }
+
+    public void setKeyCallback(GLFWKeyCallbackI call) {
+        glfwSetKeyCallback( windowId, call);
     }
 
 }

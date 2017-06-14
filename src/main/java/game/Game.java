@@ -4,6 +4,7 @@ package game;
 import static org.lwjgl.opengl.GL11.*;
 
 import engine.PositionComp;
+import engine.UserInput;
 import engine.WorldContainer;
 import engine.graphics.LightShader;
 import engine.graphics.VertexArray;
@@ -20,7 +21,9 @@ public class Game {
     private static final float FRAME_INTERVAL = 1.0f/60.0f;
 
     private Window window;
+    private UserInput userInput;
     private LightShader shader;
+
     private WorldContainer wc;
 
     private VertexArray vao;
@@ -33,6 +36,7 @@ public class Game {
 
     public void init() {
         window = new Window(1600, 900, "SIIII");
+        userInput = new UserInput(window);
 
         shader = new LightShader();
         wc = new WorldContainer();
@@ -61,7 +65,12 @@ public class Game {
                 update();
             }
 
+
+            if (window.shouldClosed() || userInput.isKeyboardPressed(UserInput.KEY_ESCAPE))
+                break;
         }
+
+        window.close();
 
     }
 
