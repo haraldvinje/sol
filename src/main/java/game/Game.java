@@ -1,6 +1,16 @@
 package game;
 
+
+import static org.lwjgl.opengl.GL11.*;
+
+import engine.PositionComp;
 import engine.WorldContainer;
+import engine.graphics.LightShader;
+import engine.graphics.VertexArray;
+import engine.graphics.VertexArrayUtils;
+import engine.window.Window;
+import utils.maths.Mat4;
+import utils.maths.Vec3;
 
 /**
  * Created by eirik on 13.06.2017.
@@ -9,8 +19,11 @@ public class Game {
 
     private static final float FRAME_INTERVAL = 1.0f/60.0f;
 
+    private Window window;
+    private LightShader shader;
     private WorldContainer wc;
 
+    private VertexArray vao;
 
     private long lastTime;
 
@@ -19,10 +32,16 @@ public class Game {
 
 
     public void init() {
+        window = new Window(1600, 900, "SIIII");
+
+        shader = new LightShader();
         wc = new WorldContainer();
 
         player = wc.createEntity();
-        wc.createPositionComp(player, 100, 100);
+        wc.addComponent(player, new PositionComp(100, 100));
+
+        vao = VertexArrayUtils.createRectangle(200, 200);
+
     }
 
     /**
@@ -47,7 +66,26 @@ public class Game {
     }
 
     public void update() {
-        System.out.println( wc.getPositionComponent(player).getX());
+        System.out.println( ((PositionComp)wc.getComponent(player, WorldContainer.COMPMASK_POSITION)).getX() );
+
+        window.pollEvents();
+
+        //render
+        Mat4 projectionTransform = Mat4.orthographic(0, 1600, 900, 0, 10, -10);
+
+        shader.bind();
+        shader.setLightPoint(new Vec3(600f, 600f, 2f));
+        shader.setModelTransform(Mat4.translate( new Vec3(100f, 100f, 0f) ));
+        shader.setViewTransform(Mat4.identity());
+        shader.setProjectionTransform(projectionTransform);
+
+        vao.bind();
+        glDrawElements(GL_TRIANGLES, vao.getIndicesCount(), GL_UNSIGNED_BYTE, 0);
+
+        vao.unbind();
+        shader.unbind();
+
+        window.swapBuffers();
     }
 
 
