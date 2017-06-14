@@ -21,7 +21,7 @@ public class WorldContainer {
 
     private int[] entityMask; //the main container for entities
 
-    private Map<Integer, PositionComp> positionComps = new HashMap<Integer, PositionComp>();
+    private Map<Integer, Map<Integer, Component>> components = new HashMap<>();
 
 
     public WorldContainer() {
@@ -30,25 +30,23 @@ public class WorldContainer {
     }
 
 
-
     public int createEntity() {
         for (int i = 0; i < ENTITY_COUNT; i++) {
             if (!entityExists(i)) {
                 resetEntity(i);
+
+                components.put(i, new HashMap<>()); // create a hashmap to store components
                 return i;
             }
         }
         throw new IllegalStateException("There is not allocated enough space for more entities");
     }
 
-    public void createPositionComp(int entity, float x, float y) {
-        PositionComp pc = new PositionComp();
-        pc.setX(x);
-        pc.setY(y);
-        positionComps.put(entity, pc);
+    public void addComponent(int entity, Component comp) {
+        components.get(entity).put(comp.getMask(), comp);
     }
-    public PositionComp getPositionComponent(int entity) {
-        return positionComps.get(entity);
+    public Component getComponent(int entity, int compmask) {
+        return components.get(entity).get(compmask);
     }
 
     public boolean entityExists(int entity) {
