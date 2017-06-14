@@ -1,9 +1,6 @@
 package game;
 
 
-import engine.Circle;
-
-
 import static org.lwjgl.opengl.GL11.*;
 
 import engine.PositionComp;
@@ -14,6 +11,10 @@ import engine.graphics.LightShader;
 import engine.graphics.VertexArray;
 import engine.graphics.VertexArrayComp;
 import engine.graphics.VertexArrayUtils;
+import engine.physics.Circle;
+import engine.physics.CollisionComp;
+import engine.physics.CollisionDetectionSys;
+import engine.physics.VelocityComp;
 import engine.window.Window;
 import org.lwjgl.opengl.GL11;
 import utils.maths.Mat4;
@@ -39,6 +40,8 @@ public class Game {
 
     private WorldContainer wc;
 
+    private CollisionDetectionSys cds;
+
 
     private int player;
     private int sandbag;
@@ -53,30 +56,15 @@ public class Game {
         shader = new LightShader();
         wc = new WorldContainer();
 
+        cds = new CollisionDetectionSys(wc);
 
-/*
-        wc.createPositionComp(player, 100, 100);
-        wc.createVelocityComp(player, 0,0);
-        Circle c1 = new Circle();
-        c1.setRadius(10);
-        wc.createCollisionComp(player, c1);
 
-        this.sandbag = wc.createEntity();
-
-        wc.createPositionComp(sandbag, 109, 109);
-        wc.createVelocityComp(sandbag, 0,0);
-        Circle c2 = new Circle();
-        c2.setRadius(10);
-        wc.createCollisionComp(sandbag, c2);
-
-        wc.init();
-
-        System.out.println(5 & 4);
-*/
       
         //assign component types
         wc.assignComponentType(PositionComp.class);
         wc.assignComponentType(VertexArrayComp.class);
+        wc.assignComponentType(CollisionComp.class);
+        wc.assignComponentType(VelocityComp.class);
 
 
 
@@ -84,7 +72,12 @@ public class Game {
         wc.addComponent(player, new PositionComp(100, 100));
         wc.addComponent(player, new VertexArrayComp( VertexArrayUtils.createRectangle(32, 32)));
 
+        wc.addComponent(player, new CollisionComp(new Circle(1)));
 
+        sandbag = wc.createEntity();
+        wc.addComponent(sandbag, new PositionComp(102, 102) );
+
+        wc.addComponent(sandbag, new CollisionComp(new Circle( 5)) );
     }
 
 
@@ -123,6 +116,11 @@ public class Game {
         //System.out.println( ((PositionComp)wc.getComponent(player, WorldContainer.COMPMASK_POSITION)).getX() );
 
         window.pollEvents();
+
+
+        //collision system
+        cds.update();
+
 
         //render
         glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);

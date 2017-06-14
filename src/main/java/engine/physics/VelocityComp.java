@@ -1,9 +1,11 @@
-package engine;
+package engine.physics;
+
+import engine.Component;
 
 /**
  * Created by haraldvinje on 13-Jun-17.
  */
-public class VelocityComp {
+public class VelocityComp implements Component{
 
     private float vx;
     private float vy;

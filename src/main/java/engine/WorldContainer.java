@@ -1,5 +1,10 @@
 package engine;
 
+import engine.physics.CollisionComp;
+import engine.physics.CollisionDetectionSys;
+import engine.physics.Shape;
+import engine.physics.VelocityComp;
+
 import java.util.*;
 
 /**
@@ -40,29 +45,30 @@ public class WorldContainer {
 
     }
 
-    public void init(){
+//    public void init(){
+//
+//        collisionDetectionSystem = new CollisionDetectionSys(this);
+//
+//    }
+//
+//
+//
+//    public Map<Integer, PositionComp> getPositionComps() {
+//        return positionComps;
+//    }
+//
+//    public Map<Integer, VelocityComp> getVelocityComps() {
+//        return velocityComps;
+//    }
+//
+//    public Map<Integer, CollisionComp> getCollisionComps() {
+//        return collisionComps;
+//    }
+//
+//    public CollisionDetectionSys getCollisionDetectionSystem(){
+//        return this.collisionDetectionSystem;
+//    }
 
-        collisionDetectionSystem = new CollisionDetectionSys(this);
-
-    }
-
-
-
-    public Map<Integer, PositionComp> getPositionComps() {
-        return positionComps;
-    }
-
-    public Map<Integer, VelocityComp> getVelocityComps() {
-        return velocityComps;
-    }
-
-    public Map<Integer, CollisionComp> getCollisionComps() {
-        return collisionComps;
-    }
-
-    public CollisionDetectionSys getCollisionDetectionSystem(){
-        return this.collisionDetectionSystem;
-    }
 
     public void assignComponentType(Class<? extends Component> compType) {
         components.put(compType, new HashMap<>());
@@ -100,28 +106,12 @@ public class WorldContainer {
 
 
   //-------------PHYSICS
-    public void createVelocityComp(int entity, float vx, float vy){
-        VelocityComp vc = new VelocityComp();
-        vc.setVx(vx);
-        vc.setVy(vy);
-        velocityComps.put(entity, vc);
-    }
-
-    public void createCollisionComp(int entity, Shape shape){
-        CollisionComp cc = new CollisionComp();
-        cc.setShape(shape);
-        collisionComps.put(entity, cc);
-    }
-
-
-
-
-    public PositionComp getPositionComponent(int entity) {return positionComps.get(entity);}
-
-    public VelocityComp getVelocityComponent(int entity) {return velocityComps.get(entity);}
-
-    public CollisionComp getCollisionComponent(int entity) {return collisionComps.get(entity);}
-
+//    public void createVelocityComp(int entity, float vx, float vy){
+//        VelocityComp vc = new VelocityComp();
+//        vc.setVx(vx);
+//        vc.setVy(vy);
+//        velocityComps.put(entity, vc);
+//    }
 
 
 

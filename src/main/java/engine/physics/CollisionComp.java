@@ -1,6 +1,6 @@
-package engine;
+package engine.physics;
 
-import engine.maths.Vec2;
+import engine.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +15,9 @@ public class CollisionComp implements Component {
     private List<CollisionData> collisionData = new ArrayList<CollisionData>();
 
 
+    public CollisionComp(Shape s) {
+        this.shape = s;
+    }
 
     public Shape getShape() {
         return shape;

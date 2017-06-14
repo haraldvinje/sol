@@ -1,4 +1,6 @@
-package engine;
+package engine.physics;
+
+import engine.Sys;
 
 /**
  * Created by haraldvinje on 14-Jun-17.

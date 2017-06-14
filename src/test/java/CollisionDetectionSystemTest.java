@@ -1,5 +1,5 @@
-import engine.Circle;
-import engine.CollisionDetectionSys;
+import engine.physics.Circle;
+import engine.physics.CollisionDetectionSys;
 import org.junit.Assert;
 import org.junit.Test;
 
