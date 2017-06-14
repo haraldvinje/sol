@@ -9,6 +9,24 @@ public class Circle extends Shape {
     private float cx;
     private float cy;
 
+    public Circle(){}
+
+    public Circle(float radius){
+        this.radius = radius;
+    }
+
+    public Circle(float cx, float cy, float radius){
+        this.cx = cx;
+        this.cy = cy;
+        this.radius = radius;
+    }
+
+    public void setValues(float cx, float cy, float radius){
+        this.cx = cx;
+        this.cy = cy;
+        this.radius = radius;
+    }
+
     public float getCx() {
         return cx;
     }

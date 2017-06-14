@@ -1,10 +1,6 @@
 package engine;
 
-import javax.swing.text.Position;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by eirik on 13.06.2017.
@@ -31,7 +27,9 @@ public class WorldContainer {
 
     private Map<Integer, CollisionComp> collisionComps = new HashMap<Integer, CollisionComp>();
 
-    private MechanicsSystem mechSystem;
+    private CollisionDetectionSys collisionDetectionSystem;
+
+    private ComponentUpdateSystem componentUpdateSystem;
 
 
 
@@ -42,13 +40,8 @@ public class WorldContainer {
 
     public void init(){
 
-        mechSystem = new MechanicsSystem(this);
-        mechSystem.init();
+        collisionDetectionSystem = new CollisionDetectionSys(this);
 
-    }
-
-    public void updateSystems(){
-        mechSystem.updateComponents();
     }
 
 
@@ -65,8 +58,8 @@ public class WorldContainer {
         return collisionComps;
     }
 
-    public MechanicsSystem getMechanicsSystem(){
-        return this.mechSystem;
+    public CollisionDetectionSys getCollisionDetectionSystem(){
+        return this.collisionDetectionSystem;
     }
 
 
@@ -100,6 +93,8 @@ public class WorldContainer {
         cc.setShape(shape);
         collisionComps.put(entity, cc);
     }
+
+
 
 
     public PositionComp getPositionComponent(int entity) {return positionComps.get(entity);}

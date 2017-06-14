@@ -1,25 +1,27 @@
 package engine;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 /**
  * Created by haraldvinje on 13-Jun-17.
  */
-public class MechanicsSystem {
+public class CollisionDetectionSys implements Sys {
 
 
+/*
     private Integer[] collisionEntitiesArray;
+*/
 
     private WorldContainer worldContainer;
 
-    public MechanicsSystem(WorldContainer wc){
+    public CollisionDetectionSys(){}
+
+    public CollisionDetectionSys(WorldContainer wc){
         this.worldContainer = wc;
-        init();
     }
 
 
+/*
 
     public void init(){
         createCollisionEntitiesArray();
@@ -38,29 +40,23 @@ public class MechanicsSystem {
         }
     }
 
+*/
 
 
-    /*
-    public void setComponents(Map<Integer, PositionComp> positionComps, Map<Integer, VelocityComp> velocityComps, Map<Integer, CollisionComp> collisionComps){
-        this.positionComps = positionComps;
-        this.velocityComps = velocityComps;
-        this.collisionComps = collisionComps;
-    }
-    */
-
+/*
     private void createCollisionEntitiesArray(){
         Set keySet = this.worldContainer.getCollisionComps().keySet();
         int size = keySet.size();
         this.collisionEntitiesArray = (Integer[]) keySet.toArray(new Integer[size]);
-    }
-
+    }*/
+/*
     public void update(){
         resolveCollisions();
-        updateComponents();
-    }
+    }*/
 
 
 
+/*
     public void resolveCollisions(){
         int length = this.collisionEntitiesArray.length;
         Integer[] cea = this.collisionEntitiesArray;
@@ -73,6 +69,31 @@ public class MechanicsSystem {
             }
         }
     }
+*/
+
+    public void update(){
+        Integer[] cea = createCollisionEntitiesArray();
+        int length = cea.length;
+        for (int i = 0; i<length; i++){
+            for (int j = i; j<length; j++){
+                CollisionComp cc1 = worldContainer.getCollisionComponent(cea[i]);
+                CollisionComp cc2 = worldContainer.getCollisionComponent(cea[j]);
+                if (detectCollision(cc1.getShape(), cc2.getShape())){
+                    System.out.println("kollisjon mellom to sirkler suuuuh :D \n Nå må det bare løses da hehe");
+                    cc1.addCollidingCollisionComps(cc2);
+                    cc1.addCollisionData(cc2);
+                    cc2.addCollisionData(cc1);
+
+                }
+            }
+        }
+    }
+
+    private Integer[] createCollisionEntitiesArray(){
+        Set keySet = this.worldContainer.getCollisionComps().keySet();
+        int size = keySet.size();
+        return (Integer[]) keySet.toArray(new Integer[size]);
+    }
 
     public boolean detectCollision(Shape s1, Shape s2){
         if (s1 instanceof Circle && s2 instanceof Circle){
@@ -81,7 +102,7 @@ public class MechanicsSystem {
         return false;
     }
 
-    public boolean detectCollision(Circle circle1, Circle circle2){
+    private boolean detectCollision(Circle circle1, Circle circle2){
         float c1x = circle1.getCx();
         float c1y = circle1.getCy();
         float c1r = circle1.getRadius();
@@ -100,7 +121,6 @@ public class MechanicsSystem {
 
 
         //need to sqaure the sum of the radiuses to compare it with distance squared
-        return centerDist<rsum*rsum;
+        return centerDist<=rsum*rsum;
     }
-
 }
