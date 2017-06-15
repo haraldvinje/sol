@@ -5,11 +5,11 @@ import engine.Component;
 /**
  * Created by eirik on 13.06.2017.
  */
-public class VertexArrayComp implements Component{
+public class ColoredMeshComp implements Component{
 
     private ColoredMesh mesh;
 
-    public VertexArrayComp(ColoredMesh mesh) {
+    public ColoredMeshComp(ColoredMesh mesh) {
         setMesh(mesh);
     }
 

@@ -7,9 +7,10 @@ import org.lwjgl.opengl.GL30;
 import utils.BufferUtils;
 
 /**
+ * A vertex array
  * Created by eirik on 13.06.2017.
  */
-public class VertexArray {
+public class ColoredMesh {
 
     int vaoId;
     int verticesId;
@@ -19,14 +20,14 @@ public class VertexArray {
 
     int indicesCount;
 
-    public VertexArray(float[] vertices, float[] colors, byte[] indices) {
+    public ColoredMesh(float[] vertices, float[] colors, byte[] indices) {
         indicesCount = indices.length;
         float[] normals = {0,0,0};
         vaoId = createVertexArray(vertices, normals, colors, indices);
 
         throw new IllegalStateException("Do not use this constructor, normals not defined");
     }
-    public VertexArray(float[] vertices, float[] normals, float[] colors, byte[] indices) {
+    public ColoredMesh(float[] vertices, float[] normals, float[] colors, byte[] indices) {
         indicesCount = indices.length;
         vaoId = createVertexArray(vertices, normals, colors, indices);
     }
@@ -48,36 +49,16 @@ public class VertexArray {
         int id = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(id);
 
-        verticesId = createVertexBuffer(Shader.VERTEX_LOCATION, 3, vertices);
-        normalsId = createVertexBuffer(Shader.NORMALS_LOCATION, 3, normals);
-        colorsId = createVertexBuffer(Shader.COLORS_LOCATION, 3, colors);
-        indicesId = createIndicesBuffer(indices);
+        verticesId = VertexArrayUtils.createVertexBuffer(ColorShader.VERTEX_LOCATION, 3, vertices);
+        normalsId = VertexArrayUtils.createVertexBuffer(ColorShader.NORMALS_LOCATION, 3, normals);
+        colorsId = VertexArrayUtils.createVertexBuffer(ColorShader.COLORS_LOCATION, 3, colors);
+        indicesId = VertexArrayUtils.createIndicesBuffer(indices);
 
 
         GL30.glBindVertexArray(0);
 
         return id;
     }
-    private int createVertexBuffer(int attribIndex, int size, float[] data) {
-        int vboId = GL15.glGenBuffers();
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboId);
 
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, BufferUtils.createFloatBuffer(data), GL15.GL_STATIC_DRAW);
-        GL20.glVertexAttribPointer(attribIndex, size, GL11.GL_FLOAT, false, 0, 0);
-        GL20.glEnableVertexAttribArray(attribIndex);
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-
-        return vboId;
-    }
-
-    private int createIndicesBuffer(byte[] indices) {
-        int indicesId = GL15.glGenBuffers();
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesId);
-        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, BufferUtils.createByteBuffer(indices), GL15.GL_STATIC_DRAW);
-
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
-
-        return indicesId;
-    }
 
 }

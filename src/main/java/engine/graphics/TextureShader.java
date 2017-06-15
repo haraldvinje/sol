@@ -7,17 +7,18 @@ import utils.maths.Vec3;
 /**
  * Created by eirik on 08.05.2017.
  */
-public class ColorShader extends Shader{
+public class TextureShader extends Shader{
 
     public static final int VERTEX_LOCATION = 0;
     public static final int NORMALS_LOCATION = 1;
-    public static final int COLORS_LOCATION = 2;
+    public static final int UVS_LOCATION = 2;
 
 
     private static final String UNIFORM_MODEL_TRANSFORM = "modelTransform";
     private static final String UNIFORM_VIEW_TRANSFORM = "viewTransform";
     private static final String UNIFORM_PROJECTION_TRANSFORM = "projectionTransform";
     private static final String UNIFORM_LIGHT = "lightPosition";
+
 
     private final int modelTransformLocation;
     private final int viewTransformLocation;
@@ -26,11 +27,11 @@ public class ColorShader extends Shader{
     private final int pointLightLocation;
 
 
-    private static String vertexPath = "shaders/light_shader.vert";
-    private static String fragPath = "shaders/light_shader.frag";
+    private static String vertexPath = "shaders/texture_shader.vert";
+    private static String fragPath = "shaders/texture_shader.frag";
 
 
-    public ColorShader() {
+    public TextureShader() {
         super(vertexPath, fragPath);
 
         modelTransformLocation = super.getUniformLocation(UNIFORM_MODEL_TRANSFORM);
