@@ -3,10 +3,8 @@ package game;
 
 import static org.lwjgl.opengl.GL11.*;
 
-import engine.PositionComp;
-import engine.UserInput;
+import engine.*;
 
-import engine.WorldContainer;
 import engine.graphics.*;
 import engine.physics.Circle;
 import engine.physics.CollisionComp;
@@ -60,16 +58,26 @@ public class Game {
         wc.assignComponentType(VertexArrayComp.class);
         wc.assignComponentType(CollisionComp.class);
         wc.assignComponentType(VelocityComp.class);
+        wc.assignComponentType(CharacterComp.class);
+        wc.assignComponentType(CharacterInputComp.class);
+        wc.assignComponentType(UserCharacterInputComp.class);
 
         //add systems
         wc.addSystem(new RenderSys(window));
+        wc.addSystem(new CharacterSys());
+        wc.addSystem(new UserCharacterInputSys(userInput));
 
 
 
         player = wc.createEntity();
+        wc.addComponent(player, new CharacterComp());
+        wc.addComponent(player, new CharacterInputComp());
+        wc.addComponent(player, new UserCharacterInputComp());
+
         wc.addComponent(player, new PositionComp(500, 100));
         wc.addComponent(player, new VertexArrayComp( VertexArrayUtils.createRectangle(32, 32)));
         wc.addComponent(player, new CollisionComp(new Circle(1)));
+
 
         sandbag = wc.createEntity();
         wc.addComponent(sandbag, new PositionComp(102, 102) );
