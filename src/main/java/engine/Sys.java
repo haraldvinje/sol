@@ -5,5 +5,6 @@ package engine;
  */
 public interface Sys {
 
+    public void setWorldContainer(WorldContainer wc);
     public void update();
 }

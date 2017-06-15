@@ -18,10 +18,14 @@ public class WorldContainer {
 
 
 
-    private boolean[] entities; //an overview of entity id's in use
+    //an overview of entity id's in use
+    private boolean[] entities;
 
-    private Map<Class<? extends Component>, Map<Integer, Component>> components = new HashMap<>(); //a mapping between entities and components for each componnent type
+    //A mapping between entities and components for each componnent type.
+    //A TreeMap is used to keep the map sorted on its keyValues.
+    private Map<Class<? extends Component>, TreeMap<Integer, Component>> components = new HashMap<>();
 
+    private List<Sys> systems = new ArrayList<>();
 
 
 
@@ -32,13 +36,29 @@ public class WorldContainer {
     }
 
 
+    //---------SETUP
+
+    //assign component types to be used during execution
     public void assignComponentType(Class<? extends Component> compType) {
-        components.put(compType, new HashMap<>());
+        components.put(compType, new TreeMap<>());
+    }
+
+    //add system instances to be updated/run on each update frame
+    public void addSystem(Sys system) {
+        systems.add(system);
     }
 
 
+    //----------EXECUTION
 
-    //----------ENTITIES
+    public void update() {
+        for (Sys s : systems) {
+            s.update();
+        }
+    }
+
+
+    //----------ENTITY HANDLING
 
     public int createEntity() {
         int e = allocateEntity();
@@ -49,6 +69,16 @@ public class WorldContainer {
         if (! entityExists(entity)) throw new IllegalArgumentException("Trying to destroy an entity that doesnt exist");
 
         deallocateEntity(entity);
+    }
+
+    /**
+     * Retrieve the entities that contains a given component  in ascending order based on the entities id.
+     * That is, the set's values are ordered
+     * @param compType
+     * @return
+     */
+    public Set<Integer> getEntitiesWithComponentType(Class<? extends Component> compType) {
+        return components.get(compType).keySet();
     }
 
     private int allocateEntity() {
@@ -69,7 +99,7 @@ public class WorldContainer {
 
 
 
-    //----------COMPONENTS
+    //----------COMPONENT HANDLING
 
     public void addComponent(int entity, Component comp) {
         validateComponentType(comp);
@@ -84,7 +114,7 @@ public class WorldContainer {
     public Component getComponent(int entity, Class<? extends Component> compType) {
         return getComponentsOfType(compType).get(entity);
     }
-   public boolean containsComponent(int entity, Class<? extends Component> compType) {
+    public boolean hasComponent(int entity, Class<? extends Component> compType) {
         return getComponentsOfType(compType).containsKey(entity);
    }
 
