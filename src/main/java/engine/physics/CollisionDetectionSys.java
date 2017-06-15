@@ -36,6 +36,7 @@ public class CollisionDetectionSys implements Sys {
         Integer[] cea = createCollisionEntitiesArray();
         System.out.println(Arrays.toString(cea));
         int length = cea.length;
+
         for (int i = 0; i<length; i++){
             for (int j = i+1; j<length; j++){
                 CollisionComp cc1 = (CollisionComp)worldContainer.getComponent(cea[i], CollisionComp.class);
@@ -60,7 +61,7 @@ public class CollisionDetectionSys implements Sys {
     }
 
     private Integer[] createCollisionEntitiesArray(){
-        Set keySet = this.worldContainer.getComponentsOfType(CollisionComp.class).keySet();
+        Set keySet = worldContainer.getEntitiesWithComponentType(CollisionComp.class);
         int size = keySet.size();
         return (Integer[]) keySet.toArray(new Integer[size]);
     }
