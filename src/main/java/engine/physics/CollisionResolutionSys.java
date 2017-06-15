@@ -26,6 +26,7 @@ public class CollisionResolutionSys implements Sys {
         //need to get all collisionComponents
         //run over every collisionDataList for every collisionComponent
         //add vector to velocitycomponent of based on ID
+        //success
     }
 
 
