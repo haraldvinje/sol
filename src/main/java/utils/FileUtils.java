@@ -1,5 +1,7 @@
 package utils;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 
 /**
@@ -25,6 +27,15 @@ public class FileUtils {
             e.printStackTrace();
         }
         return result.toString();
+    }
+
+    public static BufferedImage loadImage(String path) {
+        try {
+            return ImageIO.read(FileUtils.class.getClassLoader().getResourceAsStream(path) ); // new FileInputStream(path))
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException("Could not load image, see more above");
+        }
     }
 
 }

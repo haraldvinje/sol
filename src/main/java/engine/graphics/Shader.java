@@ -12,10 +12,6 @@ import utils.ShaderUtils;
  */
 public abstract class Shader {
 
-    public static final int VERTEX_LOCATION = 0;
-    public static final int NORMALS_LOCATION = 1;
-    public static final int COLORS_LOCATION = 2;
-
     private int programId;
 
     private boolean bound;

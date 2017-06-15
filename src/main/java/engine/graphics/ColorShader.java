@@ -7,7 +7,12 @@ import utils.maths.Vec3;
 /**
  * Created by eirik on 08.05.2017.
  */
-public class LightShader extends Shader{
+public class ColorShader extends Shader{
+
+    public static final int VERTEX_LOCATION = 0;
+    public static final int NORMALS_LOCATION = 1;
+    public static final int COLORS_LOCATION = 2;
+
 
     private static final String UNIFORM_MODEL_TRANSFORM = "modelTransform";
     private static final String UNIFORM_VIEW_TRANSFORM = "viewTransform";
@@ -25,7 +30,7 @@ public class LightShader extends Shader{
     private static String fragPath = "shaders/light_shader.frag";
 
 
-    public LightShader() {
+    public ColorShader() {
         super(vertexPath, fragPath);
 
         modelTransformLocation = super.getUniformLocation(UNIFORM_MODEL_TRANSFORM);

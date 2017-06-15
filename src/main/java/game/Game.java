@@ -23,7 +23,7 @@ public class Game {
     private UserInput userInput;
 
 
-    private VertexArray vao;
+    private ColoredMesh vao;
 
     private long lastTime;
 
@@ -50,12 +50,14 @@ public class Game {
       
         //assign component types
         wc.assignComponentType(PositionComp.class);
-        wc.assignComponentType(VertexArrayComp.class);
+        wc.assignComponentType(ColoredMeshComp.class);
+        wc.assignComponentType(TexturedMeshComp.class);
         wc.assignComponentType(CollisionComp.class);
         wc.assignComponentType(VelocityComp.class);
         wc.assignComponentType(CharacterComp.class);
         wc.assignComponentType(CharacterInputComp.class);
         wc.assignComponentType(UserCharacterInputComp.class);
+        wc.assignComponentType(RotationComp.class);
 
         //add systems
         wc.addSystem(new RenderSys(window));
@@ -70,7 +72,9 @@ public class Game {
         wc.addComponent(player, new UserCharacterInputComp());
 
         wc.addComponent(player, new PositionComp(500, 100));
-        wc.addComponent(player, new VertexArrayComp( VertexArrayUtils.createRectangle(32, 32)));
+        wc.addComponent(player, new RotationComp());
+        //wc.addComponent(player, new ColoredMeshComp( ColoredMeshUtils.createRectangle(32, 32)));
+        wc.addComponent(player, new TexturedMeshComp(TexturedMeshUtils.createRectangle("character.png", 128, 64)));
         wc.addComponent(player, new CollisionComp(new Circle(1)));
 
 
