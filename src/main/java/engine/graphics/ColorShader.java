@@ -9,6 +9,11 @@ import utils.maths.Vec3;
  */
 public class LightShader extends Shader{
 
+    public static final int VERTEX_LOCATION = 0;
+    public static final int NORMALS_LOCATION = 1;
+    public static final int COLORS_LOCATION = 2;
+    
+
     private static final String UNIFORM_MODEL_TRANSFORM = "modelTransform";
     private static final String UNIFORM_VIEW_TRANSFORM = "viewTransform";
     private static final String UNIFORM_PROJECTION_TRANSFORM = "projectionTransform";
