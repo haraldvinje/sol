@@ -7,10 +7,7 @@ import engine.PositionComp;
 import engine.UserInput;
 
 import engine.WorldContainer;
-import engine.graphics.LightShader;
-import engine.graphics.VertexArray;
-import engine.graphics.VertexArrayComp;
-import engine.graphics.VertexArrayUtils;
+import engine.graphics.*;
 import engine.physics.Circle;
 import engine.physics.CollisionComp;
 import engine.physics.CollisionDetectionSys;
@@ -31,7 +28,6 @@ public class Game {
 
     private Window window;
     private UserInput userInput;
-    private LightShader shader;
 
 
     private VertexArray vao;
@@ -40,7 +36,7 @@ public class Game {
 
     private WorldContainer wc;
 
-    private CollisionDetectionSys cds;
+    //private CollisionDetectionSys cds;
 
 
     private int player;
@@ -53,10 +49,9 @@ public class Game {
         window = new Window(1600, 900, "SIIII");
         userInput = new UserInput(window);
 
-        shader = new LightShader();
         wc = new WorldContainer();
 
-        cds = new CollisionDetectionSys(wc);
+        //cds = new CollisionDetectionSys(wc);
 
 
       
@@ -66,17 +61,18 @@ public class Game {
         wc.assignComponentType(CollisionComp.class);
         wc.assignComponentType(VelocityComp.class);
 
+        //add systems
+        wc.addSystem(new RenderSys(window));
+
 
 
         player = wc.createEntity();
-        wc.addComponent(player, new PositionComp(100, 100));
+        wc.addComponent(player, new PositionComp(500, 100));
         wc.addComponent(player, new VertexArrayComp( VertexArrayUtils.createRectangle(32, 32)));
-
         wc.addComponent(player, new CollisionComp(new Circle(1)));
 
         sandbag = wc.createEntity();
         wc.addComponent(sandbag, new PositionComp(102, 102) );
-
         wc.addComponent(sandbag, new CollisionComp(new Circle( 5)) );
     }
 
@@ -119,38 +115,10 @@ public class Game {
 
 
         //collision system
-        cds.update();
+        //cds.update();
 
+        wc.updateSystems();
 
-        //render
-        glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-
-        Mat4 projectionTransform = Mat4.orthographic(0, 1600, 900, 0, 10, -10);
-
-        VertexArray vao = ((VertexArrayComp) wc.getComponent(player, VertexArrayComp.class) ).getVao();
-
-
-        shader.bind();
-        vao.bind();
-
-        shader.setLightPoint(new Vec3(100f, 100f, -100f));
-
-        shader.bind();
-        vao.bind();
-
-        shader.setLightPoint(new Vec3(100f, 100f, -100f));
-
-        shader.setModelTransform(Mat4.translate( new Vec3(100f, 100f, 0f) ));
-        shader.setViewTransform(Mat4.identity());
-        shader.setProjectionTransform(projectionTransform);
-
-
-        glDrawElements(GL_TRIANGLES, vao.getIndicesCount(), GL_UNSIGNED_BYTE, 0);
-
-        vao.unbind();
-        shader.unbind();
-
-        window.swapBuffers();
     }
 
 
