@@ -50,13 +50,11 @@ public class CollisionDetectionSys implements Sys {
 
                 if (detectCollision(cc1.getShape(), cc2.getShape())){
                     System.out.println("kollisjon mellom to sirkler suuuuh :D \n Nå må det bare løses da hehe");
-                    cc1.addCollidingCollisionComps(cc2);
-                    CollisionData collisionData1 = new CollisionData(cc1, cc2);
-                    CollisionData collisionData2 = new CollisionData(cc2, cc1);
-                    calculateCollisionData(collisionData1);
-                    cc1.addCollisionData(collisionData1);
-                    calculateCollisionData(collisionData2);
-                    cc2.addCollisionData(collisionData2);
+                    cc1.addCollidingEntity(cea[j]);
+                    CollisionData collisionData = new CollisionData(cea[i], cea[j]);
+                    calculateCollisionData(collisionData);
+                    cc1.addCollisionData(collisionData);
+
                 }
             }
         }
@@ -99,16 +97,15 @@ public class CollisionDetectionSys implements Sys {
 
 
     private void calculateCollisionData(CollisionData collisionData){
-        Shape s1 = collisionData.getCollisionComp1().getShape();
-        Shape s2 = collisionData.getCollisionComp2().getShape();
+        Shape s1 = ((CollisionComp)worldContainer.getComponent(collisionData.getEntity1(), CollisionComp.class)).getShape();
+        Shape s2 = ((CollisionComp)worldContainer.getComponent(collisionData.getEntity2(), CollisionComp.class)).getShape();
+
         if (s1 instanceof Circle && s2 instanceof Circle){
-            calculateCollisionDataCircCirc(collisionData);
+            calculateCollisionDataCircCirc((Circle) s1, (Circle) s2, collisionData);
         }
     }
 
-    private void calculateCollisionDataCircCirc(CollisionData collisionData){
-        Circle c1 = (Circle) collisionData.getCollisionComp1().getShape();
-        Circle c2 = (Circle) collisionData.getCollisionComp2().getShape();
+    private void calculateCollisionDataCircCirc(Circle c1, Circle c2, CollisionData collisionData){
 
         Vec2 colVector = new Vec2(c1.getX()-c2.getX(), c1.getY()-c2.getY() );
         float maxDist = c1.getRadius() + c2.getRadius();

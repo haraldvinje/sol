@@ -10,7 +10,7 @@ public class VelocityComp implements Component {
 
     private float vx;
     private float vy;
-    private Vec2 vector;
+    private Vec2 velocity;
 
     public float getVx() {
         return vx;
@@ -28,18 +28,18 @@ public class VelocityComp implements Component {
         this.vy = vy;
     }
 
-    public void addVector(Vec2 vector) {
-        vx = vx + vector.x;
-        vy = vy + vector.y;
+    public void addVelocity(Vec2 velocity) {
+        vx = vx + velocity.x;
+        vy = vy + velocity.y;
     }
 
-    public void setVector(Vec2 vector){
-        this.vector = vector;
+    public void setVelocity(Vec2 vector){
+        this.velocity = vector;
         this.vx = vector.x;
         this.vy = vector.y;
     }
 
-    public Vec2 getVector(){
-        return this.vector;
+    public Vec2 getVelocity(){
+        return this.velocity;
     }
 }

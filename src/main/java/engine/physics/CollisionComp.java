@@ -11,7 +11,7 @@ import java.util.List;
 public class CollisionComp implements Component {
 
     private Shape shape;
-    private List<CollisionComp> collidingCollisionComps = new ArrayList<CollisionComp>();
+    private List<Integer> collidingEntities = new ArrayList<Integer>();
     private List<CollisionData> collisionDataList = new ArrayList<CollisionData>();
 
 
@@ -23,9 +23,11 @@ public class CollisionComp implements Component {
         return shape;
     }
 
+/*
     public void addCollisionData(CollisionComp other){
-        collisionDataList.add(new CollisionData(this, other));
+        collisionDataList.add(new CollisionData(this, null));
     }
+*/
 
     public void addCollisionData(CollisionData collisionData){
         collisionDataList.add(collisionData);
@@ -35,12 +37,12 @@ public class CollisionComp implements Component {
         this.shape = shape;
     }
 
-    public void addCollidingCollisionComps(CollisionComp other){
-        collidingCollisionComps.add(other);
+    public void addCollidingEntity(int otherEntity){
+        collidingEntities.add(otherEntity);
     }
 
     public void reset(){
-        collidingCollisionComps.clear();
+        collidingEntities.clear();
         collisionDataList.clear();
     }
 

@@ -1,5 +1,6 @@
 package engine.physics;
 
+import engine.WorldContainer;
 import engine.maths.Vec2;
 
 /**
@@ -7,24 +8,24 @@ import engine.maths.Vec2;
  */
 public class CollisionData {
 
-    private CollisionComp c1, c2;
+
+    private int entity1, entity2;
     private Vec2 collisionVector;
     private float penetrationDepth;
 
-    public CollisionComp getCollisionComp1() {
-        return c1;
+
+
+    public CollisionData(int e1, int e2){
+        this.entity1 = e1;
+        this.entity2 = e2;
     }
 
-
-    public CollisionComp getCollisionComp2() {
-        return c2;
+    public int getEntity1() {
+        return entity1;
     }
 
-
-    public CollisionData(CollisionComp c1, CollisionComp c2){
-        this.c1 = c1;
-        this.c2 = c2;
-
+    public int getEntity2() {
+        return entity2;
     }
 
     public void setCollisionVector(Vec2 vector){this.collisionVector = vector; }
