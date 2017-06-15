@@ -45,13 +45,14 @@ public class WorldContainer {
 
     //add system instances to be updated/run on each update frame
     public void addSystem(Sys system) {
+        system.setWorldContainer(this);
         systems.add(system);
     }
 
 
     //----------EXECUTION
 
-    public void update() {
+    public void updateSystems() {
         for (Sys s : systems) {
             s.update();
         }

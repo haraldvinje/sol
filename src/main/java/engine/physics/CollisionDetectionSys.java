@@ -26,6 +26,11 @@ public class CollisionDetectionSys implements Sys {
     }
 
 
+    @Override
+    public void setWorldContainer(WorldContainer wc) {
+        //assign wc
+    }
+
     public void update(){
         Integer[] cea = createCollisionEntitiesArray();
         System.out.println(Arrays.toString(cea));
