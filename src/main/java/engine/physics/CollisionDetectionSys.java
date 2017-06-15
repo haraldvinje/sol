@@ -105,7 +105,7 @@ public class CollisionDetectionSys implements Sys {
         Circle c1 = (Circle) collisionData.getCollisionComp1().getShape();
         Circle c2 = (Circle) collisionData.getCollisionComp2().getShape();
 
-        Vec2 colVector = new Vec2(c2.getX()-c1.getX(), c2.getY()-c1.getY() );
+        Vec2 colVector = new Vec2(c1.getX()-c2.getX(), c1.getY()-c2.getY() );
         float maxDist = c1.getRadius() + c2.getRadius();
         float dist = colVector.getLength();
 
