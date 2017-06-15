@@ -48,10 +48,10 @@ public class CollisionResolutionSys implements Sys {
     }
 
     private void resolveCollision(CollisionData cd){
-        VelocityComp vc1 = (VelocityComp) worldContainer.getComponent(cd.getEntity1(), CollisionComp.class);
-        VelocityComp vc2 = (VelocityComp) worldContainer.getComponent(cd.getEntity2(), CollisionComp.class);
+        PhysicsComp phc1 = (PhysicsComp) worldContainer.getComponent(cd.getEntity1(), CollisionComp.class);
+        PhysicsComp phc2 = (PhysicsComp) worldContainer.getComponent(cd.getEntity2(), CollisionComp.class);
 
-        Vec2 relVelocity = vc2.getVelocity().subtract(vc1.getVelocity());
+        Vec2 relVelocity = phc2.getVelocity().subtract(phc1.getVelocity());
         float velAlongNormal = relVelocity.dotProduct(cd.getCollisionVector());
 
         if (velAlongNormal > 0) { //do not resolve collision if objects are moving apart
@@ -66,8 +66,8 @@ public class CollisionResolutionSys implements Sys {
         Vec2 norm = cd.getCollisionVector();
         norm.scale(impulse);
 
-        vc1.addVelocity(norm);
-        vc2.addVelocity(norm.negative());
+        phc1.addVelocity(norm);
+        phc2.addVelocity(norm.negative());
 
 
     }

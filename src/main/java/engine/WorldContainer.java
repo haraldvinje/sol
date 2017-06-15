@@ -1,10 +1,5 @@
 package engine;
 
-import engine.physics.CollisionComp;
-import engine.physics.CollisionDetectionSys;
-import engine.physics.Shape;
-import engine.physics.VelocityComp;
-
 import java.util.*;
 
 /**

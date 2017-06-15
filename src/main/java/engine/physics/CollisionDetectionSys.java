@@ -54,7 +54,6 @@ public class CollisionDetectionSys implements Sys {
                     CollisionData collisionData = new CollisionData(cea[i], cea[j]);
                     calculateCollisionData(collisionData);
                     cc1.addCollisionData(collisionData);
-
                 }
             }
         }

@@ -7,7 +7,7 @@ import engine.character.*;
 import engine.graphics.*;
 import engine.physics.Circle;
 import engine.physics.CollisionComp;
-import engine.physics.VelocityComp;
+import engine.physics.PhysicsComp;
 import engine.window.Window;
 
 /**
@@ -52,7 +52,7 @@ public class Game {
         wc.assignComponentType(PositionComp.class);
         wc.assignComponentType(VertexArrayComp.class);
         wc.assignComponentType(CollisionComp.class);
-        wc.assignComponentType(VelocityComp.class);
+        wc.assignComponentType(PhysicsComp.class);
         wc.assignComponentType(CharacterComp.class);
         wc.assignComponentType(CharacterInputComp.class);
         wc.assignComponentType(UserCharacterInputComp.class);

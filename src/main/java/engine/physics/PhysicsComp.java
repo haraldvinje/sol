@@ -6,7 +6,7 @@ import engine.maths.Vec2;
 /**
  * Created by haraldvinje on 13-Jun-17.
  */
-public class VelocityComp implements Component {
+public class PhysicsComp implements Component {
 
     private float vx;
     private float vy;
