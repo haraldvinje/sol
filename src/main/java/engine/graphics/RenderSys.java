@@ -60,9 +60,10 @@ public class RenderSys implements Sys {
             Mat4 modelTranslate = Mat4.translate( new Vec3(positionComp.getX(), positionComp.getY(), 0f) );
             Mat4 modelCenterTranslate = Mat4.identity();
 
-            //check if mesh should be centered
-            if (wc.hasComponent(entity, CenterMeshComp.class)) {
-
+            //center mesh if centerComp is present
+            if (wc.hasComponent(entity, MeshCenterComp.class)) {
+                MeshCenterComp centerComp = (MeshCenterComp) wc.getComponent(entity, MeshCenterComp.class);
+                modelCenterTranslate = Mat4.translate(new Vec3(-centerComp.getCx(), -centerComp.getCy(), 0));
             }
 
             if (wc.hasComponent(entity, RotationComp.class)) {
@@ -70,7 +71,9 @@ public class RenderSys implements Sys {
 
                 modelRotate = Mat4.rotate(rotComp.getAngle());
             }
-            Mat4 modelTransform = modelTranslate.multiply(modelScale.multiply(modelRotate));
+
+
+            Mat4 modelTransform = modelTranslate.multiply(modelScale.multiply(modelRotate.multiply( modelCenterTranslate )));
 
             ColoredMeshComp coloredMeshComp = (ColoredMeshComp)wc.getComponent(entity, ColoredMeshComp.class);
             renderColoredMesh(coloredMeshComp.getMesh(), modelTransform, Mat4.identity(), projectionTransform);
@@ -86,13 +89,20 @@ public class RenderSys implements Sys {
             Mat4 modelScale = Mat4.identity();
             Mat4 modelRotate = Mat4.identity();
             Mat4 modelTranslate = Mat4.translate( new Vec3(positionComp.getX(), positionComp.getY(), 0f) );
+            Mat4 modelCenterTranslate = Mat4.identity();
+
+            //center mesh if centerComp is present
+            if (wc.hasComponent(entity, MeshCenterComp.class)) {
+                MeshCenterComp centerComp = (MeshCenterComp) wc.getComponent(entity, MeshCenterComp.class);
+                modelCenterTranslate = Mat4.translate(new Vec3(-centerComp.getCx(), -centerComp.getCy(), 0));
+            }
 
             if (wc.hasComponent(entity, RotationComp.class)) {
                 RotationComp rotComp = (RotationComp) wc.getComponent(entity, RotationComp.class);
 
                 modelRotate = Mat4.rotate(rotComp.getAngle());
             }
-            Mat4 modelTransform = modelTranslate.multiply(modelScale.multiply(modelRotate));
+            Mat4 modelTransform = modelTranslate.multiply(modelScale.multiply(modelRotate.multiply( modelCenterTranslate )));
 
 
             TexturedMeshComp texturedMeshComp = (TexturedMeshComp)wc.getComponent(entity, TexturedMeshComp.class);
