@@ -42,7 +42,7 @@ public class RenderSys implements Sys {
         glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
         shader.bind();
-        shader.setLightPoint(new Vec3(100f, 100f, -100f));
+        shader.setLightPoint(new Vec3(100f, 100f, -1000f));
 
 
         for (int entity : wc.getEntitiesWithComponentType(VertexArrayComp.class)) {
