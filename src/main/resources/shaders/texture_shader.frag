@@ -31,6 +31,8 @@ void main() {
 
     //RESULT COLOR
     vec3 result = (ambientLight + diffuseLight) * texColor;
-	outputColor = vec4(result, 1.0);
+
+    if (texColor.w != 1) discard; //---------------------------------------------------CHEEEEEEEEEEEAT-------------------------------------
+	outputColor = vec4(result, texColor.w);
 	//outputColor = vec4(1.0, 0, 0, 1.0);
 }
