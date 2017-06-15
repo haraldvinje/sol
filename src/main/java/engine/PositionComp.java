@@ -15,17 +15,21 @@ public class PositionComp implements Component {
     public float getX() {
         return x;
     }
-
     public void setX(float x) {
         this.x = x;
+    }
+    public void addX(float x) {
+        setX(getX()+x);
     }
 
     public float getY() {
         return y;
     }
-
     public void setY(float y) {
         this.y = y;
+    }
+    public void addY(float y) {
+        setY(getY()+y);
     }
 
 
