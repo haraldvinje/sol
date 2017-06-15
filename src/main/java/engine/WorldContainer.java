@@ -1,10 +1,5 @@
 package engine;
 
-import engine.physics.CollisionComp;
-import engine.physics.CollisionDetectionSys;
-import engine.physics.Shape;
-import engine.physics.VelocityComp;
-
 import java.util.*;
 
 /**
@@ -21,7 +16,7 @@ public class WorldContainer {
     //an overview of entity id's in use
     private boolean[] entities;
 
-    //A mapping between entities and components for each componnent type.
+    //A mapping between entities and components for each component type.
     //A TreeMap is used to keep the map sorted on its keyValues.
     private Map<Class<? extends Component>, TreeMap<Integer, Component>> components = new HashMap<>();
 
