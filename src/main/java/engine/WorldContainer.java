@@ -17,26 +17,12 @@ public class WorldContainer {
     private static int ENTITY_COUNT = 32;
 
 
-//    public static final int COMPMASK_ENTITY_EXISTS = 1 << 0,
-//                            COMPMASK_POSITION = 1 << 1,
-//                            COMPMASK_VELOCITY = 1 << 2,
-//                            COMPMASK_COLLISION = 1 << 3,
-//                            COMPMASK_VERTEX_ARRAY = 1 << 4;
 
-
-    //private int[] entityMask; //the main container for entities
-
-    private boolean[] entities; //an overview of entity id's used
+    private boolean[] entities; //an overview of entity id's in use
 
     private Map<Class<? extends Component>, Map<Integer, Component>> components = new HashMap<>(); //a mapping between entities and components for each componnent type
 
-    private Map<Integer, VelocityComp> velocityComps = new HashMap<Integer, VelocityComp>();
 
-    private Map<Integer, CollisionComp> collisionComps = new HashMap<Integer, CollisionComp>();
-
-    private CollisionDetectionSys collisionDetectionSystem;
-
-    private ComponentUpdateSystem componentUpdateSystem;
 
 
 
@@ -45,34 +31,11 @@ public class WorldContainer {
 
     }
 
-//    public void init(){
-//
-//        collisionDetectionSystem = new CollisionDetectionSys(this);
-//
-//    }
-//
-//
-//
-//    public Map<Integer, PositionComp> getPositionComps() {
-//        return positionComps;
-//    }
-//
-//    public Map<Integer, VelocityComp> getVelocityComps() {
-//        return velocityComps;
-//    }
-//
-//    public Map<Integer, CollisionComp> getCollisionComps() {
-//        return collisionComps;
-//    }
-//
-//    public CollisionDetectionSys getCollisionDetectionSystem(){
-//        return this.collisionDetectionSystem;
-//    }
-
 
     public void assignComponentType(Class<? extends Component> compType) {
         components.put(compType, new HashMap<>());
     }
+
 
 
     //----------ENTITIES
@@ -103,16 +66,6 @@ public class WorldContainer {
     private boolean entityExists(int entity) {
         return entities[entity];
     }
-
-
-  //-------------PHYSICS
-//    public void createVelocityComp(int entity, float vx, float vy){
-//        VelocityComp vc = new VelocityComp();
-//        vc.setVx(vx);
-//        vc.setVy(vy);
-//        velocityComps.put(entity, vc);
-//    }
-
 
 
 
