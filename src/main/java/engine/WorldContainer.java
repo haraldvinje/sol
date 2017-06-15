@@ -113,7 +113,9 @@ public class WorldContainer {
         return components.get(compType);
     }
     public Component getComponent(int entity, Class<? extends Component> compType) {
-        return getComponentsOfType(compType).get(entity);
+        Component c = getComponentsOfType(compType).get(entity);
+        if (c == null) throw new IllegalStateException("No component of the given type is assigned to the given entity, type="+compType);
+        return c;
     }
     public boolean hasComponent(int entity, Class<? extends Component> compType) {
         return getComponentsOfType(compType).containsKey(entity);
@@ -123,7 +125,7 @@ public class WorldContainer {
         validateComponentType(comp.getClass());
     }
     private void validateComponentType(Class<? extends Component> compType) {
-        if (!components.containsKey(compType)) throw new IllegalStateException("Trying to add a component of a type that is not assigned");
+        if (!components.containsKey(compType)) throw new IllegalStateException("Trying to use a component of a type that is not assigned, type="+compType);
     }
 
 
