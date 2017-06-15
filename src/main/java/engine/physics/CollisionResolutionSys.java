@@ -2,6 +2,7 @@ package engine.physics;
 
 import engine.Sys;
 import engine.WorldContainer;
+
 import engine.maths.Vec2;
 
 /**
@@ -20,6 +21,11 @@ public class CollisionResolutionSys implements Sys {
     }
 
 
+
+    @Override
+    public void setWorldContainer(WorldContainer wc) {
+
+    }
 
     @Override
     public void update() {
