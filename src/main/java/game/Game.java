@@ -58,6 +58,7 @@ public class Game {
         wc.assignComponentType(CharacterInputComp.class);
         wc.assignComponentType(UserCharacterInputComp.class);
         wc.assignComponentType(RotationComp.class);
+        wc.assignComponentType(MeshCenterComp.class);
 
         //add systems
         wc.addSystem(new RenderSys(window));
@@ -66,21 +67,9 @@ public class Game {
 
 
 
-        player = wc.createEntity();
-        wc.addComponent(player, new CharacterComp());
-        wc.addComponent(player, new CharacterInputComp());
-        wc.addComponent(player, new UserCharacterInputComp());
+        player = createPlayer(wc);
+        createBackground(wc);
 
-        wc.addComponent(player, new PositionComp(500, 100));
-        wc.addComponent(player, new RotationComp());
-        //wc.addComponent(player, new ColoredMeshComp( ColoredMeshUtils.createRectangle(32, 32)));
-        wc.addComponent(player, new TexturedMeshComp(TexturedMeshUtils.createRectangle("character.png", 128, 64)));
-        wc.addComponent(player, new CollisionComp(new Circle(1)));
-
-
-        sandbag = wc.createEntity();
-        wc.addComponent(sandbag, new PositionComp(102, 102) );
-        wc.addComponent(sandbag, new CollisionComp(new Circle( 5)) );
     }
 
 
@@ -109,6 +98,34 @@ public class Game {
         window.close();
 
     }
+
+    private int createPlayer(WorldContainer wc) {
+        int player = wc.createEntity();
+        wc.addComponent(player, new CharacterComp());
+        wc.addComponent(player, new CharacterInputComp());
+        wc.addComponent(player, new UserCharacterInputComp());
+
+        wc.addComponent(player, new PositionComp(0, 0));
+        wc.addComponent(player, new RotationComp());
+        //wc.addComponent(player, new ColoredMeshComp( ColoredMeshUtils.createRectangle(32, 32)));
+        wc.addComponent(player, new TexturedMeshComp(TexturedMeshUtils.createRectangle("frank_original_swg.png", 128, 64)));
+        wc.addComponent(player, new MeshCenterComp(32, 32));
+
+        return player;
+    }
+    private int createSandbag(WorldContainer wc) {
+        int sandbag = wc.createEntity();
+        wc.addComponent(sandbag, new PositionComp(102, 102) );
+        wc.addComponent(sandbag, new CollisionComp(new Circle( 5)) );
+        return sandbag;
+    }
+    private void createBackground(WorldContainer wc) {
+        int bg = wc.createEntity();
+        wc.addComponent(bg, new PositionComp(0, 0));
+        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", 1600, 900)));
+
+    }
+
     public void update() {
 
 /*        System.out.println(wc.getPositionComps());
