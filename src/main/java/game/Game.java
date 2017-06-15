@@ -1,19 +1,14 @@
 package game;
 
 
-import static org.lwjgl.opengl.GL11.*;
-
 import engine.*;
 
+import engine.character.*;
 import engine.graphics.*;
 import engine.physics.Circle;
 import engine.physics.CollisionComp;
-import engine.physics.CollisionDetectionSys;
 import engine.physics.VelocityComp;
 import engine.window.Window;
-import org.lwjgl.opengl.GL11;
-import utils.maths.Mat4;
-import utils.maths.Vec3;
 
 /**
  * Created by eirik on 13.06.2017.
