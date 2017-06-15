@@ -1,5 +1,7 @@
 package engine;
 
+import engine.maths.Vec2;
+
 /**
  * Created by eirik on 13.06.2017.
  */
@@ -26,6 +28,10 @@ public class PositionComp implements Component {
 
     public void setY(float y) {
         this.y = y;
+    }
+
+    public void addVector(Vec2 vector){
+        setY(y+vector.);
     }
 
 

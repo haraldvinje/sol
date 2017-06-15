@@ -3,6 +3,7 @@ package engine.physics;
 import engine.PositionComp;
 import engine.Sys;
 import engine.WorldContainer;
+import engine.maths.Vec2;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -45,9 +46,12 @@ public class CollisionDetectionSys implements Sys {
                 if (detectCollision(cc1.getShape(), cc2.getShape())){
                     System.out.println("kollisjon mellom to sirkler suuuuh :D \n Nå må det bare løses da hehe");
                     cc1.addCollidingCollisionComps(cc2);
-                    cc1.addCollisionData(cc2);
-                    cc2.addCollisionData(cc1);
-
+                    CollisionData collisionData1 = new CollisionData(cc1, cc2);
+                    CollisionData collisionData2 = new CollisionData(cc2, cc1);
+                    calculateCollisionData(collisionData1);
+                    cc1.addCollisionData(collisionData1);
+                    calculateCollisionData(collisionData2);
+                    cc2.addCollisionData(collisionData2);
                 }
             }
         }
@@ -86,5 +90,26 @@ public class CollisionDetectionSys implements Sys {
 
         //need to sqaure the sum of the radiuses to compare it with distance squared
         return centerDist<=rsum*rsum;
+    }
+
+
+    private void calculateCollisionData(CollisionData collisionData){
+        Shape s1 = collisionData.getCollisionComp1().getShape();
+        Shape s2 = collisionData.getCollisionComp2().getShape();
+        if (s1 instanceof Circle && s2 instanceof Circle){
+            calculateCollisionDataCircCirc(collisionData);
+        }
+    }
+
+    private void calculateCollisionDataCircCirc(CollisionData collisionData){
+        Circle c1 = (Circle) collisionData.getCollisionComp1().getShape();
+        Circle c2 = (Circle) collisionData.getCollisionComp2().getShape();
+
+        Vec2 colVector = new Vec2(c2.getX()-c1.getX(), c2.getY()-c1.getY() );
+        float maxDist = c1.getRadius() + c2.getRadius();
+        float dist = colVector.getLength();
+
+        collisionData.setCollisionVector(colVector.scale(1/dist));
+        collisionData.setPenetrationDepth(maxDist-dist);
     }
 }
