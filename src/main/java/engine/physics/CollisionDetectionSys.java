@@ -22,19 +22,15 @@ public class CollisionDetectionSys implements Sys {
 
     public CollisionDetectionSys(){}
 
-    public CollisionDetectionSys(WorldContainer wc){
-        this.worldContainer = wc;
-    }
-
 
     @Override
     public void setWorldContainer(WorldContainer wc) {
-        //assign wc
+        this.worldContainer = wc;
     }
 
     public void update(){
         Integer[] cea = createCollisionEntitiesArray();
-        System.out.println(Arrays.toString(cea));
+        //System.out.println(Arrays.toString(cea));
         int length = cea.length;
 
         for (int i = 0; i<length; i++){

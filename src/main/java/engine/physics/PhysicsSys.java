@@ -31,6 +31,7 @@ public class PhysicsSys implements Sys {
         updateVelocities();         //accelerating
         applyFriction();            //adding friction acceleration vector
         updatePositions();
+        resetAcceleration();
     }
 
     private void applyFriction() {
@@ -38,7 +39,8 @@ public class PhysicsSys implements Sys {
             PhysicsComp physicsComp = (PhysicsComp) worldContainer.getComponent(entity, PhysicsComp.class);
             Vec2 frictionVector = ((PhysicsComp) worldContainer.getComponent(entity, PhysicsComp.class)).getVelocity().negative();
             float frictionConst = physicsComp.getFrictionConst();
-            frictionVector.scale(physicsComp.getVelocity().getLength()*frictionConst);
+            frictionVector = frictionVector.scale(physicsComp.getVelocity().getLength()*frictionConst);
+
             physicsComp.addVelocity(frictionVector);
         }
     }
@@ -48,6 +50,9 @@ public class PhysicsSys implements Sys {
             PhysicsComp physicsComp = (PhysicsComp) worldContainer.getComponent(entity, PhysicsComp.class);
             Vec2 acceleration = ((PhysicsComp) worldContainer.getComponent(entity, PhysicsComp.class)).getAcceleration();
             physicsComp.addVelocity(acceleration);
+
+            System.out.println(physicsComp.getAcceleration());
+            System.out.println(physicsComp.getVelocity());
         }
     }
 
@@ -58,6 +63,14 @@ public class PhysicsSys implements Sys {
             PositionComp posComp = (PositionComp) worldContainer.getComponent(entity, PositionComp.class);
             Vec2 velocity = ((PhysicsComp) worldContainer.getComponent(entity, PhysicsComp.class)).getVelocity();
             posComp.addVector(velocity);
+
+        }
+    }
+
+    private void resetAcceleration() {
+        for (int entity: physicsEntities){
+            PhysicsComp physicsComp = (PhysicsComp) worldContainer.getComponent(entity, PhysicsComp.class);
+            physicsComp.resetAcceleration();
         }
     }
 }

@@ -5,9 +5,7 @@ import engine.*;
 
 import engine.character.*;
 import engine.graphics.*;
-import engine.physics.Circle;
-import engine.physics.CollisionComp;
-import engine.physics.PhysicsComp;
+import engine.physics.*;
 import engine.window.Window;
 
 /**
@@ -64,10 +62,14 @@ public class Game {
         wc.addSystem(new RenderSys(window));
         wc.addSystem(new CharacterSys());
         wc.addSystem(new UserCharacterInputSys(userInput));
+        wc.addSystem(new CollisionDetectionSys());
+        wc.addSystem(new CollisionResolutionSys());
+        wc.addSystem(new PhysicsSys());
 
 
 
         player = createPlayer(wc);
+        sandbag = createSandbag(wc);
         createBackground(wc);
 
     }
@@ -107,16 +109,25 @@ public class Game {
 
         wc.addComponent(player, new PositionComp(0, 0));
         wc.addComponent(player, new RotationComp());
-        //wc.addComponent(player, new ColoredMeshComp( ColoredMeshUtils.createRectangle(32, 32)));
+
+        wc.addComponent(player, new PhysicsComp());
+        wc.addComponent(player, new CollisionComp(new Circle(32)));
+
         wc.addComponent(player, new TexturedMeshComp(TexturedMeshUtils.createRectangle("frank_original_swg.png", 128, 64)));
         wc.addComponent(player, new MeshCenterComp(32, 32));
 
         return player;
     }
     private int createSandbag(WorldContainer wc) {
+        float radius = 32;
         int sandbag = wc.createEntity();
-        wc.addComponent(sandbag, new PositionComp(102, 102) );
-        wc.addComponent(sandbag, new CollisionComp(new Circle( 5)) );
+        wc.addComponent(sandbag, new PositionComp(500, 300) );
+        wc.addComponent(sandbag, new ColoredMeshComp(ColoredMeshUtils.createCircleMulticolor(radius, 16)));
+        //wc.addComponent(sandbag, new CollisionComp(new Circle( 5)) );
+
+        wc.addComponent(sandbag, new PhysicsComp());
+        wc.addComponent(sandbag, new CollisionComp(new Circle(radius)));
+
         return sandbag;
     }
     private void createBackground(WorldContainer wc) {

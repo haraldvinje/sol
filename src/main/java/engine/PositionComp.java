@@ -35,8 +35,8 @@ public class PositionComp implements Component {
     }
 
     public void addVector(Vec2 vector){
-        x = x+vector.x;
-        y = y+vector.y;
+        addX(vector.x);
+        addY(vector.y);
     }
 
 

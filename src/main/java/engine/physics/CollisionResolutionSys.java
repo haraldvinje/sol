@@ -18,15 +18,10 @@ public class CollisionResolutionSys implements Sys {
 
     }
 
-    public CollisionResolutionSys(WorldContainer wc){
-        this.worldContainer = wc;
-    }
-
-
 
     @Override
     public void setWorldContainer(WorldContainer wc) {
-
+        this.worldContainer = wc;
     }
 
     @Override
@@ -48,8 +43,8 @@ public class CollisionResolutionSys implements Sys {
     }
 
     private void resolveCollision(CollisionData cd){
-        PhysicsComp phc1 = (PhysicsComp) worldContainer.getComponent(cd.getEntity1(), CollisionComp.class);
-        PhysicsComp phc2 = (PhysicsComp) worldContainer.getComponent(cd.getEntity2(), CollisionComp.class);
+        PhysicsComp phc1 = (PhysicsComp) worldContainer.getComponent(cd.getEntity1(), PhysicsComp.class);
+        PhysicsComp phc2 = (PhysicsComp) worldContainer.getComponent(cd.getEntity2(), PhysicsComp.class);
 
         Vec2 relVelocity = phc2.getVelocity().subtract(phc1.getVelocity());
         float velAlongNormal = relVelocity.dotProduct(cd.getCollisionVector());
