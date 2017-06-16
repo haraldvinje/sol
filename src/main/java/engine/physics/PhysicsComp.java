@@ -1,7 +1,7 @@
 package engine.physics;
 
 import engine.Component;
-import engine.maths.Vec2;
+import utils.maths.Vec2;
 
 /**
  * Created by haraldvinje on 13-Jun-17.

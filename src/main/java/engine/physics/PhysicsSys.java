@@ -5,7 +5,7 @@ import engine.Component;
 import engine.PositionComp;
 import engine.Sys;
 import engine.WorldContainer;
-import engine.maths.Vec2;
+import utils.maths.Vec2;
 import javafx.geometry.Pos;
 
 import java.util.Map;
@@ -62,7 +62,7 @@ public class PhysicsSys implements Sys {
         for (int entity: physicsEntities){
             PositionComp posComp = (PositionComp) worldContainer.getComponent(entity, PositionComp.class);
             Vec2 velocity = ((PhysicsComp) worldContainer.getComponent(entity, PhysicsComp.class)).getVelocity();
-            posComp.addVector(velocity);
+            posComp.addPos(velocity);
 
         }
     }

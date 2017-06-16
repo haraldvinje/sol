@@ -3,7 +3,7 @@ package engine.physics;
 import engine.PositionComp;
 import engine.Sys;
 import engine.WorldContainer;
-import engine.maths.Vec2;
+import utils.maths.Vec2;
 
 import java.util.Arrays;
 import java.util.Set;
