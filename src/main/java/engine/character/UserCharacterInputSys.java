@@ -38,10 +38,11 @@ public class UserCharacterInputSys implements Sys {
             inputComp.setMoveDown(userInput.isKeyboardPressed(UserInput.KEY_S));
 
             inputComp.setAction1(userInput.isMousePressed(UserInput.MOUSE_BUTTON_1));
-            inputComp.setAction1(userInput.isMousePressed(UserInput.MOUSE_BUTTON_2));
+            inputComp.setAction2(userInput.isMousePressed(UserInput.MOUSE_BUTTON_2));
 
             inputComp.setAimX(userInput.getMouseX());
             inputComp.setAimY(userInput.getMouseY());
+
         }
     }
 }

@@ -1,9 +1,15 @@
 package engine.character;
 
 import engine.*;
-import engine.maths.Vec2;
+import engine.graphics.ColoredMesh;
+import engine.graphics.ColoredMeshComp;
+import engine.graphics.ColoredMeshUtils;
+import engine.physics.Circle;
+import engine.physics.CollisionComp;
 import engine.physics.PhysicsComp;
+import engine.physics.Shape;
 import utils.maths.TrigUtils;
+import utils.maths.Vec2;
 
 /**
  * Created by eirik on 15.06.2017.
@@ -12,6 +18,12 @@ public class CharacterSys implements Sys {
 
 
     private WorldContainer wc;
+
+    private float reloadTime = 1f;
+    private float bulletSpeed = 50f;
+    private float bulletRadius = 12;
+    private float timeToShoot = reloadTime;
+    private ColoredMesh bulletMesh = ColoredMeshUtils.createCircleTwocolor(bulletRadius, 8);
 
 
     @Override
@@ -36,6 +48,7 @@ public class CharacterSys implements Sys {
     private void updateEntity(int entity, PositionComp posComp, CharacterInputComp inputComp, RotationComp rotComp, PhysicsComp phComp) {
         updateMove(inputComp, phComp);
         updateRotation(inputComp, posComp, rotComp);
+        updateAbilities(inputComp, posComp, rotComp);
     }
 
 
@@ -49,5 +62,36 @@ public class CharacterSys implements Sys {
     private void updateRotation(CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
         float angle = TrigUtils.pointDirection(posComp.getX(), posComp.getY(), inputComp.getAimX(), inputComp.getAimY());
         rotComp.setAngle(angle);
+    }
+
+    private void updateAbilities(CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
+        System.out.println(inputComp.isAction1());
+
+        if (inputComp.isAction1() && timeToShoot <= 0) {
+            timeToShoot = reloadTime;
+
+            createBullet(posComp.getPos(), Vec2.newLenDir(bulletSpeed, rotComp.getAngle()) );
+        }
+        else {
+            timeToShoot -= 1.0f/60f;
+        }
+    }
+
+
+    private void createBullet(Vec2 position, Vec2 velocity) {
+        System.out.println("Creating bullet");
+        int b = wc.createEntity();
+
+        Vec2 offset = new Vec2(velocity);
+        offset.setLength(64);
+        position = position.add(offset);
+        wc.addComponent(b, new PositionComp(position.x, position.y));
+        PhysicsComp pc = new PhysicsComp();
+        pc.addVelocity(velocity);
+        //pc.setFrictionConstant(0.001f); not implemented in resolution
+        wc.addComponent(b, pc);
+        wc.addComponent(b, new CollisionComp(new Circle(bulletRadius)));
+        wc.addComponent(b, new ColoredMeshComp(bulletMesh));
+
     }
 }
