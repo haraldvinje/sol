@@ -111,7 +111,7 @@ public class Game {
         wc.addComponent(player, new RotationComp());
 
         wc.addComponent(player, new PhysicsComp());
-        //wc.addComponent(player, new CollisionComp(new Circle(32)));
+        wc.addComponent(player, new CollisionComp(new Circle(32)));
 
         wc.addComponent(player, new TexturedMeshComp(TexturedMeshUtils.createRectangle("frank_original_swg.png", 128, 64)));
         wc.addComponent(player, new MeshCenterComp(32, 32));
@@ -126,7 +126,7 @@ public class Game {
         //wc.addComponent(sandbag, new CollisionComp(new Circle( 5)) );
 
         wc.addComponent(sandbag, new PhysicsComp());
-        //wc.addComponent(sandbag, new CollisionComp(new Circle(radius)));
+        wc.addComponent(sandbag, new CollisionComp(new Circle(radius)));
 
         return sandbag;
     }

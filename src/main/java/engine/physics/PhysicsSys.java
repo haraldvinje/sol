@@ -52,8 +52,7 @@ public class PhysicsSys implements Sys {
             Vec2 acceleration = ((PhysicsComp) worldContainer.getComponent(entity, PhysicsComp.class)).getAcceleration();
             physicsComp.addVelocity(acceleration);
 
-            System.out.println(physicsComp.getAcceleration());
-            System.out.println(physicsComp.getVelocity());
+
         }
     }
 

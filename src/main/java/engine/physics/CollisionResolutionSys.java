@@ -35,6 +35,7 @@ public class CollisionResolutionSys implements Sys {
                 //calculate vector based on current velocity vector,  penetration depth
                 resolveCollision(cd);
             }
+            cc1.reset();
         }
         //need to get all collisionComponents
         //run over every collisionDataList for every collisionComponent
@@ -49,7 +50,7 @@ public class CollisionResolutionSys implements Sys {
         Vec2 relVelocity = phc2.getVelocity().subtract(phc1.getVelocity());
         float velAlongNormal = relVelocity.dotProduct(cd.getCollisionVector());
 
-        if (velAlongNormal > 0) { //do not resolve collision if objects are moving apart
+        if (velAlongNormal < 0) { //do not resolve collision if objects are moving apart
             return;
         }
 
@@ -59,10 +60,13 @@ public class CollisionResolutionSys implements Sys {
         float impulse = -(1 + elasticity)*velAlongNormal;
         impulse /= mass1 + mass2;
         Vec2 norm = cd.getCollisionVector();
-        norm.scale(impulse);
+        Vec2 impulseVec = norm.scale(impulse);
 
-        phc1.addVelocity(norm);
-        phc2.addVelocity(norm.negative());
+        phc1.addVelocity(impulseVec.negative());
+        phc2.addVelocity(impulseVec);
+
+
+
 
 
     }
