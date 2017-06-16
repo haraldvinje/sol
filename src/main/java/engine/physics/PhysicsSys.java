@@ -28,8 +28,8 @@ public class PhysicsSys implements Sys {
     @Override
     public void update() {
         this.physicsEntities = worldContainer.getEntitiesWithComponentType(PhysicsComp.class);
-        updateVelocities();         //accelerating
         applyFriction();            //adding friction acceleration vector
+        updateVelocities();         //accelerating
         updatePositions();
         resetAcceleration();
     }
@@ -41,7 +41,8 @@ public class PhysicsSys implements Sys {
             float frictionConst = physicsComp.getFrictionConst();
             frictionVector = frictionVector.scale(physicsComp.getVelocity().getLength()*frictionConst);
 
-            physicsComp.addVelocity(frictionVector);
+            //physicsComp.addVelocity(frictionVector);
+            physicsComp.addAcceleration(physicsComp.getVelocity().scale(0.1f).negative());
         }
     }
 

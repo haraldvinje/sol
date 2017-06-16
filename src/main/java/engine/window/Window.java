@@ -2,6 +2,7 @@ package engine.window;
 
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 import org.lwjgl.glfw.GLFWCursorPosCallbackI;
@@ -83,7 +84,7 @@ public class Window {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glEnable(GL_DEPTH_TEST);
-        //glActiveTexture(GL_TEXTURE1);
+        glActiveTexture(GL_TEXTURE0);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
