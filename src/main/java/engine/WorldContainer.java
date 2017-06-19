@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class WorldContainer {
 
-    private static int ENTITY_COUNT = 32;
+    private static int ENTITY_COUNT = 200;
 
 
 
