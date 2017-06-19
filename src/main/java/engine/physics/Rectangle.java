@@ -8,8 +8,9 @@ public class Rectangle extends Shape {
     private float height;
     private float width;
 
-    public Rectangle(float x, float y) {
-        super(x, y);
+    public Rectangle(float width, float height) {
+        this.width = width;
+        this.height = height;
     }
 
     public float getHeight() {
