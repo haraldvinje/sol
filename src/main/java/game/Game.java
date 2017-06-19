@@ -1,16 +1,12 @@
 package game;
 
 
-import static org.lwjgl.opengl.GL11.*;
+import engine.*;
 
-import engine.PositionComp;
-import engine.WorldContainer;
-import engine.graphics.LightShader;
-import engine.graphics.VertexArray;
-import engine.graphics.VertexArrayUtils;
+import engine.character.*;
+import engine.graphics.*;
+import engine.physics.*;
 import engine.window.Window;
-import utils.maths.Mat4;
-import utils.maths.Vec3;
 
 /**
  * Created by eirik on 13.06.2017.
@@ -19,30 +15,65 @@ public class Game {
 
     private static final float FRAME_INTERVAL = 1.0f/60.0f;
 
-    private Window window;
-    private LightShader shader;
-    private WorldContainer wc;
 
-    private VertexArray vao;
+
+    private Window window;
+    private UserInput userInput;
+
+
+    private ColoredMesh vao;
 
     private long lastTime;
 
+    private WorldContainer wc;
+
+    //private CollisionDetectionSys cds;
+
 
     private int player;
+    private int sandbag;
+
+
 
 
     public void init() {
         window = new Window(1600, 900, "SIIII");
+        userInput = new UserInput(window);
 
-        shader = new LightShader();
         wc = new WorldContainer();
 
-        player = wc.createEntity();
-        wc.addComponent(player, new PositionComp(100, 100));
+        //cds = new CollisionDetectionSys(wc);
 
-        vao = VertexArrayUtils.createRectangle(200, 200);
+
+      
+        //assign component types
+        wc.assignComponentType(PositionComp.class);
+        wc.assignComponentType(ColoredMeshComp.class);
+        wc.assignComponentType(TexturedMeshComp.class);
+        wc.assignComponentType(CollisionComp.class);
+        wc.assignComponentType(PhysicsComp.class);
+        wc.assignComponentType(CharacterComp.class);
+        wc.assignComponentType(CharacterInputComp.class);
+        wc.assignComponentType(UserCharacterInputComp.class);
+        wc.assignComponentType(RotationComp.class);
+        wc.assignComponentType(MeshCenterComp.class);
+
+        //add systems
+        wc.addSystem(new RenderSys(window));
+        wc.addSystem(new CharacterSys());
+        wc.addSystem(new UserCharacterInputSys(userInput));
+        wc.addSystem(new CollisionDetectionSys());
+        wc.addSystem(new CollisionResolutionSys());
+        wc.addSystem(new PhysicsSys());
+
+
+
+        player = createPlayer(wc);
+        sandbag = createSandbag(wc);
+        createBackground(wc);
 
     }
+
 
     /**
      * blocking while the game runs
@@ -61,31 +92,68 @@ public class Game {
                 update();
             }
 
+
+            if (window.shouldClosed() || userInput.isKeyboardPressed(UserInput.KEY_ESCAPE))
+                break;
         }
+
+        window.close();
+
+    }
+
+    private int createPlayer(WorldContainer wc) {
+        int player = wc.createEntity();
+        wc.addComponent(player, new CharacterComp());
+        wc.addComponent(player, new CharacterInputComp());
+        wc.addComponent(player, new UserCharacterInputComp());
+
+        wc.addComponent(player, new PositionComp(0, 0));
+        wc.addComponent(player, new RotationComp());
+
+        wc.addComponent(player, new PhysicsComp());
+        wc.addComponent(player, new CollisionComp(new Circle(32)));
+
+        wc.addComponent(player, new TexturedMeshComp(TexturedMeshUtils.createRectangle("frank_original_swg.png", 128, 64)));
+        wc.addComponent(player, new MeshCenterComp(32, 32));
+
+        return player;
+    }
+    private int createSandbag(WorldContainer wc) {
+        float radius = 32;
+        int sandbag = wc.createEntity();
+        wc.addComponent(sandbag, new PositionComp(500, 300) );
+        wc.addComponent(sandbag, new ColoredMeshComp(ColoredMeshUtils.createCircleMulticolor(radius, 16)));
+        //wc.addComponent(sandbag, new CollisionComp(new Circle( 5)) );
+
+        wc.addComponent(sandbag, new PhysicsComp());
+        wc.addComponent(sandbag, new CollisionComp(new Circle(radius)));
+
+        return sandbag;
+    }
+    private void createBackground(WorldContainer wc) {
+        int bg = wc.createEntity();
+        wc.addComponent(bg, new PositionComp(0, 0));
+        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", 1600, 900)));
 
     }
 
     public void update() {
-        System.out.println( ((PositionComp)wc.getComponent(player, WorldContainer.COMPMASK_POSITION)).getX() );
+
+/*        System.out.println(wc.getPositionComps());
+        System.out.println(wc.getVelocityComps());
+        System.out.println(wc.getCollisionComps());
+        wc.updateSystems();*/
+  
+        //System.out.println( ((PositionComp)wc.getComponent(player, WorldContainer.COMPMASK_POSITION)).getX() );
 
         window.pollEvents();
 
-        //render
-        Mat4 projectionTransform = Mat4.orthographic(0, 1600, 900, 0, 10, -10);
 
-        shader.bind();
-        shader.setLightPoint(new Vec3(600f, 600f, 2f));
-        shader.setModelTransform(Mat4.translate( new Vec3(100f, 100f, 0f) ));
-        shader.setViewTransform(Mat4.identity());
-        shader.setProjectionTransform(projectionTransform);
+        //collision system
+        //cds.update();
 
-        vao.bind();
-        glDrawElements(GL_TRIANGLES, vao.getIndicesCount(), GL_UNSIGNED_BYTE, 0);
+        wc.updateSystems();
 
-        vao.unbind();
-        shader.unbind();
-
-        window.swapBuffers();
     }
 
 
