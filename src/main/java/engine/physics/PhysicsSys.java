@@ -43,7 +43,7 @@ public class PhysicsSys implements Sys {
             physicsComp.addAcceleration(calculateFriction(physicsComp));
 
             //apply acceleration
-            System.out.println(physicsComp.getImpulse());
+            //System.out.println(physicsComp.getImpulse());
 
             Vec2 deltaAcceleration = physicsComp.getAcceleration().scale(DELTA_TIME);
             physicsComp.addVelocity( deltaAcceleration.add( physicsComp.getImpulse()) );

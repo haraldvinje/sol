@@ -30,15 +30,20 @@ public class CollisionResolutionSys implements Sys {
     public void update() {
         Set<Integer> collisionEntitiesSet = worldContainer.getEntitiesWithComponentType(CollisionComp.class);
         //TODO: assuming that all entities with collisioncomp also have velocitycomp. Write test for this later
-        for (int entity: collisionEntitiesSet){
-            CollisionComp cc1 = (CollisionComp) worldContainer.getComponent(entity, CollisionComp.class);
 
-            for (CollisionData data: cc1.getCollisionDataList()){
+        for (int entity: collisionEntitiesSet) {
+            CollisionComp collisionComp = (CollisionComp) worldContainer.getComponent(entity, CollisionComp.class);
+        }
+        for (int entity: collisionEntitiesSet){
+            CollisionComp collisionComp = (CollisionComp) worldContainer.getComponent(entity, CollisionComp.class);
+
+            for (CollisionData data: collisionComp.getPrimaryCollisionDataList()){
                 //calculate vector based on current velocity vector,  penetration depth
-                resolveCollision(data);
+                if (data.isActive()){
+                    resolveCollision(data);
+                }
             }
 
-            cc1.reset();
         }
         //need to get all collisionComponents
         //run over every collisionDataList for every collisionComponent

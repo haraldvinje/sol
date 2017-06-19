@@ -1,7 +1,9 @@
 package engine.physics;
 
+import engine.Component;
+
 /**
  * Created by haraldvinje on 19-Jun-17.
  */
-public class HoleComp {
+public class HoleComp implements Component{
 }

@@ -19,6 +19,8 @@ public class CollisionData {
     private Vec2 collisionVector;
     private float penetrationDepth;
 
+    private boolean active = true;
+
 
     public CollisionData(int e1, CollisionComp collComp1, PositionComp posComp1, PhysicsComp physicsComp1, int e2, CollisionComp collComp2, PositionComp posComp2, PhysicsComp physicsComp2){
         this.entity1 = e1;
@@ -40,6 +42,14 @@ public class CollisionData {
     }
     public int getEntity2() {
         return entity2;
+    }
+
+    public void setActive(boolean flag){
+        this.active = flag;
+    }
+
+    public boolean isActive(){
+        return active;
     }
 
     public CollisionComp getCollComp1() {
