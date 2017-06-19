@@ -15,6 +15,7 @@ public class Game {
 
     private static final float FRAME_INTERVAL = 1.0f/60.0f;
 
+    public static final float WINDOW_WIDTH = 1600f, WINDOW_HEIGHT = 900f;
 
 
     private Window window;
@@ -70,6 +71,11 @@ public class Game {
 
         player = createPlayer(wc);
         sandbag = createSandbag(wc);
+
+        float wallThickness = 64f;
+        createWall(wc, wallThickness/2, WINDOW_HEIGHT/2, wallThickness, WINDOW_HEIGHT);
+        createWall(wc, WINDOW_WIDTH-wallThickness/2, WINDOW_HEIGHT/2, wallThickness, WINDOW_HEIGHT);
+
         createBackground(wc);
 
     }
@@ -85,6 +91,7 @@ public class Game {
 
         while (true) {
             timeSinceUpdate += timePassed();
+            System.out.println("Time since update: "+timeSinceUpdate);
 
             if (timeSinceUpdate >= FRAME_INTERVAL) {
                 timeSinceUpdate -= FRAME_INTERVAL;
@@ -119,7 +126,7 @@ public class Game {
         return player;
     }
     private int createSandbag(WorldContainer wc) {
-        float radius = 32f*4;
+        float radius = 32f;
         int sandbag = wc.createEntity();
         wc.addComponent(sandbag, new PositionComp(500, 300) );
         wc.addComponent(sandbag, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sandbag.png", radius*2, radius*2)));
@@ -130,11 +137,24 @@ public class Game {
 
         return sandbag;
     }
-    private void createBackground(WorldContainer wc) {
+    private int createBackground(WorldContainer wc) {
         int bg = wc.createEntity();
         wc.addComponent(bg, new PositionComp(0, 0));
         wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", 1600, 900)));
 
+        return bg;
+    }
+
+    private int createWall(WorldContainer wc, float x, float y, float width, float height) {
+        int w = wc.createEntity();
+        wc.addComponent(w, new PositionComp(x, y));
+        wc.addComponent(w, new PhysicsComp(0, 1, 1));
+        wc.addComponent(w, new CollisionComp(new Rectangle(width, height)));
+
+        wc.addComponent(w, new ColoredMeshComp(ColoredMeshUtils.createRectangle(width, height)));
+        wc.addComponent(w, new MeshCenterComp(width/2, height/2)); //physical rectangle is defined with position being the center, while the graphical square is defined in the upper left corner
+
+        return w;
     }
 
     public void update() {
