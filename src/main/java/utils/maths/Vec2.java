@@ -84,7 +84,8 @@ public class Vec2 {
 		y = v.y;
 	}
 	public void setZero() {
-		x = y = 0;
+		x = 0;
+		y = 0;
 	}
 	
 	@Override

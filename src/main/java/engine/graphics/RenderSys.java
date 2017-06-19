@@ -45,9 +45,9 @@ public class RenderSys implements Sys {
         glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
         colorShader.bind();
-        colorShader.setLightPoint(new Vec3(100f, 100f, -1000f));
+        colorShader.setLightPoint(new Vec3(100f, 100f, -500f));
         textureShader.bind();
-        textureShader.setLightPoint(new Vec3(100f, 100f, -1000f));
+        textureShader.setLightPoint(new Vec3(100f, 100f, -500f));
 
 
         for (int entity : wc.getEntitiesWithComponentType(ColoredMeshComp.class)) {
