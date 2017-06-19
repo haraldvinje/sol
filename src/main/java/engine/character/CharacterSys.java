@@ -19,8 +19,8 @@ public class CharacterSys implements Sys {
 
     private WorldContainer wc;
 
-    private float reloadTime = 1f;
-    private float bulletSpeed = 50f;
+    private float reloadTime = 0.1f;
+    private float bulletSpeed = 600f;
     private float bulletRadius = 12;
     private float timeToShoot = reloadTime;
     private ColoredMesh bulletMesh = ColoredMeshUtils.createCircleTwocolor(bulletRadius, 8);
@@ -53,10 +53,11 @@ public class CharacterSys implements Sys {
 
 
     private void updateMove(CharacterInputComp inputComp, PhysicsComp phComp) {
-        float speed = 1;
-        float stepX = ( (inputComp.isMoveRight()? 1:0) - (inputComp.isMoveLeft()? 1:0) ) * speed;
-        float stepY = ( (inputComp.isMoveDown()? 1:0) - (inputComp.isMoveUp()? 1:0) ) * speed;
-        phComp.addAcceleration(new Vec2(stepX, stepY));
+        float accel = 1200.0f;
+        float stepX = ( (inputComp.isMoveRight()? 1:0) - (inputComp.isMoveLeft()? 1:0) );
+        float stepY = ( (inputComp.isMoveDown()? 1:0) - (inputComp.isMoveUp()? 1:0) );
+
+        phComp.addAcceleration(new Vec2(stepX, stepY).normalize().scale(accel));
     }
 
     private void updateRotation(CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
@@ -65,7 +66,7 @@ public class CharacterSys implements Sys {
     }
 
     private void updateAbilities(CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
-        System.out.println(inputComp.isAction1());
+        //System.out.println(inputComp.isAction1());
 
         if (inputComp.isAction1() && timeToShoot <= 0) {
             timeToShoot = reloadTime;
