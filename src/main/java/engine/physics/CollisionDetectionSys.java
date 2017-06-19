@@ -3,6 +3,7 @@ package engine.physics;
 import engine.PositionComp;
 import engine.Sys;
 import engine.WorldContainer;
+import utils.maths.M;
 import utils.maths.Vec2;
 
 import java.util.Arrays;
@@ -29,28 +30,30 @@ public class CollisionDetectionSys implements Sys {
     }
 
     public void update(){
-        Integer[] cea = createCollisionEntitiesArray();
+
+
+        Integer[] collisionEntities = createCollisionEntitiesArray();
         //System.out.println(Arrays.toString(cea));
-        int length = cea.length;
+        int length = collisionEntities.length;
 
         for (int i = 0; i<length; i++){
+            int entity1 = collisionEntities[i];
+
+            CollisionComp collComp1 = (CollisionComp)worldContainer.getComponent(entity1, CollisionComp.class);
+            PositionComp posComp1 = (PositionComp)worldContainer.getComponent(entity1, PositionComp.class);
+            PhysicsComp physComp1 = (PhysicsComp)worldContainer.getComponent(entity1, PhysicsComp.class);
+
             for (int j = i+1; j<length; j++){
-                CollisionComp cc1 = (CollisionComp)worldContainer.getComponent(cea[i], CollisionComp.class);
-                CollisionComp cc2 = (CollisionComp)worldContainer.getComponent(cea[j], CollisionComp.class);
-                PositionComp po1 = (PositionComp)worldContainer.getComponent(cea[i], PositionComp.class);
-                PositionComp po2 = (PositionComp)worldContainer.getComponent(cea[j], PositionComp.class);
-                Shape s1 = cc1.getShape();
-                Shape s2 = cc2.getShape();
+                int entity2 = collisionEntities[j];
 
-                s1.setXY(po1.getX(), po1.getY());
-                s2.setXY(po2.getX(), po2.getY());
+                CollisionComp collComp2 = (CollisionComp)worldContainer.getComponent(entity2, CollisionComp.class);
+                PositionComp posComp2 = (PositionComp)worldContainer.getComponent(entity2, PositionComp.class);
+                PhysicsComp physComp2 = (PhysicsComp)worldContainer.getComponent(entity2, PhysicsComp.class);
 
-                if (detectCollision(cc1.getShape(), cc2.getShape())){
-                    System.out.println("kollisjon mellom to sirkler suuuuh :D \n Nå må det bare løses da hehe");
-                    cc1.addCollidingEntity(cea[j]);
-                    CollisionData collisionData = new CollisionData(cea[i], cea[j]);
-                    calculateCollisionData(collisionData);
-                    cc1.addCollisionData(collisionData);
+                CollisionData collData = new CollisionData(entity1, collComp1, posComp1, physComp1, entity2, collComp2, posComp2, physComp2);
+
+                if (detectCollision(collData)) {
+                    collComp1.addCollisionData(collData);
                 }
             }
         }
@@ -62,52 +65,207 @@ public class CollisionDetectionSys implements Sys {
         return (Integer[]) keySet.toArray(new Integer[size]);
     }
 
-    public boolean detectCollision(Shape s1, Shape s2){
-        if (s1 instanceof Circle && s2 instanceof Circle){
-            return detectCollision((Circle)s1,(Circle)s2);
+
+    public boolean detectCollision(CollisionData data){
+        Shape shape1 = data.getCollComp1().getShape();
+        Shape shape2 = data.getCollComp2().getShape();
+
+        if (shape1 instanceof Circle && shape2 instanceof Circle){
+            return detectCollisionCircCirc(data);
         }
+        else if (shape1 instanceof Rectangle && shape2 instanceof Rectangle) {
+            return detectCollisionRectRect(data);
+        }
+        else if (shape1 instanceof Rectangle && shape2 instanceof Circle) {
+            return detectCollisionRectCirc(data);
+        }
+        else if (shape1 instanceof Circle && shape2 instanceof Rectangle) {
+            data.swapEntities();
+            return detectCollisionRectCirc(data);
+        }
+
+        throw new IllegalArgumentException("trying to detect collision between nonsupported shapes");
+    }
+
+    private boolean detectCollisionCircCirc(CollisionData data){
+        Circle circ1 = (Circle)data.getCollComp1().getShape();
+        Circle circ2 = (Circle)data.getCollComp2().getShape();
+        Vec2 pos1 = data.getPosComp1().getPos();
+        Vec2 pos2 = data.getPosComp2().getPos();
+
+        float r1 = circ1.getRadius();
+        float r2 = circ2.getRadius();
+
+        float maxDist = r1 + r2;
+        float maxDistSquared = M.pow2(maxDist);
+
+        Vec2 distVec = pos2.subtract(pos1);
+
+        if (distVec.getLengthSquared() >= maxDistSquared) {
+            return false;
+        }
+
+        float dist = distVec.getLength();
+
+        if (dist != 0) {
+            data.setPenetrationDepth( maxDist - dist );
+            data.setCollisionVector( distVec.scale(1/dist) ); //optimized normalize
+            return true;
+        }
+
+        //set default values if circles on same pos
+        data.setPenetrationDepth(r1);
+        data.setCollisionVector( new Vec2(1, 0) );
+        return true;
+    }
+
+    private boolean detectCollisionRectRect(CollisionData data) {
+        Rectangle rect1 = (Rectangle)data.getCollComp1().getShape();
+        Rectangle rect2 = (Rectangle)data.getCollComp2().getShape();
+
+        Vec2 pos1 = data.getPosComp1().getPos();
+        Vec2 pos2 = data.getPosComp2().getPos();
+
+        Vec2 distVec = pos2.subtract(pos1);
+
+        // Calculate half extents along x axis for each object
+        float rect1HExtentX = rect1.getWidth() / 2.0f;
+        float rect2HExtentX = rect2.getWidth() / 2.0f;
+
+        // Calculate overlap on x axis
+        float xOverlap = rect1HExtentX + rect2HExtentX - M.abs( distVec.x );
+
+        // SAT test on x axis
+        if(xOverlap > 0)
+        {
+            // Calculate half extents along y axis for each object
+            float rect1HExtentY = rect1.getHeight() / 2.0f;
+            float rect2HExtentY = rect2.getHeight() / 2.0f;
+
+            // Calculate overlap on y axis
+            float yOverlap = rect1HExtentY + rect2HExtentY - M.abs( distVec.y );
+
+            // SAT test on y axis
+            if(yOverlap > 0)
+            {
+                // Find out which axis is axis of least penetration
+                if(xOverlap < yOverlap) {
+                    // Point towards B knowing that n points from A to B
+                    if(distVec.x < 0)
+                        data.setCollisionVector(new Vec2( -1, 0 ) );
+                    else
+                        data.setCollisionVector(new Vec2( 1, 0 ) );
+
+                    data.setPenetrationDepth( xOverlap );
+                    return true;
+                }
+                else {
+                    // Point toward B knowing that n points from A to B
+                    if(distVec.y < 0)
+                        data.setCollisionVector( new Vec2( 0, -1 ) );
+                    else
+                        data.setCollisionVector( new Vec2( 0, 1 ) );
+
+                    data.setPenetrationDepth( yOverlap );
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 
-    private boolean detectCollision(Circle circle1, Circle circle2){
-        float c1x = circle1.getX();
-        float c1y = circle1.getY();
-        float c1r = circle1.getRadius();
+    private boolean detectCollisionRectCirc(CollisionData data) {
+        Rectangle rect = (Rectangle)data.getCollComp1().getShape();
+        Circle circ = (Circle)data.getCollComp2().getShape();
+        Vec2 posRect = data.getPosComp1().getPos();
+        Vec2 posCirc = data.getPosComp2().getPos();
 
-        float c2x = circle2.getX();
-        float c2y = circle2.getY();
-        float c2r = circle2.getRadius();
+        // Vector from A to B
+        Vec2 distVec = posCirc.subtract(posRect);
 
-        float dx = c2x-c1x;
-        float dy = c2y-c1y;
+        // Calculate half extents along each axis
+        float rectHalfExtentX = rect.getWidth() / 2;
+        float rectHalfExtentY = rect.getHeight() / 2;
 
-        float rsum = c1r+c2r;
+        // Closest point on rect to center of circ
+        Vec2 closestRectPoint = new Vec2(	M.clamp(distVec.x, -rectHalfExtentX, rectHalfExtentX),
+                M.clamp(distVec.y, -rectHalfExtentY, rectHalfExtentY) );
 
-        //The distance between the center of two circles. No square root to save computation time
-        float centerDist =  dx*dx + dy*dy;
+        boolean circInsideRect = false;
 
+        // Circle is inside the AABB, so we need to clamp the circle's center
+        // to the closest edge
+        if(distVec.equals(closestRectPoint)) {
+            //if the clamping above did not make closestRectPoint different from distVec, circ center inside rect
+            circInsideRect = true;
 
-        //need to sqaure the sum of the radiuses to compare it with distance squared
-        return centerDist<=rsum*rsum;
-    }
-
-
-    private void calculateCollisionData(CollisionData collisionData){
-        Shape s1 = ((CollisionComp)worldContainer.getComponent(collisionData.getEntity1(), CollisionComp.class)).getShape();
-        Shape s2 = ((CollisionComp)worldContainer.getComponent(collisionData.getEntity2(), CollisionComp.class)).getShape();
-
-        if (s1 instanceof Circle && s2 instanceof Circle){
-            calculateCollisionDataCircCirc((Circle) s1, (Circle) s2, collisionData);
+            // Find closest axis
+            //if(M.abs( distVec.x ) > M.abs( distVec.y ) ) {
+            if(M.abs( distVec.x/rect.getWidth() ) > M.abs( distVec.y/rect.getHeight() ) ) {
+                //not entirely right. If rectangles width != height it might clamp to wrong axis.
+                //  ---> fixed by dividing by width and height of rectangle
+                // Clamp to rect edge in x direction
+                if(closestRectPoint.x > 0)
+                    closestRectPoint.x = rectHalfExtentX;
+                else
+                    closestRectPoint.x = -rectHalfExtentX;
+            }
+            else { //clamp to rect edge in y direction
+                if(closestRectPoint.y > 0)
+                    closestRectPoint.y = rectHalfExtentY;
+                else
+                    closestRectPoint.y = -rectHalfExtentY;
+            }
         }
+
+        Vec2 rectCircVec = distVec.subtract( closestRectPoint );
+        float rectCircDistSquared = rectCircVec.getLengthSquared();
+        float circRadius = circ.getRadius();
+
+        // Can now determine if there is a collision
+        if(rectCircDistSquared > M.pow2(circRadius) && !circInsideRect) {
+            return false;
+        }
+
+        // Avoided sqrt if no collision is found
+        float rectCircDist = M.sqrt(rectCircDistSquared);
+
+
+        if (rectCircDist == 0) {
+            return false;
+        }
+
+        Vec2 normal = rectCircVec.scale(1/rectCircDist);
+        float penetration = circRadius - rectCircDist;
+
+        // Flip normal if circ inside rect
+        if(circInsideRect) {
+            normal = normal.negative();
+            //penetration = rectCircDist; <--- this seems right, but works better without
+        }
+
+        data.setCollisionVector( normal );
+        data.setPenetrationDepth( penetration );
+        return true;
     }
 
-    private void calculateCollisionDataCircCirc(Circle c1, Circle c2, CollisionData collisionData){
+//    private void calculateCollisionData(CollisionData collisionData){
+//        Shape s1 = ((CollisionComp)worldContainer.getComponent(collisionData.getEntity1(), CollisionComp.class)).getShape();
+//        Shape s2 = ((CollisionComp)worldContainer.getComponent(collisionData.getEntity2(), CollisionComp.class)).getShape();
+//
+//        if (s1 instanceof Circle && s2 instanceof Circle){
+//            calculateCollisionDataCircCirc((Circle) s1, (Circle) s2, collisionData);
+//        }
+//    }
 
-        Vec2 colVector = new Vec2(c1.getX()-c2.getX(), c1.getY()-c2.getY() );
-        float maxDist = c1.getRadius() + c2.getRadius();
-        float dist = colVector.getLength();
-
-        collisionData.setCollisionVector(colVector.scale(1/dist));
-        collisionData.setPenetrationDepth(maxDist-dist);
-    }
+//    private void calculateCollisionDataCircCirc(Circle c1, Circle c2, CollisionData collisionData){
+//
+//        Vec2 colVector = new Vec2(c1.getX()-c2.getX(), c1.getY()-c2.getY() );
+//        float maxDist = c1.getRadius() + c2.getRadius();
+//        float dist = colVector.getLength();
+//
+//        collisionData.setCollisionVector(colVector.scale(1/dist));
+//        collisionData.setPenetrationDepth(maxDist-dist);
+//    }
 }
