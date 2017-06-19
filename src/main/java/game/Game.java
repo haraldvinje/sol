@@ -110,7 +110,7 @@ public class Game {
         wc.addComponent(player, new PositionComp(0, 0));
         wc.addComponent(player, new RotationComp());
 
-        wc.addComponent(player, new PhysicsComp());
+        wc.addComponent(player, new PhysicsComp(80, 2.5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
         wc.addComponent(player, new CollisionComp(new Circle(32)));
 
         wc.addComponent(player, new TexturedMeshComp(TexturedMeshUtils.createRectangle("frank_original_swg.png", 128, 64)));
@@ -119,14 +119,14 @@ public class Game {
         return player;
     }
     private int createSandbag(WorldContainer wc) {
-        float radius = 32;
+        float radius = 32f*4;
         int sandbag = wc.createEntity();
         wc.addComponent(sandbag, new PositionComp(500, 300) );
-        wc.addComponent(sandbag, new ColoredMeshComp(ColoredMeshUtils.createCircleMulticolor(radius, 16)));
-        //wc.addComponent(sandbag, new CollisionComp(new Circle( 5)) );
+        wc.addComponent(sandbag, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sandbag.png", radius*2, radius*2)));
+        wc.addComponent(sandbag, new MeshCenterComp(radius, radius));
 
-        wc.addComponent(sandbag, new PhysicsComp());
-        wc.addComponent(sandbag, new CollisionComp(new Circle(radius)));
+        wc.addComponent(sandbag, new PhysicsComp(500f, 10.0f));
+        wc.addComponent(sandbag, new CollisionComp(new Rectangle(radius*2, radius*2)));
 
         return sandbag;
     }
