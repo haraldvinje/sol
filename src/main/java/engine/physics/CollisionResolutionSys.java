@@ -1,8 +1,10 @@
 package engine.physics;
 
+import engine.PositionComp;
 import engine.Sys;
 import engine.WorldContainer;
 
+import utils.maths.M;
 import utils.maths.Vec2;
 
 import java.util.Set;
@@ -31,10 +33,11 @@ public class CollisionResolutionSys implements Sys {
         for (int entity: collisionEntitiesSet){
             CollisionComp cc1 = (CollisionComp) worldContainer.getComponent(entity, CollisionComp.class);
 
-            for (CollisionData cd: cc1.getCollisionDataList()){
+            for (CollisionData data: cc1.getCollisionDataList()){
                 //calculate vector based on current velocity vector,  penetration depth
-                resolveCollision(cd);
+                resolveCollision(data);
             }
+
             cc1.reset();
         }
         //need to get all collisionComponents
@@ -43,38 +46,54 @@ public class CollisionResolutionSys implements Sys {
         //success
     }
 
-    private void resolveCollision(CollisionData cd){
-        PhysicsComp phc1 = (PhysicsComp) worldContainer.getComponent(cd.getEntity1(), PhysicsComp.class);
-        PhysicsComp phc2 = (PhysicsComp) worldContainer.getComponent(cd.getEntity2(), PhysicsComp.class);
+    private void resolveCollision(CollisionData data) {
+        PhysicsComp phc1 = (PhysicsComp) worldContainer.getComponent(data.getEntity1(), PhysicsComp.class);
+        PhysicsComp phc2 = (PhysicsComp) worldContainer.getComponent(data.getEntity2(), PhysicsComp.class);
+        Vec2 collisionVector = data.getCollisionVector();
 
         Vec2 relVelocity = phc2.getVelocity().subtract(phc1.getVelocity());
-        float velAlongNormal = relVelocity.dotProduct(cd.getCollisionVector());
 
-        if (velAlongNormal < 0) { //do not resolve collision if objects are moving apart
+        float velAlongNormal = relVelocity.dotProduct(collisionVector);
+
+        if (velAlongNormal > 0) { //do not resolve collision if objects are moving apart
             return;
         }
 
-        float elasticity = 1;
-        float mass1 = 1;
-        float mass2 = 1;
-        float impulse = -(1 + elasticity)*velAlongNormal;
-        impulse /= mass1 + mass2;
-        Vec2 norm = cd.getCollisionVector();
-        Vec2 impulseVec = norm.scale(impulse);
 
-        phc1.addVelocity(impulseVec.negative());
-        phc2.addVelocity(impulseVec);
+        float invMass1 = phc1.getInvMass();
+        float invMass2 = phc2.getInvMass();
 
+        float elasticity = M.min(phc1.getElasticity(), phc2.getElasticity());
 
+        float impulseLength = -(1 + elasticity) * velAlongNormal;
+        impulseLength /= invMass1 + invMass2;
 
+        //apply impulse
+        Vec2 impulseVec = collisionVector.scale(impulseLength); //-(1 + elasticity)*velAlongNormal;
 
+        phc1.addImpulse(impulseVec.scale(invMass1).negative() );
+        phc2.addImpulse(impulseVec.scale(invMass2) );
 
+        positionalCorrection(data);
     }
 
 
+    private void positionalCorrection(CollisionData data)
+    {
+        PhysicsComp physComp1 = data.getPhysicsComp1();
+        PhysicsComp physComp2 = data.getPhysicsComp2();
 
+        PositionComp posComp1 = data.getPosComp1();
+        PositionComp posComp2 = data.getPosComp2();
 
+        float percent = 0.2f; // usually 20% to 80%
+        float slop = 0.01f; // usually 0.01 to 0.1
 
-
+        Vec2 correction = data.getCollisionVector().scale(percent * (M.max(data.getPenetrationDepth() - slop, 0.0f) / (physComp1.getInvMass() + physComp2.getInvMass()) ) );
+        posComp1.addPos( correction.scale(physComp1.getInvMass()).negative() );
+        posComp2.addPos( correction.scale(physComp2.getInvMass()) );
+//		p1.addTemporaryVelocity( correction.scale(p1.getInvMass()).negative() );
+//		p2.addTemporaryVelocity( correction.scale(p2.getInvMass()) );
+    }
 
 }
