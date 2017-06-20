@@ -174,7 +174,7 @@ public class Game {
         wc.addComponent(hole, new MeshCenterComp(radius, radius));
 
         wc.addComponent(hole, new PhysicsComp(500f, 10.0f));
-        wc.addComponent(hole, new CollisionComp(new Circle(radius)));
+        wc.addComponent(hole, new CollisionComp(new Rectangle(radius, radius)));
         wc.addComponent(hole, new HoleComp());
 
 
