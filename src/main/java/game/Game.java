@@ -59,6 +59,7 @@ public class Game {
         wc.assignComponentType(RotationComp.class);
         wc.assignComponentType(MeshCenterComp.class);
         wc.assignComponentType(HoleComp.class);
+        wc.assignComponentType(AffectedByHoleComp.class);
 
         //add systems
         wc.addSystem(new RenderSys(window));
@@ -123,6 +124,7 @@ public class Game {
 
         wc.addComponent(player, new TexturedMeshComp(TexturedMeshUtils.createRectangle("frank_original_swg.png", 4*radius, 2*radius)));
         wc.addComponent(player, new MeshCenterComp(32, 32));
+        wc.addComponent(player, new AffectedByHoleComp());
 
         return player;
     }

@@ -22,6 +22,7 @@ public class CollisionData {
     private boolean active = true;
 
 
+
     public CollisionData(int e1, CollisionComp collComp1, PositionComp posComp1, PhysicsComp physicsComp1, int e2, CollisionComp collComp2, PositionComp posComp2, PhysicsComp physicsComp2){
         this.entity1 = e1;
         this.entity2 = e2;
