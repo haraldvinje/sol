@@ -101,7 +101,14 @@ public class CollisionData {
     public float getPenetrationDepth() {return penetrationDepth;
     }
 
+    public void reverseCollisionVector() {
+        collisionVector = collisionVector.negative();
+    }
 
 
+    @Override
+    public String toString() {
+        return "[Collision Data: entity1="+entity1+" entity2="+entity2 + " active="+active +"]";
+    }
 
 }

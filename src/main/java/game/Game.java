@@ -4,6 +4,9 @@ package game;
 import engine.*;
 
 import engine.character.*;
+import engine.combat.DamageResolutionSys;
+import engine.combat.DamageableComp;
+import engine.combat.DamagerComp;
 import engine.graphics.*;
 import engine.physics.*;
 import engine.window.Window;
@@ -62,6 +65,8 @@ public class Game {
         wc.assignComponentType(RotationComp.class);
         wc.assignComponentType(MeshCenterComp.class);
         wc.assignComponentType(HoleComp.class);
+        wc.assignComponentType(DamageableComp.class);
+        wc.assignComponentType(DamagerComp.class);
 
         //add systems
         wc.addSystem(new CharacterSys());
@@ -70,7 +75,10 @@ public class Game {
         wc.addSystem(new CollisionDetectionSys());
         wc.addSystem(new HoleResolutionSys());
 
+        wc.addSystem(new DamageResolutionSys());
+
         wc.addSystem(new CollisionResolutionSys());
+
         wc.addSystem(new PhysicsSys());
 
         wc.addSystem(new RenderSys(window));
@@ -136,6 +144,8 @@ public class Game {
         wc.addComponent(player, new TexturedMeshComp(TexturedMeshUtils.createRectangle("frank_original_swg.png", 4*radius, 2*radius)));
         wc.addComponent(player, new MeshCenterComp(32, 32));
 
+        //wc.addComponent(player, new DamagerComp());
+
         return player;
     }
     private int createSandbag(WorldContainer wc) {
@@ -147,6 +157,8 @@ public class Game {
 
         wc.addComponent(sandbag, new PhysicsComp(500f, 10.0f));
         wc.addComponent(sandbag, new CollisionComp(new Rectangle(radius*2, radius*2)));
+
+        wc.addComponent(sandbag, new DamageableComp());
 
         return sandbag;
     }
@@ -166,7 +178,7 @@ public class Game {
         return hole;
     }
 
-    private void createBackground(WorldContainer wc) {
+    private int createBackground(WorldContainer wc) {
         int bg = wc.createEntity();
         wc.addComponent(bg, new PositionComp(0, 0));
         wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", 1600, 900)));
