@@ -30,6 +30,7 @@ public class PhysicsSys implements Sys {
     @Override
     public void update() {
         this.physicsEntities = worldContainer.getEntitiesWithComponentType(PhysicsComp.class);
+
 //        applyFriction();            //adding friction acceleration vector
 //        updateVelocities();         //accelerating
 //        updatePositions();
@@ -43,8 +44,6 @@ public class PhysicsSys implements Sys {
             physicsComp.addAcceleration(calculateFriction(physicsComp));
 
             //apply acceleration
-            System.out.println(physicsComp.getImpulse());
-
             Vec2 deltaAcceleration = physicsComp.getAcceleration().scale(DELTA_TIME);
             physicsComp.addVelocity( deltaAcceleration.add( physicsComp.getImpulse()) );
 

@@ -62,12 +62,14 @@ public class Game {
         wc.assignComponentType(MeshCenterComp.class);
 
         //add systems
-        wc.addSystem(new RenderSys(window));
         wc.addSystem(new CharacterSys());
         wc.addSystem(new UserCharacterInputSys(userInput));
+
         wc.addSystem(new CollisionDetectionSys());
         wc.addSystem(new CollisionResolutionSys());
         wc.addSystem(new PhysicsSys());
+
+        wc.addSystem(new RenderSys(window));
 
 
 
@@ -93,7 +95,7 @@ public class Game {
 
         while (true) {
             timeSinceUpdate += timePassed();
-            System.out.println("Time since update: "+timeSinceUpdate);
+            //System.out.println("Time since update: "+timeSinceUpdate);
 
             if (timeSinceUpdate >= FRAME_INTERVAL) {
                 timeSinceUpdate -= FRAME_INTERVAL;
@@ -116,7 +118,7 @@ public class Game {
         wc.addComponent(player, new CharacterInputComp());
         wc.addComponent(player, new UserCharacterInputComp());
 
-        wc.addComponent(player, new PositionComp(0, 0));
+        wc.addComponent(player, new PositionComp(100, 100));
         wc.addComponent(player, new RotationComp());
 
         wc.addComponent(player, new PhysicsComp(80, 2.5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
