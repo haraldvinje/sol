@@ -11,8 +11,11 @@ import java.util.List;
 public class CollisionComp implements Component {
 
     private Shape shape;
+/*
     private List<Integer> collidingEntities = new ArrayList<Integer>();
-    private List<CollisionData> collisionDataList = new ArrayList<CollisionData>();
+*/
+    private List<CollisionData> primaryCollisionDataList = new ArrayList<CollisionData>(5);
+    private List<CollisionData> secondaryCollisionDataList = new ArrayList<CollisionData>(5);
 
 
     public CollisionComp(Shape s) {
@@ -29,24 +32,37 @@ public class CollisionComp implements Component {
     }
 */
 
-    public void addCollisionData(CollisionData collisionData){
-        collisionDataList.add(collisionData);
+    public void addPrimaryCollisionData(CollisionData collisionData){
+        primaryCollisionDataList.add(collisionData);
+    }
+
+    public void addSecondaryCollisionData(CollisionData collisionData){
+        secondaryCollisionDataList.add(collisionData);
     }
 
     public void setShape(Shape shape) {
         this.shape = shape;
     }
 
+/*
     public void addCollidingEntity(int otherEntity){
         collidingEntities.add(otherEntity);
     }
+*/
 
     public void reset(){
+/*
         collidingEntities.clear();
-        collisionDataList.clear();
+*/
+        primaryCollisionDataList.clear();
+        secondaryCollisionDataList.clear();
     }
 
-    public List<CollisionData> getCollisionDataList() {
-        return collisionDataList;
+    public List<CollisionData> getPrimaryCollisionDataList() {
+        return primaryCollisionDataList;
+    }
+
+    public List<CollisionData> getSecondaryCollisionDataList() {
+        return secondaryCollisionDataList;
     }
 }
