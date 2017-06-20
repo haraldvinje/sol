@@ -44,7 +44,7 @@ public class CollisionDetectionSys implements Sys {
             collComp1.reset();
         }
 
-        for (int i = 0; i<length-1; i++){
+        for (int i = 0; i<length; i++){
             int entity1 = collisionEntities[i];
 
             CollisionComp collComp1 = (CollisionComp)worldContainer.getComponent(entity1, CollisionComp.class);

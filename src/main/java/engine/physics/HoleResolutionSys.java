@@ -29,24 +29,24 @@ public class HoleResolutionSys implements Sys {
             for (CollisionData data: cc1.getPrimaryCollisionDataList()){
                 //resolve
 
-                onCollision(data);
+                onCollision(data, data.getEntity2());
             }
             for (CollisionData data: cc1.getSecondaryCollisionDataList()){
                 //resolve
 
-                onCollision(data);
+                onCollision(data, data.getEntity1());
             }
         }
     }
 
-    private void onCollision(CollisionData data) {
-        respawnEntities(data);
+    private void onCollision(CollisionData data, int entity) {
+        respawnEntities(data, entity);
         data.setActive(false);
     }
 
-    private void respawnEntities(CollisionData data){
+    private void respawnEntities(CollisionData data, int entity){
         //TODO: Make this method much more general
-        PositionComp posComp = (PositionComp) worldContainer.getComponent(0, PositionComp.class);
+        PositionComp posComp = (PositionComp) worldContainer.getComponent(entity, PositionComp.class);
         posComp.setPos(new Vec2(0,0));
 
     }
