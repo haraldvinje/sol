@@ -22,26 +22,34 @@ public class HoleResolutionSys implements Sys {
     @Override
     public void update() {
         Set<Integer> holeEntities = worldContainer.getEntitiesWithComponentType(HoleComp.class);
-
+        int otherEntity = -1;
         for (int entity: holeEntities){
             CollisionComp cc1 = (CollisionComp) worldContainer.getComponent(entity, CollisionComp.class);
 
             for (CollisionData data: cc1.getPrimaryCollisionDataList()){
                 //resolve
+                otherEntity = data.getEntity2();
+                if (worldContainer.hasComponent(otherEntity, AffectedByHoleComp.class)){
+                    onCollision(data, otherEntity);
+                }
+                data.setActive(false);
 
-                onCollision(data, data.getEntity2());
             }
             for (CollisionData data: cc1.getSecondaryCollisionDataList()){
                 //resolve
 
-                onCollision(data, data.getEntity1());
+                otherEntity = data.getEntity1();
+                if (worldContainer.hasComponent(otherEntity, AffectedByHoleComp.class)) {
+                    onCollision(data, otherEntity);
+                }
+                data.setActive(false);
+
             }
         }
     }
 
     private void onCollision(CollisionData data, int entity) {
         respawnEntities(data, entity);
-        data.setActive(false);
     }
 
     private void respawnEntities(CollisionData data, int entity){
@@ -50,7 +58,5 @@ public class HoleResolutionSys implements Sys {
         posComp.setPos(new Vec2(900,600));
 
     }
-
-
 
 }

@@ -4,6 +4,7 @@ import engine.PositionComp;
 import engine.Sys;
 import engine.WorldContainer;
 
+import javafx.geometry.Pos;
 import utils.maths.M;
 import utils.maths.Vec2;
 
@@ -83,13 +84,15 @@ public class CollisionResolutionSys implements Sys {
     }
 
 
-    private void positionalCorrection(CollisionData data)
-    {
-        PhysicsComp physComp1 = data.getPhysicsComp1();
-        PhysicsComp physComp2 = data.getPhysicsComp2();
+    private void positionalCorrection(CollisionData data) {
+        int entity1 = data.getEntity1();
+        int entity2 = data.getEntity2();
+        PhysicsComp physComp1 = (PhysicsComp)worldContainer.getComponent(entity1, PhysicsComp.class);
+        PhysicsComp physComp2 = (PhysicsComp)worldContainer.getComponent(entity2, PhysicsComp.class);
 
-        PositionComp posComp1 = data.getPosComp1();
-        PositionComp posComp2 = data.getPosComp2();
+
+        PositionComp posComp1 = (PositionComp)worldContainer.getComponent(entity1, PositionComp.class);
+        PositionComp posComp2 = (PositionComp)worldContainer.getComponent(entity2, PositionComp.class);
 
         float percent = 0.2f; // usually 20% to 80%
         float slop = 0.01f; // usually 0.01 to 0.1
