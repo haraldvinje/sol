@@ -18,7 +18,7 @@ public class WorldContainer {
 
     //A mapping between entities and components for each component type.
     //A TreeMap is used to keep the map sorted on its keyValues.
-    private Map<Class<? extends Component>, TreeMap<Integer, Component>> components = new HashMap<>();
+    private Map< Class<? extends Component >, TreeMap<Integer, Component>> components = new HashMap<>();
 
     private List<Sys> systems = new ArrayList<>();
 
@@ -65,6 +65,7 @@ public class WorldContainer {
         if (! entityExists(entity)) throw new IllegalArgumentException("Trying to destroy an entity that doesnt exist");
 
         deallocateEntity(entity);
+        //e
     }
 
     /**
