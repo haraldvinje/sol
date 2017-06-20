@@ -94,7 +94,7 @@ public class PhysicsComp implements Component {
         if (m == 0)
             invMass = 0;
         else
-            invMass = 1/m;
+            invMass = 1.0f/m;
     }
     public float getElasticity() {
         return elasticity;
