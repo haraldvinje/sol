@@ -57,7 +57,9 @@ public class CollisionDetectionSys implements Sys {
                 PositionComp posComp2 = (PositionComp)worldContainer.getComponent(entity2, PositionComp.class);
 
                 CollisionData collData = new CollisionData(entity1, entity2);
+              
                 if (detectCollision(collData, collComp1, posComp1, collComp2, posComp2)) {
+                  
                     collComp1.addPrimaryCollisionData(collData);
                     collComp2.addSecondaryCollisionData(collData);
                 }
@@ -86,8 +88,14 @@ public class CollisionDetectionSys implements Sys {
             return detectCollisionRectCirc(data, colComp1, posComp1, colComp2, posComp2);
         }
         else if (shape1 instanceof Circle && shape2 instanceof Rectangle) {
-            data.swap();
-            return detectCollisionRectCirc(data, colComp2, posComp2, colComp1, posComp1);
+          
+            data.swapEntities();
+            boolean result = detectCollisionRectCirc(data, colComp2, posComp2, colComp1, posComp1);
+            if (result) {
+                data.swapEntities();
+                data.reverseCollisionVector();
+            }
+            return result;
         }
 
         throw new IllegalArgumentException("trying to detect collision between nonsupported shapes");

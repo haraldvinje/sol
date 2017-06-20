@@ -1,6 +1,7 @@
 package engine.character;
 
 import engine.*;
+import engine.combat.DamagerComp;
 import engine.graphics.ColoredMesh;
 import engine.graphics.ColoredMeshComp;
 import engine.graphics.ColoredMeshUtils;
@@ -93,6 +94,8 @@ public class CharacterSys implements Sys {
         wc.addComponent(b, pc);
         wc.addComponent(b, new CollisionComp(new Circle(bulletRadius)));
         wc.addComponent(b, new ColoredMeshComp(bulletMesh));
+
+        wc.addComponent(b, new DamagerComp(600f, 1f));
 
     }
 }

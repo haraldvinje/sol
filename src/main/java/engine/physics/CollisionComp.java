@@ -3,12 +3,13 @@ package engine.physics;
 import engine.Component;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * Created by haraldvinje on 13-Jun-17.
  */
-public class CollisionComp implements Component {
+public class CollisionComp implements Component, Iterable<CollisionData> {
 
     private Shape shape;
 /*
@@ -64,5 +65,15 @@ public class CollisionComp implements Component {
 
     public List<CollisionData> getSecondaryCollisionDataList() {
         return secondaryCollisionDataList;
+    }
+
+
+    @Override
+    public Iterator<CollisionData> iterator() {
+        return new CollisionCompIterator(primaryCollisionDataList, secondaryCollisionDataList);
+    }
+
+    public CollisionCompIterator collisionCompIterator() {
+        return new CollisionCompIterator(primaryCollisionDataList, secondaryCollisionDataList);
     }
 }
