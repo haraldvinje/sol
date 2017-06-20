@@ -44,7 +44,7 @@ public class CollisionData {
     }
 
 
-    public void swap(){
+    public void swapEntities(){
         int nentity1 = this.entity2;
 
         this.entity2 = this.entity1;
