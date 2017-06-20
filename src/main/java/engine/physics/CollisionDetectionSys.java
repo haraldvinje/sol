@@ -36,10 +36,19 @@ public class CollisionDetectionSys implements Sys {
         //System.out.println(Arrays.toString(cea));
         int length = collisionEntities.length;
 
+
+        //reseting all collision entities. Need to reset before to avoid resetting from secondary list in collComp.
+        for (int i = 0; i<length; i++) {
+            int entity1 = collisionEntities[i];
+            CollisionComp collComp1 = (CollisionComp) worldContainer.getComponent(entity1, CollisionComp.class);
+            collComp1.reset();
+        }
+
         for (int i = 0; i<length; i++){
             int entity1 = collisionEntities[i];
 
             CollisionComp collComp1 = (CollisionComp)worldContainer.getComponent(entity1, CollisionComp.class);
+
             PositionComp posComp1 = (PositionComp)worldContainer.getComponent(entity1, PositionComp.class);
             PhysicsComp physComp1 = (PhysicsComp)worldContainer.getComponent(entity1, PhysicsComp.class);
 
@@ -51,9 +60,9 @@ public class CollisionDetectionSys implements Sys {
                 PhysicsComp physComp2 = (PhysicsComp)worldContainer.getComponent(entity2, PhysicsComp.class);
 
                 CollisionData collData = new CollisionData(entity1, collComp1, posComp1, physComp1, entity2, collComp2, posComp2, physComp2);
-
                 if (detectCollision(collData)) {
-                    collComp1.addCollisionData(collData);
+                    collComp1.addPrimaryCollisionData(collData);
+                    collComp2.addSecondaryCollisionData(collData);
                 }
             }
         }
