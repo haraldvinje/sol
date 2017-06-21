@@ -109,4 +109,8 @@ public class PhysicsComp implements Component {
     public void setFrictionModel(int frictionModel) {
         this.frictionModel = frictionModel;
     }
+
+    void setVelocityLen(float length) {
+        velocity.setLength(length);
+    }
 }

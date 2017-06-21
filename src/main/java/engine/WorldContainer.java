@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class WorldContainer {
 
-    private static int ENTITY_COUNT = 200;
+    private static int ENTITY_COUNT = 400;
 
 
 
@@ -65,7 +65,7 @@ public class WorldContainer {
         if (! entityExists(entity)) throw new IllegalArgumentException("Trying to destroy an entity that doesnt exist");
 
         deallocateEntity(entity);
-        //e
+
     }
 
     /**
@@ -88,7 +88,12 @@ public class WorldContainer {
         throw new IllegalStateException("There is not allocated enough space for more entities");
     }
     private void deallocateEntity(int entity) {
+        //release components
+
+
+        //release id
         entities[entity] = false;
+
     }
     private boolean entityExists(int entity) {
         return entities[entity];

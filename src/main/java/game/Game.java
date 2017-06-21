@@ -76,13 +76,10 @@ public class Game {
 
         wc.addSystem(new CollisionDetectionSys());
         wc.addSystem(new HoleResolutionSys());
-
         wc.addSystem(new DamageResolutionSys());
-
         wc.addSystem(new CollisionResolutionSys());
 
         wc.addSystem(new PhysicsSys());
-
         wc.addSystem(new RenderSys(window));
 
 
@@ -136,6 +133,7 @@ public class Game {
     private int createPlayer(WorldContainer wc) {
         int player = wc.createEntity();
         float radius = 32f;
+        float xoffset = 16f;
         wc.addComponent(player, new CharacterComp());
         wc.addComponent(player, new CharacterInputComp());
         wc.addComponent(player, new UserCharacterInputComp());
@@ -146,9 +144,11 @@ public class Game {
         wc.addComponent(player, new PhysicsComp(80, 2.5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
         wc.addComponent(player, new CollisionComp(new Circle(radius)));
 
-        wc.addComponent(player, new TexturedMeshComp(TexturedMeshUtils.createRectangle("frank_original_swg.png", 4*radius, 2*radius)));
-        wc.addComponent(player, new MeshCenterComp(32, 32));
+        wc.addComponent(player, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sol_frank.png", 4*radius*2, 2*radius*2)));
+        wc.addComponent(player, new MeshCenterComp(radius*2+xoffset, radius*2));
         wc.addComponent(player, new AffectedByHoleComp());
+
+        wc.addComponent(player, new DamageableComp());
 
         //wc.addComponent(player, new DamagerComp());
 

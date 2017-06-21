@@ -20,8 +20,8 @@ public class CharacterSys implements Sys {
 
     private WorldContainer wc;
 
-    private float reloadTime = 0.1f;
-    private float bulletSpeed = 10f;//600f;
+    private float reloadTime = 0.2f;
+    private float bulletSpeed = 600f;
     private float bulletRadius = 12;
     private float timeToShoot = reloadTime;
     private ColoredMesh bulletMesh = ColoredMeshUtils.createCircleTwocolor(bulletRadius, 8);
@@ -88,14 +88,14 @@ public class CharacterSys implements Sys {
         offset.setLength(64);
         position = position.add(offset);
         wc.addComponent(b, new PositionComp(position.x, position.y));
-        PhysicsComp pc = new PhysicsComp(40, 0.5f, 1.2f);
+        PhysicsComp pc = new PhysicsComp(20, 0.05f, 0.3f);
         pc.addVelocity(velocity);
         //pc.setFrictionConstant(0.001f); not implemented in resolution
         wc.addComponent(b, pc);
         wc.addComponent(b, new CollisionComp(new Circle(bulletRadius)));
         wc.addComponent(b, new ColoredMeshComp(bulletMesh));
 
-        wc.addComponent(b, new DamagerComp(600f, 1f));
+        wc.addComponent(b, new DamagerComp(10, 1f));
 
     }
 }
