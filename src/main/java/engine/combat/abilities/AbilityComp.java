@@ -16,6 +16,12 @@ public class AbilityComp implements Component {
     private List<MeleeAbility> meleeAbilities = new ArrayList<>(EXPECTED_MELEE_ABILITIES);
     private List<ProjectileAbility> projectileAbilities = new ArrayList<>(EXPECTED_PROJECTILE_ABILITIES);
 
+    public void addMeleeAbility(MeleeAbility meleeAbility){
+        meleeAbilities.add(meleeAbility);
+    }
 
+    public List<MeleeAbility> getMeleeAbilities(){
+        return meleeAbilities;
+    }
 
 }
