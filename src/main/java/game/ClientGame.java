@@ -1,21 +1,22 @@
 package game;
 
-
-import engine.*;
-
+import engine.PositionComp;
+import engine.RotationComp;
+import engine.UserInput;
+import engine.WorldContainer;
 import engine.character.*;
 import engine.combat.DamageResolutionSys;
 import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
 import engine.graphics.*;
+import engine.network.client.ClientNetworkSys;
 import engine.physics.*;
 import engine.window.Window;
 
 /**
- * Created by eirik on 13.06.2017.
+ * Created by eirik on 22.06.2017.
  */
-public class Game {
-
+public class ClientGame {
 
     private static final float FRAME_INTERVAL = 1.0f/60.0f;
 
@@ -26,33 +27,29 @@ public class Game {
     private UserInput userInput;
 
 
-    private ColoredMesh vao;
-
     private long lastTime;
 
     private WorldContainer wc;
 
-    //private CollisionDetectionSys cds;
 
 
-    private int player;
+    private int[] players;
     private int sandbag;
     private int hole;
 
 
+    private ClientNetworkSys clientSys;
 
 
     public void init() {
-        window = new Window(1600, 900, "SIIII");
+        window = new Window(WINDOW_WIDTH, WINDOW_HEIGHT, "SIIII");
         userInput = new UserInput(window);
 
         wc = new WorldContainer();
 
-        //cds = new CollisionDetectionSys(wc);
-
         System.out.println("HEELLLLLOOOOO");
 
-      
+
         //assign component types
         wc.assignComponentType(PositionComp.class);
         wc.assignComponentType(ColoredMeshComp.class);
@@ -68,25 +65,31 @@ public class Game {
         wc.assignComponentType(DamageableComp.class);
         wc.assignComponentType(DamagerComp.class);
         wc.assignComponentType(AffectedByHoleComp.class);
-      
+
 
         //add systems
-        wc.addSystem(new UserCharacterInputSys(userInput));
-        wc.addSystem(new CharacterSys());
+//        wc.addSystem(new UserCharacterInputSys(userInput));
+//        wc.addSystem(new CharacterSys());
 
-        wc.addSystem(new CollisionDetectionSys());
-        wc.addSystem(new HoleResolutionSys());
-        wc.addSystem(new DamageResolutionSys());
-        wc.addSystem(new CollisionResolutionSys());
+        //wc.addSystem(new CollisionDetectionSys());
+        //wc.addSystem(new HoleResolutionSys());
+        //wc.addSystem(new DamageResolutionSys());
+        //wc.addSystem(new CollisionResolutionSys());
 
-        wc.addSystem(new PhysicsSys());
+        //wc.addSystem(new PhysicsSys());
         wc.addSystem(new RenderSys(window));
 
+        clientSys = new ClientNetworkSys("127.0.0.1", userInput); //tries to connect to server
+        wc.addSystem(clientSys);
 
 
 
-        player = createPlayer(wc);
-        sandbag = createSandbag(wc);
+        players = new int[2];
+
+        players[0] = createPlayer(wc, "sol_frank.png");
+        players[1] = createPlayer(wc, "sol_frank.png");//createPlayer(wc, "sandbag.png");
+
+        //sandbag = createSandbag(wc);
 
         float wallThickness = 64f;
         createWall(wc, wallThickness/2, WINDOW_HEIGHT/2, wallThickness, WINDOW_HEIGHT);
@@ -126,27 +129,27 @@ public class Game {
                 break;
         }
 
-        window.close();
+        close();
 
     }
 
-    private int createPlayer(WorldContainer wc) {
+    private int createPlayer(WorldContainer wc, String imagePath) {
         int player = wc.createEntity();
         float radius = 32f;
         float xoffset = 16f;
         wc.addComponent(player, new CharacterComp());
-        wc.addComponent(player, new CharacterInputComp());
-        wc.addComponent(player, new UserCharacterInputComp());
+//        wc.addComponent(player, new CharacterInputComp());
+//        wc.addComponent(player, new UserCharacterInputComp());
 
         wc.addComponent(player, new PositionComp(WINDOW_WIDTH/2f, WINDOW_HEIGHT/2f));
         wc.addComponent(player, new RotationComp());
 
-        wc.addComponent(player, new PhysicsComp(80, 2.5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
-        wc.addComponent(player, new CollisionComp(new Circle(radius)));
+//        wc.addComponent(player, new PhysicsComp(80, 2.5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
+//        wc.addComponent(player, new CollisionComp(new Circle(radius)));
 
-        wc.addComponent(player, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sol_frank.png", 4*radius*2, 2*radius*2)));
+        wc.addComponent(player, new TexturedMeshComp(TexturedMeshUtils.createRectangle(imagePath, 4*radius*2, 2*radius*2)));
         wc.addComponent(player, new MeshCenterComp(radius*2+xoffset, radius*2));
-        wc.addComponent(player, new AffectedByHoleComp());
+//        wc.addComponent(player, new AffectedByHoleComp());
 
         //wc.addComponent(player, new DamageableComp());
 
@@ -157,15 +160,17 @@ public class Game {
     private int createSandbag(WorldContainer wc) {
         float radius = 32f;
         int sandbag = wc.createEntity();
-        wc.addComponent(sandbag, new PositionComp(500, 300) );
+        wc.addComponent(sandbag, new PositionComp(WINDOW_WIDTH/2f, WINDOW_HEIGHT/2f) );
         wc.addComponent(sandbag, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sandbag.png", radius*2, radius*2)));
         wc.addComponent(sandbag, new MeshCenterComp(radius, radius));
 
-        wc.addComponent(sandbag, new PhysicsComp(80, 2.5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
-        wc.addComponent(sandbag, new CollisionComp(new Rectangle(radius*2, radius*2)));
+//        wc.addComponent(sandbag, new PhysicsComp(80, 2.5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
+//        wc.addComponent(sandbag, new CollisionComp(new Rectangle(radius*2, radius*2)));
+//
+//        wc.addComponent(sandbag, new DamageableComp());
+//        wc.addComponent(sandbag, new AffectedByHoleComp());
 
-        wc.addComponent(sandbag, new DamageableComp());
-        wc.addComponent(sandbag, new AffectedByHoleComp());
+        //wc.addComponent(sandbag, new CharacterComp());
 
         return sandbag;
     }
@@ -212,7 +217,7 @@ public class Game {
         System.out.println(wc.getVelocityComps());
         System.out.println(wc.getCollisionComps());
         wc.updateSystems();*/
-  
+
         //System.out.println( ((PositionComp)wc.getComponent(player, WorldContainer.COMPMASK_POSITION)).getX() );
 
         window.pollEvents();
@@ -222,7 +227,12 @@ public class Game {
         //cds.update();
 
         wc.updateSystems();
+    }
 
+    private void close() {
+        clientSys.close();
+
+        window.close();
     }
 
 
@@ -239,4 +249,5 @@ public class Game {
 
         return deltaTimeF/1000000000;
     }
+
 }
