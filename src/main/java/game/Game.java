@@ -158,11 +158,16 @@ public class Game {
 
         //Creating an ability for the player. Starting off with melee attacks
         AbilityComp ability = new AbilityComp();
+
         float hitboxRadius = 16f;
         Circle hitbox = new Circle(hitboxRadius);
-        ability.addMeleeAbility(new MeleeAbility(wc, hitbox, 82.0f));
+        MeleeAbility meleeAbility = new MeleeAbility(wc, hitbox, 82.0f, 5, 10, 5, 30);
+        ability.addMeleeAbility(meleeAbility);
 
-
+        float hboxRadius = 32f;
+        Circle hbox = new Circle(hboxRadius);
+        MeleeAbility melAb = new MeleeAbility(wc, hbox, - 102f, 10,60,10,10);
+        ability.addMeleeAbility(melAb);
 
         wc.addComponent(player, ability);
 

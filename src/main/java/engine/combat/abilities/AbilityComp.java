@@ -34,4 +34,7 @@ public class AbilityComp implements Component {
     public void requestExecution(int meleeId) {
         meleeAbilities.get(meleeId).requestExecution();
     }
+
+    public void setOccupied(boolean b) {
+    }
 }

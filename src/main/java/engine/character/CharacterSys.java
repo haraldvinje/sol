@@ -77,12 +77,16 @@ public class CharacterSys implements Sys {
             abComp.requestExecution(0);
         }
 
+        if (inputComp.isAction1()){
+            abComp.requestExecution(1);
+        }
 
-        if (inputComp.isAction1() && timeToShoot <= 0) {
+
+/*        if (inputComp.isAction1() && timeToShoot <= 0) {
             timeToShoot = reloadTime;
 
             createBullet(posComp.getPos(), Vec2.newLenDir(bulletSpeed, rotComp.getAngle()) );
-        }
+        }*/
         else {
             timeToShoot -= 1.0f/60f;
         }

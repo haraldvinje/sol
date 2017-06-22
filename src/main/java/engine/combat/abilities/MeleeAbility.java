@@ -22,37 +22,41 @@ public class MeleeAbility {
 
     private int hitboxEntity;
     private Shape hitbox;
-    private boolean active = false;
+    private boolean activeHitbox = false;
     private float relativeDistance;
     private WorldContainer worldContainer;
 //  private List<Component> components = new ArrayList<>(5);
     private CollisionComp collComp;
 
 
-
-    private boolean executable = true;
-
-
-
-    public int durationCounter;
-    public int rechargeTimeCounter;
+    private boolean requestExecution;
+    private boolean executing = false;
 
 
-    private final int startupTime = 10;
-    private final int activeHitboxTime = 20;
-    private final int endlagTime = 10;
-    private final int duration = startupTime+activeHitboxTime+endlagTime;
-    private final int rechargeTime = 20;
+
+    public int counter;
+
+
+
+    private int startupTime;
+    private int activeHitboxTime;
+    private int endlagTime;
+    private int rechargeTime;
     private ColoredMeshComp colMeshComp;
 
 
     public MeleeAbility(WorldContainer wc){
-        this(wc, null, 0.0f);
+        this(wc, null, 0.0f, 10, 10, 10, 10);
     }
 
 
 
-    public MeleeAbility(WorldContainer wc, Shape hitbox, float relativeDistance){
+    public MeleeAbility(WorldContainer wc, Shape hitbox, float relativeDistance, int startupTime, int activeHitboxTime, int endlagTime, int rechargeTime){
+        this.startupTime = startupTime;
+        this.activeHitboxTime = activeHitboxTime;
+        this.endlagTime = endlagTime;
+        this.rechargeTime = rechargeTime;
+
         if (hitbox instanceof Circle){
             createCircleHitbox(wc, (Circle)hitbox, relativeDistance);
         }
@@ -64,35 +68,50 @@ public class MeleeAbility {
 
 
     public void requestExecution() {
-        if (!isExecutable()) {
+        if (isExecuting()) {
             return;
         }
         execute();
     }
 
+
+
     private void execute() {
-        durationCounter = 0;
-        setExecutable(false);
-        setActiveHitbox(true);
+        counter = 0;
+        setExecuting(true);
     }
 
-    public boolean isExecutable() {
-        return executable;
+    public int getStartupTime() {
+        return startupTime;
     }
 
-    public void setExecutable(boolean executable) {
-        this.executable = executable;
+    public int getActiveHitboxTime() {
+        return activeHitboxTime;
+    }
+
+    public int getEndlagTime() {
+        return endlagTime;
+    }
+
+
+    public void setExecuting(boolean status){
+        this.executing = status;
+    }
+
+    public boolean isExecuting(){
+        return this.executing;
     }
 
 
     public void setActiveHitbox(boolean active) {
-        this.active = active;
-        if (active){
+        if (!this.activeHitbox && active){
             activateComponents();
         }
-        else {
+        else if (this.activeHitbox && !active){
             deactivateComponents();
         }
+        this.activeHitbox = active;
+
     }
 
     private void deactivateComponents(){
@@ -111,17 +130,10 @@ public class MeleeAbility {
 
 
     public boolean isActiveHitbox() {
-        return active;
-    }
-
-    public void startRechargeTime() {
-        rechargeTimeCounter = 0;
+        return activeHitbox;
     }
 
 
-    public int getDuration() {
-        return duration;
-    }
 
     public int getRechargeTime() {
         return rechargeTime;
