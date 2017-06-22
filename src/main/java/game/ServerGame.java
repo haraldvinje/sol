@@ -1,32 +1,34 @@
 package game;
 
-
-import engine.*;
-
+import engine.PositionComp;
+import engine.RotationComp;
+import engine.UserInput;
+import engine.WorldContainer;
 import engine.character.*;
 import engine.combat.DamageResolutionSys;
 import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
 import engine.graphics.*;
+import engine.network.server.ServerNetworkSys;
 import engine.physics.*;
 import engine.window.Window;
+
+
 
 /**
  * Created by eirik on 13.06.2017.
  */
-public class Game {
+public class ServerGame {
 
 
     private static final float FRAME_INTERVAL = 1.0f/60.0f;
 
-    public static final float WINDOW_WIDTH = 1600f, WINDOW_HEIGHT = 900f;
+    public static final float WINDOW_WIDTH = 1600f,
+                                WINDOW_HEIGHT = 900f;
 
 
     private Window window;
     private UserInput userInput;
-
-
-    private ColoredMesh vao;
 
     private long lastTime;
 
@@ -35,24 +37,24 @@ public class Game {
     //private CollisionDetectionSys cds;
 
 
-    private int player;
+    private int[] players;
     private int sandbag;
     private int hole;
 
+    private ServerNetworkSys serverSys;
 
 
 
     public void init() {
-        window = new Window(1600, 900, "SIIII");
+        window = new Window(WINDOW_WIDTH/4, WINDOW_HEIGHT/4, "SIIII");
         userInput = new UserInput(window);
 
         wc = new WorldContainer();
 
-        //cds = new CollisionDetectionSys(wc);
 
         System.out.println("HEELLLLLOOOOO");
 
-      
+
         //assign component types
         wc.assignComponentType(PositionComp.class);
         wc.assignComponentType(ColoredMeshComp.class);
@@ -61,17 +63,18 @@ public class Game {
         wc.assignComponentType(PhysicsComp.class);
         wc.assignComponentType(CharacterComp.class);
         wc.assignComponentType(CharacterInputComp.class);
-        wc.assignComponentType(UserCharacterInputComp.class);
+//        wc.assignComponentType(UserCharacterInputComp.class);
         wc.assignComponentType(RotationComp.class);
         wc.assignComponentType(MeshCenterComp.class);
         wc.assignComponentType(HoleComp.class);
         wc.assignComponentType(DamageableComp.class);
         wc.assignComponentType(DamagerComp.class);
         wc.assignComponentType(AffectedByHoleComp.class);
-      
+
 
         //add systems
-        wc.addSystem(new UserCharacterInputSys(userInput));
+//        wc.addSystem(new UserCharacterInputSys(userInput));
+
         wc.addSystem(new CharacterSys());
 
         wc.addSystem(new CollisionDetectionSys());
@@ -80,13 +83,20 @@ public class Game {
         wc.addSystem(new CollisionResolutionSys());
 
         wc.addSystem(new PhysicsSys());
+
+
+        serverSys = new ServerNetworkSys();
+        wc.addSystem(serverSys);
+
         wc.addSystem(new RenderSys(window));
 
 
+        players= new int[2];
 
+        players[0] = createPlayer(wc);
+        players[1] = createPlayer(wc);
 
-        player = createPlayer(wc);
-        sandbag = createSandbag(wc);
+        //sandbag = createSandbag(wc);
 
         float wallThickness = 64f;
         createWall(wc, wallThickness/2, WINDOW_HEIGHT/2, wallThickness, WINDOW_HEIGHT);
@@ -98,7 +108,7 @@ public class Game {
 
         hole = createHole(wc);
 
-        createBackground(wc);
+//        createBackground(wc);
 
     }
 
@@ -126,7 +136,7 @@ public class Game {
                 break;
         }
 
-        window.close();
+        close();
 
     }
 
@@ -136,7 +146,7 @@ public class Game {
         float xoffset = 16f;
         wc.addComponent(player, new CharacterComp());
         wc.addComponent(player, new CharacterInputComp());
-        wc.addComponent(player, new UserCharacterInputComp());
+//        wc.addComponent(player, new UserCharacterInputComp());
 
         wc.addComponent(player, new PositionComp(WINDOW_WIDTH/2f, WINDOW_HEIGHT/2f));
         wc.addComponent(player, new RotationComp());
@@ -165,7 +175,6 @@ public class Game {
         wc.addComponent(sandbag, new CollisionComp(new Rectangle(radius*2, radius*2)));
 
         wc.addComponent(sandbag, new DamageableComp());
-        wc.addComponent(sandbag, new AffectedByHoleComp());
 
         return sandbag;
     }
@@ -185,13 +194,13 @@ public class Game {
         return hole;
     }
 
-    private int createBackground(WorldContainer wc) {
-        int bg = wc.createEntity();
-        wc.addComponent(bg, new PositionComp(0, 0));
-        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", 1600, 900)));
-
-        return bg;
-    }
+//    private int createBackground(WorldContainer wc) {
+//        int bg = wc.createEntity();
+//        wc.addComponent(bg, new PositionComp(0, 0));
+//        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", 1600, 900)));
+//
+//        return bg;
+//    }
 
     private int createWall(WorldContainer wc, float x, float y, float width, float height) {
         int w = wc.createEntity();
@@ -199,8 +208,8 @@ public class Game {
         wc.addComponent(w, new PhysicsComp(0, 1, 1));
         wc.addComponent(w, new CollisionComp(new Rectangle(width, height)));
 
-        wc.addComponent(w, new ColoredMeshComp(ColoredMeshUtils.createRectangle(width, height)));
-        wc.addComponent(w, new MeshCenterComp(width/2, height/2)); //physical rectangle is defined with position being the center, while the graphical square is defined in the upper left corner
+//        wc.addComponent(w, new ColoredMeshComp(ColoredMeshUtils.createRectangle(width, height)));
+//        wc.addComponent(w, new MeshCenterComp(width/2, height/2)); //physical rectangle is defined with position being the center, while the graphical square is defined in the upper left corner
 
         return w;
     }
@@ -208,21 +217,16 @@ public class Game {
 
     public void update() {
 
-/*        System.out.println(wc.getPositionComps());
-        System.out.println(wc.getVelocityComps());
-        System.out.println(wc.getCollisionComps());
-        wc.updateSystems();*/
-  
-        //System.out.println( ((PositionComp)wc.getComponent(player, WorldContainer.COMPMASK_POSITION)).getX() );
-
         window.pollEvents();
-
-
-        //collision system
-        //cds.update();
 
         wc.updateSystems();
 
+    }
+
+    private void close() {
+        serverSys.close();
+
+        window.close();
     }
 
 
@@ -240,3 +244,4 @@ public class Game {
         return deltaTimeF/1000000000;
     }
 }
+

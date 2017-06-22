@@ -18,6 +18,7 @@ import java.util.TreeMap;
 public class PhysicsSys implements Sys {
 
     private static float DELTA_TIME = 1.0f / 60.0f;
+    private static float MAX_VELOCITY = 30f*60f;
 
     private WorldContainer worldContainer;
     private Set<Integer> physicsEntities;
@@ -46,6 +47,12 @@ public class PhysicsSys implements Sys {
             //apply acceleration
             Vec2 deltaAcceleration = physicsComp.getAcceleration().scale(DELTA_TIME);
             physicsComp.addVelocity( deltaAcceleration.add( physicsComp.getImpulse()) );
+
+            //check if velocity is to great
+            if (physicsComp.getVelocity().getLengthSquared() > MAX_VELOCITY*MAX_VELOCITY) {
+                System.out.println("Hit max velocity");
+                physicsComp.setVelocityLen(MAX_VELOCITY);
+            }
 
             //apply velocity
             Vec2 deltaVelocity = physicsComp.getVelocity().scale(DELTA_TIME);

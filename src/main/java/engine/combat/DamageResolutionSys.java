@@ -6,6 +6,7 @@ import engine.physics.CollisionComp;
 import engine.physics.CollisionCompIterator;
 import engine.physics.CollisionData;
 import engine.physics.PhysicsComp;
+import utils.maths.M;
 import utils.maths.Vec2;
 
 /**
@@ -58,13 +59,10 @@ public class DamageResolutionSys implements Sys {
         PhysicsComp dmgablPhysComp = (PhysicsComp)wc.getComponent(damaged, PhysicsComp.class);
 
         float damage = dmgerComp.getDamage();
-        float knockbackLen = dmgablComp.getDamage() * dmgerComp.getKnockbackRatio();
+        float knockbackLen = M.pow(dmgablComp.getDamage() * dmgerComp.getKnockbackRatio(), 2 );
         float knockbackDir = dmgerPhysComp.getVelocity().getDirection();
 
         dmgablComp.applyDamage(damage);
-        dmgablPhysComp.addAcceleration( Vec2.newLenDir(knockbackLen, knockbackDir) );
-
-        System.out.println("Sandbag damage:"+dmgablComp.getDamage());
-        System.out.println("Sandbag hit with knockback:"+knockbackLen);
+        dmgablPhysComp.addImpulse( Vec2.newLenDir(knockbackLen, knockbackDir) );
     }
 }
