@@ -5,10 +5,7 @@ import engine.combat.DamagerComp;
 import engine.graphics.ColoredMesh;
 import engine.graphics.ColoredMeshComp;
 import engine.graphics.ColoredMeshUtils;
-import engine.physics.Circle;
-import engine.physics.CollisionComp;
-import engine.physics.PhysicsComp;
-import engine.physics.Shape;
+import engine.physics.*;
 import utils.maths.TrigUtils;
 import utils.maths.Vec2;
 
@@ -96,6 +93,8 @@ public class CharacterSys implements Sys {
         wc.addComponent(b, new ColoredMeshComp(bulletMesh));
 
         wc.addComponent(b, new DamagerComp(10, 1f));
+
+        wc.addComponent(b, new AffectedByHoleComp());
 
     }
 }
