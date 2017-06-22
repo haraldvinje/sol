@@ -55,13 +55,35 @@ task extractNativeBundle(type: Sync) {
     into file(project.nativeLibsDir)
 }
 
+task runServer(type: JavaExec) {
 
-run {
+    classpath = sourceSets.main.runtimeClasspath
+
+    main = 'game.MainServer'
+
+    systemProperty 'java.library.path', project.nativeLibsDir
+}
+
+task runClient(type: JavaExec) {
+
+    classpath = sourceSets.main.runtimeClasspath
+
+    main = 'game.MainClient'
+
     systemProperty 'java.library.path', project.nativeLibsDir
 }
 
 
+run {
+    mainClassName = 'game.Main'
+    systemProperty 'java.library.path', project.nativeLibsDir
+
+}
+
+
+
+
 // Define the main class for the application
-mainClassName = 'game.Main'
+
 
 
