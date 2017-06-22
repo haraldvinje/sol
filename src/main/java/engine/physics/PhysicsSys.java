@@ -50,7 +50,7 @@ public class PhysicsSys implements Sys {
 
             //check if velocity is to great
             if (physicsComp.getVelocity().getLengthSquared() > MAX_VELOCITY*MAX_VELOCITY) {
-                System.out.println("Hit max velocity");
+                //System.out.println("Hit max velocity");
                 physicsComp.setVelocityLen(MAX_VELOCITY);
             }
 
