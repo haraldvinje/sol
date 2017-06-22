@@ -4,6 +4,7 @@ import engine.PositionComp;
 import engine.RotationComp;
 import engine.Sys;
 import engine.WorldContainer;
+import engine.physics.PhysicsComp;
 import utils.maths.Vec2;
 
 import java.util.Set;
@@ -16,6 +17,7 @@ public class AbilitySys implements Sys {
     WorldContainer worldContainer;
 
     @Override
+
     public void setWorldContainer(WorldContainer wc) {
         this.worldContainer = wc;
     }
@@ -24,22 +26,39 @@ public class AbilitySys implements Sys {
     public void update() {
         Set<Integer> abilityComps = worldContainer.getEntitiesWithComponentType(AbilityComp.class);
         for (int entity: abilityComps){
+
             AbilityComp abComp = (AbilityComp) worldContainer.getComponent(entity, AbilityComp.class);
+
+            if (abComp.isOccupied()){
+                continue;
+            }
+
             PositionComp posComp = (PositionComp) worldContainer.getComponent(entity, PositionComp.class);
             RotationComp rotComp = (RotationComp) worldContainer.getComponent(entity, RotationComp.class);
+
             float x = posComp.getX();
             float y = posComp.getY();
             float angle = rotComp.getAngle();
+
             for (MeleeAbility meleeAbility: abComp.getMeleeAbilities()){
+                int hitboxEntity = meleeAbility.getHitboxEntity();
+                PhysicsComp phComp = (PhysicsComp)(worldContainer.getComponent(hitboxEntity, PhysicsComp.class));
+                phComp.setVelocity(new Vec2(0,0));
+                if (meleeAbility.isActiveHitbox()) {
 
-                int hitBoxEntity = meleeAbility.getHitBoxEntity();
+                    PositionComp mPosComp = (PositionComp) worldContainer.getComponent(hitboxEntity, PositionComp.class);
 
-                PositionComp mPosComp = (PositionComp) worldContainer.getComponent(hitBoxEntity, PositionComp.class);
-
-                Vec2 vector = Vec2.newLenDir(meleeAbility.getRelativeDistance(), angle);
-                Vec2 result = new Vec2(x,y).add(vector);
-                mPosComp.setPos(result);
-
+                    Vec2 vector = Vec2.newLenDir(meleeAbility.getRelativeDistance(), angle);
+                    Vec2 result = new Vec2(x, y).add(vector);
+                    mPosComp.setPos(result);
+                    if (meleeAbility.durationCounter++>=meleeAbility.getDuration()){
+                        meleeAbility.setActiveHitbox(false);
+                        meleeAbility.startRechargeTime();
+                    }
+                }
+                else if (meleeAbility.rechargeTimeCounter++>meleeAbility.getRechargeTime()){
+                    meleeAbility.setExecutable(true);
+                }
             }
 
         }
