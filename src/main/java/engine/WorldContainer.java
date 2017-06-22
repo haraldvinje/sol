@@ -113,6 +113,11 @@ public class WorldContainer {
 
         return components.get(compType);
     }
+
+    public void removeComponent(int entity, Class<? extends Component> compType){
+        getComponentsOfType(compType).remove(entity);
+    }
+
     public Component getComponent(int entity, Class<? extends Component> compType) {
         Component c = getComponentsOfType(compType).get(entity);
         if (c == null) throw new IllegalStateException("No component of the given type is assigned to the given entity, type="+compType);
