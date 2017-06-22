@@ -2,6 +2,8 @@ package engine.character;
 
 import engine.*;
 import engine.combat.DamagerComp;
+import engine.combat.abilities.Ability;
+import engine.combat.abilities.AbilityComp;
 import engine.graphics.ColoredMesh;
 import engine.graphics.ColoredMeshComp;
 import engine.graphics.ColoredMeshUtils;
@@ -41,15 +43,16 @@ public class CharacterSys implements Sys {
             CharacterInputComp inputComp = (CharacterInputComp) wc.getComponent(entity, CharacterInputComp.class);
             RotationComp rotComp = (RotationComp) wc.getComponent(entity, RotationComp.class);
             PhysicsComp phComp = (PhysicsComp) wc.getComponent(entity, PhysicsComp.class);
+            AbilityComp abComp = (AbilityComp) wc.getComponent(entity, AbilityComp.class);
 
-            updateEntity(entity, posComp, inputComp, rotComp, phComp);
+            updateEntity(entity, posComp, inputComp, rotComp, phComp, abComp);
         }
     }
 
-    private void updateEntity(int entity, PositionComp posComp, CharacterInputComp inputComp, RotationComp rotComp, PhysicsComp phComp) {
+    private void updateEntity(int entity, PositionComp posComp, CharacterInputComp inputComp, RotationComp rotComp, PhysicsComp phComp, AbilityComp abComp) {
         updateMove(inputComp, phComp);
         updateRotation(inputComp, posComp, rotComp);
-        updateAbilities(inputComp, posComp, rotComp);
+        updateAbilities(inputComp, posComp, rotComp, abComp);
     }
 
 
@@ -66,8 +69,14 @@ public class CharacterSys implements Sys {
         rotComp.setAngle(angle);
     }
 
-    private void updateAbilities(CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
+    private void updateAbilities(CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp,  AbilityComp abComp) {
         //System.out.println(inputComp.isAction1());
+
+
+        if (inputComp.isAction2()) {
+            abComp.requestExecution(0);
+        }
+
 
         if (inputComp.isAction1() && timeToShoot <= 0) {
             timeToShoot = reloadTime;
