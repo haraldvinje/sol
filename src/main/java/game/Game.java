@@ -166,7 +166,7 @@ public class Game {
 
         float hboxRadius = 32f;
         Circle hbox = new Circle(hboxRadius);
-        MeleeAbility melAb = new MeleeAbility(wc, hbox, - 102f, 10,60,10,10);
+        MeleeAbility melAb = new MeleeAbility(wc, hbox, - 102f, 60,60,60,60);
         ability.addMeleeAbility(melAb);
 
         wc.addComponent(player, ability);

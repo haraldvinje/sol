@@ -4,6 +4,7 @@ import engine.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by eirik on 19.06.2017.
@@ -36,5 +37,6 @@ public class AbilityComp implements Component {
     }
 
     public void setOccupied(boolean b) {
+        this.occupied = b;
     }
 }
