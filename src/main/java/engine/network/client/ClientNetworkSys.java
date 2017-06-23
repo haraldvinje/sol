@@ -57,6 +57,16 @@ public class ClientNetworkSys implements Sys{
         updateServerByInput();
 
         updateGameStateByServer();
+
+
+        //destroy bullet on timeout
+        for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class)) {
+            CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
+            if (charComp.timeToDestroy == 0) {
+                charComp.deactivateBullet(wc);
+            }
+            charComp.timeToDestroy -= 1.0f;
+        }
     }
 
     @Override
@@ -113,11 +123,21 @@ public class ClientNetworkSys implements Sys{
 
             PositionComp posComp = (PositionComp)wc.getComponent(entity, PositionComp.class);
             RotationComp rotComp = (RotationComp)wc.getComponent(entity, RotationComp.class);
+            CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
 
             //System.out.println("Updating game state by data: " + gameState);
             posComp.setX(gameState.getX(entityNumb));
             posComp.setY(gameState.getY(entityNumb));
             rotComp.setAngle(gameState.getRotation(entityNumb));
+
+            //shoot bullet
+            if (gameState.getAbilityExecuted(entityNumb) == 1) {
+                if (charComp.bulletEntity == -1) {
+                    charComp.allocateBulletEntity(wc);
+                }
+                System.out.println(charComp.bulletEntity);
+                charComp.activateBullet(wc, posComp.getPos(), rotComp.getAngle() );
+            }
 
             entityNumb++;
         }

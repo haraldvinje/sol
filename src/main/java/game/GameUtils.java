@@ -60,7 +60,7 @@ public class GameUtils {
             wc.assignComponentType(RotationComp.class);
             wc.assignComponentType(MeshCenterComp.class);
 //            wc.assignComponentType(CollisionComp.class);
-//            wc.assignComponentType(PhysicsComp.class);
+            wc.assignComponentType(PhysicsComp.class);
 //            wc.assignComponentType(CharacterInputComp.class);
 //            wc.assignComponentType(UserCharacterInputComp.class);
 //            wc.assignComponentType(HoleComp.class);
@@ -94,6 +94,8 @@ public class GameUtils {
             wc.addSystem(new RenderSys(window));
 
             wc.addSystem(new ClientNetworkSys(HOST_NAME, userInput) );
+
+            wc.addSystem(new PhysicsSys());
         }
     }
 

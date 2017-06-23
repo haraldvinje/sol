@@ -122,11 +122,17 @@ public class ServerNetworkSys implements Sys {
         for (int c : chars) {
             PositionComp posComp = (PositionComp)wc.getComponent(c, PositionComp.class);
             RotationComp rotComp = (RotationComp)wc.getComponent(c, RotationComp.class);
+
+            CharacterComp charComp = (CharacterComp)wc.getComponent(c, CharacterComp.class);
             //add characters created
 
             sd.setX(charNumb, posComp.getX());
             sd.setY(charNumb, posComp.getY());
             sd.setRotation(charNumb, rotComp.getAngle());
+            if (charComp.shootExecuted) {
+                sd.setAbilityExecuted(charNumb, 1);
+                charComp.shootExecuted = false;
+            }
 
             charNumb++;
         }

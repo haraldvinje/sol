@@ -8,12 +8,13 @@ import java.util.Arrays;
 public class GameStateData {
 
 
-    public static final int BYTES = Float.BYTES*6 + Integer.BYTES*2;
+    public static final int BYTES = Float.BYTES*6 + Integer.BYTES*2 *2;
 
     private float[] x = new float[NetworkUtils.CHARACTER_NUMB],
                     y = new float[NetworkUtils.CHARACTER_NUMB],
                     rotation = new float[NetworkUtils.CHARACTER_NUMB];
     private int[] abilityExecuted = new int[NetworkUtils.CHARACTER_NUMB];
+    private int[] abilityTerminated = new int[NetworkUtils.CHARACTER_NUMB];
 
 
 
@@ -46,6 +47,13 @@ public class GameStateData {
     }
     public void setAbilityExecuted(int charNumb, int ability) {
         abilityExecuted[charNumb] = ability;
+    }
+
+    public int getAbilityTerminated(int charNumb) {
+        return abilityTerminated[charNumb];
+    }
+    public void setAbilityTerminated(int charNumb, int ability) {
+        this.abilityTerminated[charNumb] = ability;
     }
 
     @Override

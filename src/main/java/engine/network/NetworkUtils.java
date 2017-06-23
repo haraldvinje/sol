@@ -22,6 +22,7 @@ public class NetworkUtils {
                 out.writeFloat(stateData.getY(i));
                 out.writeFloat(stateData.getRotation(i));
                 out.writeInt(stateData.getAbilityExecuted(i));
+                out.writeInt(stateData.getAbilityTerminated(i));
             }
 
         } catch (SocketException e) {
@@ -42,7 +43,8 @@ public class NetworkUtils {
                 state.setX(i, in.readFloat());
                 state.setY(i, in.readFloat());
                 state.setRotation(i, in.readFloat());
-                state.setAbilityExecuted(i, in.readInt()); //<------------------------- No sbility
+                state.setAbilityExecuted(i, in.readInt());
+                state.setAbilityTerminated(i, in.readInt());
             }
 
 
