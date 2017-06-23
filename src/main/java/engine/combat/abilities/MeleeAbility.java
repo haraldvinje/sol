@@ -2,6 +2,7 @@ package engine.combat.abilities;
 
 import engine.Component;
 import engine.PositionComp;
+import engine.RotationComp;
 import engine.WorldContainer;
 import engine.character.UserCharacterInputComp;
 import engine.combat.DamagerComp;
@@ -10,6 +11,7 @@ import engine.graphics.ColoredMeshComp;
 import engine.graphics.ColoredMeshUtils;
 import engine.physics.*;
 import org.w3c.dom.css.Rect;
+import utils.maths.Vec2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +25,14 @@ public class MeleeAbility extends Ability{
     private int hitboxEntity;
     private Shape hitbox;
     private boolean activeHitbox = false;
+
     private float relativeDistance;
+    private float relativeAngle;
+
     private WorldContainer worldContainer;
 //  private List<Component> components = new ArrayList<>(5);
     private CollisionComp collComp;
+    private PositionComp posComp;
 
 
     private boolean requestExecution;
@@ -43,23 +49,27 @@ public class MeleeAbility extends Ability{
     private int endlagTime;
     private int rechargeTime;
     private ColoredMeshComp colMeshComp;
+    private RotationComp rotComp;
 
 
     public MeleeAbility(WorldContainer wc){
-        this(wc, null, 0.0f, 10, 10, 10, 10);
+        this(wc, null, 0.0f, 0.0f, 10, 10, 10, 10);
     }
 
 
 
-    public MeleeAbility(WorldContainer wc, Shape hitbox, float relativeDistance, int startupTime, int activeHitboxTime, int endlagTime, int rechargeTime){
+    public MeleeAbility(WorldContainer wc, Shape hitbox, float relativeDistance, float relativeAngle, int startupTime, int activeHitboxTime, int endlagTime, int rechargeTime){
         this.startupTime = startupTime;
         this.activeHitboxTime = activeHitboxTime;
         this.endlagTime = endlagTime;
         this.rechargeTime = rechargeTime;
+        this.relativeDistance = relativeDistance;
+        this.relativeAngle = relativeAngle;
 
         if (hitbox instanceof Circle){
             createCircleHitbox(wc, (Circle)hitbox, relativeDistance);
         }
+
         if (hitbox instanceof Rectangle){
             createRectangleHitbox(wc, (Rectangle)hitbox, relativeDistance);
         }
@@ -121,6 +131,14 @@ public class MeleeAbility extends Ability{
         this.activeHitbox = active;
     }
 
+    public void setPosition(Vec2 vector){
+        this.posComp.setPos(vector);
+    }
+
+    public void setAngle(float angle){
+        this.rotComp.setAngle(angle);
+    }
+
 
 
     private void deactivateComponents(){
@@ -136,8 +154,8 @@ public class MeleeAbility extends Ability{
     private void activateComponents(){
         worldContainer.addComponent(hitboxEntity, collComp);
         worldContainer.addComponent(hitboxEntity, colMeshComp);
-/*        PhysicsComp phComp = (PhysicsComp) worldContainer.getComponent(hitboxEntity, PhysicsComp.class);
-        phComp.resetVelocity();*/
+        PhysicsComp phComp = (PhysicsComp) worldContainer.getComponent(hitboxEntity, PhysicsComp.class);
+        phComp.resetVelocity();
 
 
     }
@@ -165,9 +183,7 @@ public class MeleeAbility extends Ability{
         return relativeDistance;
     }
 
-    public void setRelativeDistance(float relativeDistance) {
-        this.relativeDistance = relativeDistance;
-    }
+    public float getRelativeAngle() {return relativeAngle;}
 
     public Shape getHitbox() {
         return hitbox;
@@ -187,7 +203,7 @@ public class MeleeAbility extends Ability{
         worldContainer.addComponent(hitboxEntity,component);
         worldContainer.addComponent(hitboxEntity, component);
     }
-    
+
 
 
     private void createCircleHitbox(WorldContainer wc, Circle hitbox, float relativeDistance){
@@ -195,10 +211,20 @@ public class MeleeAbility extends Ability{
         this.hitbox = hitbox;
         this.relativeDistance = relativeDistance;
         this.worldContainer = wc;
-        addComponent(new PositionComp(500,500));
+
+
+        //Adding positionComp manually to reach when hitbox is active;
+        PositionComp posComp = new PositionComp(0,0);
+        this.posComp = posComp;
+        addComponent(posComp);
+
+        RotationComp rotComp = new RotationComp();
+        addComponent(rotComp);
+        this.rotComp = rotComp;
+
         //Adding collisionComp manually. The only component to be deactivated when meleeability is not active.
         CollisionComp collisionComp = new CollisionComp(hitbox);
-        addComponent(collisionComp);
+        //addComponent(collisionComp);
         this.collComp = collisionComp;
 
         //ColoredMeshComponent stored in object. Removing when inactive hitbox
