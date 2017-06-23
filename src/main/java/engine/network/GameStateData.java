@@ -1,68 +1,55 @@
 package engine.network;
 
+import java.util.Arrays;
+
 /**
  * Created by eirik on 21.06.2017.
  */
 public class GameStateData {
 
 
-    public static final int BYTES = Float.BYTES*6;
+    public static final int BYTES = Float.BYTES*6 + Integer.BYTES*2;
 
-    private float x1, y1, rotation1;
-    private float x2, y2, rotation2;
+    private float[] x = new float[NetworkUtils.CHARACTER_NUMB],
+                    y = new float[NetworkUtils.CHARACTER_NUMB],
+                    rotation = new float[NetworkUtils.CHARACTER_NUMB];
+    private int[] abilityExecuted = new int[NetworkUtils.CHARACTER_NUMB];
 
 
 
-    public float getX1() {
-        return x1;
+    public float getX(int charNumb) {
+        return x[charNumb];
     }
 
-    public void setX1(float x1) {
-        this.x1 = x1;
+    public void setX(int charNumb, float x) {
+        this.x[charNumb] = x;
     }
 
-    public float getY1() {
-        return y1;
+    public float getY(int charNumb) {
+        return y[charNumb];
     }
 
-    public void setY1(float y1) {
-        this.y1 = y1;
+    public void setY(int charNumb, float y) {
+        this.y[charNumb] = y;
     }
 
-    public float getRotation1() {
-        return rotation1;
+    public float getRotation(int charNumb) {
+        return rotation[charNumb];
     }
 
-    public void setRotation1(float rotation1) {
-        this.rotation1 = rotation1;
+    public void setRotation(int charNumb, float rotation) {
+        this.rotation[charNumb] = rotation;
     }
 
-    public float getX2() {
-        return x2;
+    public int getAbilityExecuted(int charNumb) {
+        return abilityExecuted[charNumb];
     }
-
-    public void setX2(float x2) {
-        this.x2 = x2;
-    }
-
-    public float getY2() {
-        return y2;
-    }
-
-    public void setY2(float y2) {
-        this.y2 = y2;
-    }
-
-    public float getRotation2() {
-        return rotation2;
-    }
-
-    public void setRotation2(float rotation2) {
-        this.rotation2 = rotation2;
+    public void setAbilityExecuted(int charNumb, int ability) {
+        abilityExecuted[charNumb] = ability;
     }
 
     @Override
     public String toString() {
-        return "[GameStateData: x1="+x1+" y1="+y1+" rotation1="+rotation1+" x2="+x2+" y2="+y2+" rotation2="+rotation2+"]";
+        return "[GameStateData: x="+ Arrays.toString(x)+" y="+Arrays.toString(y)+" rotation="+Arrays.toString(rotation)+"]";
     }
 }

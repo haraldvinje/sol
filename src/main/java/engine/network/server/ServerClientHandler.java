@@ -2,6 +2,7 @@ package engine.network.server;
 
 import engine.network.CharacterInputData;
 import engine.network.GameStateData;
+import engine.network.NetworkUtils;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -60,35 +61,25 @@ public class ServerClientHandler {
      */
     public boolean sendStateData(GameStateData stateData) {
         //System.out.println("[server] sending state data");
-        try {
-            DataOutputStream out = outputStream;
-            out.writeFloat(stateData.getX1());
-            out.writeFloat(stateData.getY1());
-            out.writeFloat(stateData.getRotation1());
-
-            out.writeFloat(stateData.getX2());
-            out.writeFloat(stateData.getY2());
-            out.writeFloat(stateData.getRotation2());
-
-        } catch (SocketException e) {
-            return false;
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new IllegalStateException("An IO exception that is not a socket exception occured");
-        }
-        return true;
+        return NetworkUtils.gameStateToStream(stateData, outputStream);
     }
 
     public CharacterInputData getInputData() {
         try {
-            int availableInput = inputStream.available();
-            if (availableInput >= CharacterInputData.BYTES) {
+            int messageBytes = CharacterInputData.BYTES;
 
-                return readInputBytes(inputStream);
+            if (inputStream.available() >= messageBytes) {
+
+                //remove delayed data
+                while (inputStream.available() >= messageBytes*2) {
+                    inputStream.skipBytes(messageBytes);
+                }
+
+                return NetworkUtils.streamToCharacterInput(inputStream);
 
             }
             else {
-                System.err.println("Not enough input for a inputState, numb of bytes ready: " + availableInput);
+                System.err.println("Not enough input for a inputState, numb of bytes ready: " + inputStream.available());
                 return null;
             }
         } catch (IOException e) {
@@ -98,18 +89,5 @@ public class ServerClientHandler {
 
     }
 
-    private CharacterInputData readInputBytes(DataInputStream is) {
-        CharacterInputData id = new CharacterInputData();
-        try {
-            id.setMovement(is.readBoolean(), is.readBoolean(), is.readBoolean(), is.readBoolean());
-            id.setActions(is.readBoolean(), is.readBoolean());
-            id.setAim(is.readFloat(), is.readFloat());
-        }
-        catch(IOException e) {
-            e.printStackTrace();
-        }
-
-        return id;
-    }
 
 }
