@@ -112,6 +112,28 @@ public class ServerNetworkSys implements Sys {
     }
 
 
+    private GameStateData retrieveGameState() {
+        GameStateData sd = new GameStateData();
+
+        Set<Integer> chars = wc.getEntitiesWithComponentType(CharacterComp.class);
+        if (chars.size() != 2) throw new IllegalStateException("THere is not 2 characters on the field :(");
+
+        int charNumb = 0;
+        for (int c : chars) {
+            PositionComp posComp = (PositionComp)wc.getComponent(c, PositionComp.class);
+            RotationComp rotComp = (RotationComp)wc.getComponent(c, RotationComp.class);
+            //add characters created
+
+            sd.setX(charNumb, posComp.getX());
+            sd.setY(charNumb, posComp.getY());
+            sd.setRotation(charNumb, rotComp.getAngle());
+
+            charNumb++;
+        }
+
+        return sd;
+    }
+
 
     public void sendGameState(GameStateData gameState) {
         ListIterator<ServerClientHandler> it = clientHandlers.listIterator();
@@ -154,32 +176,5 @@ public class ServerNetworkSys implements Sys {
         inpComp.setAimY( inData.getAimY() );
     }
 
-    private GameStateData retrieveGameState() {
-        GameStateData sd = new GameStateData();
-
-        Set<Integer> chars = wc.getEntitiesWithComponentType(CharacterComp.class);
-        if (chars.size() != 2) throw new IllegalStateException("THere is not 2 characters on the field :(");
-
-        int charNumb = 0;
-        for (int c : chars) {
-            PositionComp posComp = (PositionComp)wc.getComponent(c, PositionComp.class);
-            RotationComp rotComp = (RotationComp)wc.getComponent(c, RotationComp.class);
-            //add characters created
-
-            if (charNumb == 0) {
-                sd.setX1(posComp.getX());
-                sd.setY1(posComp.getY());
-                sd.setRotation1(rotComp.getAngle());
-            }
-            else {
-                sd.setX2(posComp.getX());
-                sd.setY2(posComp.getY());
-                sd.setRotation2(rotComp.getAngle());
-            }
-            charNumb++;
-        }
-
-        return sd;
-    }
 
 }
