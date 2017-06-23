@@ -67,6 +67,11 @@ public class CollisionDetectionSys implements Sys {
         }
     }
 
+    @Override
+    public void terminate() {
+
+    }
+
     private Integer[] createCollisionEntitiesArray(){
         Set keySet = worldContainer.getEntitiesWithComponentType(CollisionComp.class);
         int size = keySet.size();

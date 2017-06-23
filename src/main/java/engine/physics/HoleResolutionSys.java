@@ -48,6 +48,11 @@ public class HoleResolutionSys implements Sys {
         }
     }
 
+    @Override
+    public void terminate() {
+
+    }
+
     private void onCollision(CollisionData data, int entity) {
         respawnEntities(data, entity);
     }

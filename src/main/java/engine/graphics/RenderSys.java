@@ -116,6 +116,11 @@ public class RenderSys implements Sys {
         window.swapBuffers();
     }
 
+    @Override
+    public void terminate() {
+
+    }
+
     /**
      * Render a vertex array.
      * @param mesh

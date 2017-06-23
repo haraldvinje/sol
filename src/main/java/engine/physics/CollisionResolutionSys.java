@@ -52,6 +52,11 @@ public class CollisionResolutionSys implements Sys {
         //success
     }
 
+    @Override
+    public void terminate() {
+
+    }
+
     private void resolveCollision(CollisionData data) {
         PhysicsComp phc1 = (PhysicsComp) worldContainer.getComponent(data.getEntity1(), PhysicsComp.class);
         PhysicsComp phc2 = (PhysicsComp) worldContainer.getComponent(data.getEntity2(), PhysicsComp.class);

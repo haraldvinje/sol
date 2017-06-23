@@ -45,4 +45,9 @@ public class UserCharacterInputSys implements Sys {
 
         }
     }
+
+    @Override
+    public void terminate() {
+
+    }
 }

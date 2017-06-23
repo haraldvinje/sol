@@ -59,6 +59,11 @@ public class ClientNetworkSys implements Sys{
         updateGameStateByServer();
     }
 
+    @Override
+    public void terminate() {
+
+    }
+
     private void updateServerByInput() {
 
         CharacterInputData input = retrieveUserInput();

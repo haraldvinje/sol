@@ -42,16 +42,6 @@ public class ServerNetworkSys implements Sys {
         serverConnectionInputThread.start();
     }
 
-    public void close() {
-        connectionInput.terminate();
-
-
-        try {
-            serverConnectionInputThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public void setWorldContainer(WorldContainer wc) {

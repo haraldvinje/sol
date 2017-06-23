@@ -8,4 +8,5 @@ public interface Sys {
 
     public void setWorldContainer(WorldContainer wc);
     public void update();
+    public void terminate();
 }
