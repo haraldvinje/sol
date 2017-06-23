@@ -14,6 +14,7 @@ import engine.combat.abilities.MeleeAbility;
 import engine.graphics.*;
 import engine.physics.*;
 import engine.window.Window;
+import utils.maths.M;
 
 /**
  * Created by eirik on 13.06.2017.
@@ -161,12 +162,12 @@ public class Game {
 
         float hitboxRadius = 16f;
         Circle hitbox = new Circle(hitboxRadius);
-        MeleeAbility meleeAbility = new MeleeAbility(wc, hitbox, 82.0f, 5, 1, 5, 5);
+        MeleeAbility meleeAbility = new MeleeAbility(wc, hitbox, 82.0f, M.PI/5.0f, 5, 30, 5, 5);
         ability.addMeleeAbility(meleeAbility);
 
         float hboxRadius = 32f;
         Circle hbox = new Circle(hboxRadius);
-        MeleeAbility melAb = new MeleeAbility(wc, hbox, - 102f, 5,1,5,5);
+        MeleeAbility melAb = new MeleeAbility(wc, hbox, 102f,  M.PI/1.0f, 5,40,5,5);
         ability.addMeleeAbility(melAb);
 
         wc.addComponent(player, ability);
