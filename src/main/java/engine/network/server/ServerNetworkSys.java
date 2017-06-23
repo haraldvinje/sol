@@ -58,6 +58,18 @@ public class ServerNetworkSys implements Sys {
         updateClientsByGameState();
     }
 
+    @Override
+    public void terminate() {
+        connectionInput.terminate();
+
+
+        try {
+            serverConnectionInputThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void checkNewConnections() {
         if (connectionInput.hasConnectedClients()) {
             System.out.println("Retrieving new connection, connections= "+clientHandlers.size());

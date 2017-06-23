@@ -262,7 +262,15 @@ public class WorldContainer {
         validateComponentType(comp.getClass());
     }
     private void validateComponentType(Class<? extends Component> compType) {
-        if (!components.containsKey(compType)) throw new IllegalStateException("Trying to use a component of a type that is not assigned, type="+compType);
+        if (!activeComponents.containsKey(compType)) throw new IllegalStateException("Trying to use a component of a type that is not assigned, type="+compType);
+    }
+
+
+    //---------TERMINATION
+    public void terminate() {
+        for (Sys s : systems) {
+            s.terminate();
+        }
     }
 
 
