@@ -46,8 +46,8 @@ public class AbilitySys implements Sys {
 
         int hitboxEntity = meleeAbility.getHitboxEntity();
 
-        PhysicsComp meleePhComp = (PhysicsComp)(worldContainer.getComponent(hitboxEntity, PhysicsComp.class));
-        PositionComp meleePosComp = (PositionComp) (worldContainer.getComponent(hitboxEntity, PositionComp.class));
+       /* PhysicsComp meleePhComp = (PhysicsComp)(worldContainer.getComponent(hitboxEntity, PhysicsComp.class));
+        PositionComp meleePosComp = (PositionComp) (worldContainer.getComponent(hitboxEntity, PositionComp.class));*/
 
         int startupTime = meleeAbility.getStartupTime();
         int activeHitboxTime = meleeAbility.getActiveHitboxTime();
@@ -55,7 +55,9 @@ public class AbilitySys implements Sys {
         int attackDurationTime = startupTime + activeHitboxTime + endingLagTime;
         int rechargeTime = meleeAbility.getRechargeTime();
 
+/*
         meleePhComp.resetVelocity();
+*/
 
 
         if (meleeAbility.isRequestingExecution()){
@@ -68,6 +70,7 @@ public class AbilitySys implements Sys {
             if (meleeAbility.counter==0){
                 abComp.setOccupiedBy(meleeAbility);
             }
+
             meleeAbility.counter++;
 
             if (meleeAbility.counter == startupTime) {
@@ -75,7 +78,7 @@ public class AbilitySys implements Sys {
             }
 
             else if (startupTime + activeHitboxTime > meleeAbility.counter){
-                duringActiveHitbox(meleeAbility, meleePosComp, playerPosComp, playerRotComp);
+                duringActiveHitbox(meleeAbility, playerPosComp, playerRotComp);
 
             }
 
@@ -86,10 +89,9 @@ public class AbilitySys implements Sys {
             else if (attackDurationTime == meleeAbility.counter){
                 duringRecharge(abComp);
             }
+
             else if (attackDurationTime+rechargeTime == meleeAbility.counter) {
                 afterRecharge(meleeAbility);
-            }
-            else{
             }
         }
     }
@@ -101,11 +103,16 @@ public class AbilitySys implements Sys {
     }
 
 
-    private void duringActiveHitbox(MeleeAbility meleeAbility, PositionComp meleePosComp, PositionComp playerPosComp, RotationComp playerRotCom ){
-        Vec2 vector = Vec2.newLenDir(meleeAbility.getRelativeDistance(), playerRotCom.getAngle());
-        Vec2 result = playerPosComp.getPos().add(vector);
+    private void duringActiveHitbox(MeleeAbility meleeAbility, PositionComp playerPosComp, RotationComp playerRotCom ){
+        float positionAngle = playerRotCom.getAngle();
+        float relativeHitboxAngle = meleeAbility.getRelativeAngle();
+        float resultAngle = positionAngle + relativeHitboxAngle;
 
-        meleePosComp.setPos(result);
+        Vec2 vector = Vec2.newLenDir(meleeAbility.getRelativeDistance(),resultAngle);
+        Vec2 result = playerPosComp.getPos().add(vector);
+        meleeAbility.setPosition(result);
+
+        meleeAbility.setAngle(resultAngle);
 
     }
 
