@@ -60,7 +60,7 @@ public class HoleResolutionSys implements Sys {
     private void respawnEntities(CollisionData data, int entity){
         //TODO: Make this method much more general
         PositionComp posComp = (PositionComp) worldContainer.getComponent(entity, PositionComp.class);
-        posComp.setPos(new Vec2(900,600));
+        posComp.setPos(new Vec2(300,600));
 
     }
 
