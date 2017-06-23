@@ -55,6 +55,8 @@ public class AbilitySys implements Sys {
         int attackDurationTime = startupTime + activeHitboxTime + endingLagTime;
         int rechargeTime = meleeAbility.getRechargeTime();
 
+        meleePhComp.resetVelocity();
+
 
         if (meleeAbility.isRequestingExecution()){
             meleeAbility.execute();
