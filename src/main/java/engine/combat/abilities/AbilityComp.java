@@ -17,7 +17,7 @@ public class AbilityComp implements Component {
     private List<MeleeAbility> meleeAbilities = new ArrayList<>(EXPECTED_MELEE_ABILITIES);
     private List<ProjectileAbility> projectileAbilities = new ArrayList<>(EXPECTED_PROJECTILE_ABILITIES);
 
-    private boolean occupied = false;
+    private Ability occupiedBy;
 
     public void addMeleeAbility(MeleeAbility meleeAbility){
         meleeAbilities.add(meleeAbility);
@@ -27,8 +27,8 @@ public class AbilityComp implements Component {
         return meleeAbilities;
     }
 
-    public boolean isOccupied(){
-        return occupied;
+    public Ability getOccupiedBy(){
+        return occupiedBy;
     }
 
 
@@ -36,7 +36,7 @@ public class AbilityComp implements Component {
         meleeAbilities.get(meleeId).requestExecution();
     }
 
-    public void setOccupied(boolean b) {
-        this.occupied = b;
+    public void setOccupiedBy(Ability a) {
+        this.occupiedBy = a;
     }
 }

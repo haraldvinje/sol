@@ -18,7 +18,7 @@ import java.util.Timer;
 /**
  * Created by eirik on 19.06.2017.
  */
-public class MeleeAbility {
+public class MeleeAbility extends Ability{
 
     private int hitboxEntity;
     private Shape hitbox;
@@ -66,17 +66,25 @@ public class MeleeAbility {
     }
 
 
+    public boolean isRequestingExecution() {
+        return requestExecution;
+    }
 
     public void requestExecution() {
         if (isExecuting()) {
             return;
         }
-        execute();
+        requestExecution = true;
+
+    }
+
+    public void setRequestExecution(boolean b){
+        this.requestExecution = b;
     }
 
 
 
-    private void execute() {
+    public void execute() {
         counter = 0;
         setExecuting(true);
     }
@@ -111,8 +119,9 @@ public class MeleeAbility {
             deactivateComponents();
         }
         this.activeHitbox = active;
-
     }
+
+
 
     private void deactivateComponents(){
         worldContainer.removeComponent(hitboxEntity, CollisionComp.class);
@@ -120,11 +129,17 @@ public class MeleeAbility {
         /*for (Component c: components){
             worldContainer.removeComponent(hitboxEntity, c.getClass());
         }*/
+
+
     }
 
     private void activateComponents(){
         worldContainer.addComponent(hitboxEntity, collComp);
         worldContainer.addComponent(hitboxEntity, colMeshComp);
+/*        PhysicsComp phComp = (PhysicsComp) worldContainer.getComponent(hitboxEntity, PhysicsComp.class);
+        phComp.resetVelocity();*/
+
+
     }
 
 
@@ -172,7 +187,7 @@ public class MeleeAbility {
         worldContainer.addComponent(hitboxEntity,component);
         worldContainer.addComponent(hitboxEntity, component);
     }
-
+    
 
 
     private void createCircleHitbox(WorldContainer wc, Circle hitbox, float relativeDistance){

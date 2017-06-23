@@ -34,8 +34,10 @@ public class AbilitySys implements Sys {
             PositionComp posComp = (PositionComp) worldContainer.getComponent(entity, PositionComp.class);
             RotationComp rotComp = (RotationComp) worldContainer.getComponent(entity, RotationComp.class);
 
-            for (MeleeAbility meleeAbility: abComp.getMeleeAbilities()){
-                updateMeleeAbility(meleeAbility, abComp, posComp, rotComp);
+            for (MeleeAbility meleeAbility: abComp.getMeleeAbilities()) {
+                if (abComp.getOccupiedBy() == meleeAbility || abComp.getOccupiedBy() == null){
+                    updateMeleeAbility(meleeAbility, abComp, posComp, rotComp);
+                }
             }
         }
     }
@@ -53,11 +55,17 @@ public class AbilitySys implements Sys {
         int attackDurationTime = startupTime + activeHitboxTime + endingLagTime;
         int rechargeTime = meleeAbility.getRechargeTime();
 
-        meleePhComp.resetVelocity();
+
+        if (meleeAbility.isRequestingExecution()){
+            meleeAbility.execute();
+            meleeAbility.setRequestExecution(false);
+        }
 
         if (meleeAbility.isExecuting()) {
             //if not occupied
-            abComp.setOccupied(true);
+            if (meleeAbility.counter==0){
+                abComp.setOccupiedBy(meleeAbility);
+            }
             meleeAbility.counter++;
 
             if (meleeAbility.counter == startupTime) {
@@ -104,7 +112,7 @@ public class AbilitySys implements Sys {
     }
 
     private void duringRecharge(AbilityComp abComp) {
-        abComp.setOccupied(false);
+        abComp.setOccupiedBy(null);
     }
 
     private void afterRecharge(MeleeAbility meleeAbility){

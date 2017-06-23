@@ -1,5 +1,6 @@
 package engine.combat;
 
+import engine.RotationComp;
 import engine.Sys;
 import engine.WorldContainer;
 import engine.physics.CollisionComp;
@@ -53,14 +54,15 @@ public class DamageResolutionSys implements Sys {
 
     private void takeDamage(int damaged, int damager) {
         DamagerComp dmgerComp = (DamagerComp)wc.getComponent(damager, DamagerComp.class);
-        PhysicsComp dmgerPhysComp = (PhysicsComp)wc.getComponent(damager, PhysicsComp.class);
+        //PhysicsComp dmgerPhysComp = (PhysicsComp)wc.getComponent(damager, PhysicsComp.class);
+        RotationComp dmgerRotComp = (RotationComp)wc.getComponent(damager, RotationComp.class);
 
         DamageableComp dmgablComp = (DamageableComp)wc.getComponent(damaged, DamageableComp.class);
         PhysicsComp dmgablPhysComp = (PhysicsComp)wc.getComponent(damaged, PhysicsComp.class);
 
         float damage = dmgerComp.getDamage();
         float knockbackLen = M.pow(dmgablComp.getDamage() * dmgerComp.getKnockbackRatio(), 2 );
-        float knockbackDir = dmgerPhysComp.getVelocity().getDirection();
+        float knockbackDir = dmgerRotComp.getAngle();
 
         dmgablComp.applyDamage(damage);
         dmgablPhysComp.addImpulse( Vec2.newLenDir(knockbackLen, knockbackDir) );
