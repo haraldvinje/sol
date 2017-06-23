@@ -17,16 +17,20 @@ public class CharacterSys implements Sys {
 
     private WorldContainer wc;
 
-    private float reloadTime = 0.2f;
-    private float bulletSpeed = 600f;
-    private float bulletRadius = 12;
-    private float timeToShoot = reloadTime;
-    private ColoredMesh bulletMesh = ColoredMeshUtils.createCircleTwocolor(bulletRadius, 8);
+
+
+
+    public CharacterSys() {
+
+    }
 
 
     @Override
     public void setWorldContainer(WorldContainer wc) {
         this.wc = wc;
+
+        //allocate bullet entity
+
     }
 
     @Override
@@ -34,19 +38,25 @@ public class CharacterSys implements Sys {
         //float aimAngle = TrigUtils.pointDirection(posComp.getX(), posComp.getY(),   userInput.getMouseX(), userInput.getMouseY());
 
         for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class)) {
+            CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
             PositionComp posComp = (PositionComp) wc.getComponent(entity, PositionComp.class);
             CharacterInputComp inputComp = (CharacterInputComp) wc.getComponent(entity, CharacterInputComp.class);
             RotationComp rotComp = (RotationComp) wc.getComponent(entity, RotationComp.class);
             PhysicsComp phComp = (PhysicsComp) wc.getComponent(entity, PhysicsComp.class);
 
-            updateEntity(entity, posComp, inputComp, rotComp, phComp);
+            updateEntity(entity, charComp, posComp, inputComp, rotComp, phComp);
         }
     }
 
-    private void updateEntity(int entity, PositionComp posComp, CharacterInputComp inputComp, RotationComp rotComp, PhysicsComp phComp) {
+    @Override
+    public void terminate() {
+
+    }
+
+    private void updateEntity(int entity, CharacterComp charComp, PositionComp posComp, CharacterInputComp inputComp, RotationComp rotComp, PhysicsComp phComp) {
         updateMove(inputComp, phComp);
         updateRotation(inputComp, posComp, rotComp);
-        updateAbilities(inputComp, posComp, rotComp);
+        updateAbilities(charComp, inputComp, posComp, rotComp);
     }
 
 
@@ -63,38 +73,30 @@ public class CharacterSys implements Sys {
         rotComp.setAngle(angle);
     }
 
-    private void updateAbilities(CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
+    private void updateAbilities(CharacterComp charComp, CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
         //System.out.println(inputComp.isAction1());
 
-        if (inputComp.isAction1() && timeToShoot <= 0) {
-            timeToShoot = reloadTime;
 
-            createBullet(posComp.getPos(), Vec2.newLenDir(bulletSpeed, rotComp.getAngle()) );
+        if (inputComp.isAction1() && charComp.timeToShoot <= 0) {
+            if (charComp.bulletEntity == -1) {
+                charComp.allocateBulletEntity(wc);
+            }
+
+            charComp.timeToShoot = charComp.reloadTime;
+
+            charComp.activateBullet(wc, posComp.getPos(), rotComp.getAngle() );
+
+            charComp.timeToDestroy = charComp.bulletLifetime;
         }
         else {
-            timeToShoot -= 1.0f/60f;
+            charComp.timeToShoot -= 1.0f;
         }
+
+        if (charComp.timeToDestroy == 0) {
+            charComp.deactivateBullet(wc);
+        }
+        charComp.timeToDestroy -= 1.0f;
     }
 
 
-    private void createBullet(Vec2 position, Vec2 velocity) {
-        System.out.println("Creating bullet");
-        int b = wc.createEntity();
-
-        Vec2 offset = new Vec2(velocity);
-        offset.setLength(64);
-        position = position.add(offset);
-        wc.addComponent(b, new PositionComp(position.x, position.y));
-        PhysicsComp pc = new PhysicsComp(20, 0.05f, 0.3f);
-        pc.addVelocity(velocity);
-        //pc.setFrictionConstant(0.001f); not implemented in resolution
-        wc.addComponent(b, pc);
-        wc.addComponent(b, new CollisionComp(new Circle(bulletRadius)));
-        wc.addComponent(b, new ColoredMeshComp(bulletMesh));
-
-        wc.addComponent(b, new DamagerComp(10, 1f));
-
-        wc.addComponent(b, new AffectedByHoleComp());
-
-    }
 }
