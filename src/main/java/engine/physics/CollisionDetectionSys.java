@@ -28,6 +28,7 @@ public class CollisionDetectionSys implements Sys {
         this.worldContainer = wc;
     }
 
+
     public void update(){
 
 
@@ -65,6 +66,11 @@ public class CollisionDetectionSys implements Sys {
                 }
             }
         }
+    }
+
+    @Override
+    public void terminate() {
+
     }
 
     private Integer[] createCollisionEntitiesArray(){

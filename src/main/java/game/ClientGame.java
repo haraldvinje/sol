@@ -42,7 +42,7 @@ public class ClientGame {
 
 
     public void init() {
-        window = new Window(WINDOW_WIDTH, WINDOW_HEIGHT, "SIIII");
+        window = new Window(WINDOW_WIDTH, WINDOW_HEIGHT, "Client   SIIII");
         userInput = new UserInput(window);
 
         wc = new WorldContainer();
@@ -50,58 +50,15 @@ public class ClientGame {
         System.out.println("HEELLLLLOOOOO");
 
 
-        //assign component types
-        wc.assignComponentType(PositionComp.class);
-        wc.assignComponentType(ColoredMeshComp.class);
-        wc.assignComponentType(TexturedMeshComp.class);
-        wc.assignComponentType(CollisionComp.class);
-        wc.assignComponentType(PhysicsComp.class);
-        wc.assignComponentType(CharacterComp.class);
-        wc.assignComponentType(CharacterInputComp.class);
-        wc.assignComponentType(UserCharacterInputComp.class);
-        wc.assignComponentType(RotationComp.class);
-        wc.assignComponentType(MeshCenterComp.class);
-        wc.assignComponentType(HoleComp.class);
-        wc.assignComponentType(DamageableComp.class);
-        wc.assignComponentType(DamagerComp.class);
-        wc.assignComponentType(AffectedByHoleComp.class);
+        //set program state
+        GameUtils.ON_SERVER = false;
+
+        GameUtils.assignComponentTypes(wc);
+
+        GameUtils.assignSystems(wc, window, userInput);
 
 
-        //add systems
-//        wc.addSystem(new UserCharacterInputSys(userInput));
-//        wc.addSystem(new CharacterSys());
-
-        //wc.addSystem(new CollisionDetectionSys());
-        //wc.addSystem(new HoleResolutionSys());
-        //wc.addSystem(new DamageResolutionSys());
-        //wc.addSystem(new CollisionResolutionSys());
-
-        //wc.addSystem(new PhysicsSys());
-        wc.addSystem(new RenderSys(window));
-
-        clientSys = new ClientNetworkSys("127.0.0.1", userInput); //tries to connect to server
-        wc.addSystem(clientSys);
-
-
-
-        players = new int[2];
-
-        players[0] = createPlayer(wc, "sol_frank.png");
-        players[1] = createPlayer(wc, "sol_frank.png");//createPlayer(wc, "sandbag.png");
-
-        //sandbag = createSandbag(wc);
-
-        float wallThickness = 64f;
-        createWall(wc, wallThickness/2, WINDOW_HEIGHT/2, wallThickness, WINDOW_HEIGHT);
-        createWall(wc, WINDOW_WIDTH-wallThickness/2, WINDOW_HEIGHT/2, wallThickness, WINDOW_HEIGHT);
-
-        createWall(wc, WINDOW_WIDTH/2, wallThickness/2, WINDOW_WIDTH-wallThickness*2, wallThickness);
-        createWall(wc, WINDOW_WIDTH/2, WINDOW_HEIGHT-wallThickness/2, WINDOW_WIDTH-wallThickness*2, wallThickness);
-
-
-        hole = createHole(wc);
-
-        createBackground(wc);
+        GameUtils.createInitialEntities(wc);
 
     }
 

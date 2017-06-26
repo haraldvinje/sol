@@ -66,6 +66,11 @@ public class PhysicsSys implements Sys {
         }
     }
 
+    @Override
+    public void terminate() {
+
+    }
+
 //    private void applyFriction() {
 //        for (int entity: physicsEntities){
 //            PhysicsComp physicsComp = (PhysicsComp) worldContainer.getComponent(entity, PhysicsComp.class);

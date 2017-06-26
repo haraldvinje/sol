@@ -23,90 +23,58 @@ public class ServerGame {
 
     private static final float FRAME_INTERVAL = 1.0f/60.0f;
 
-    public static final float WINDOW_WIDTH = 1600f,
-                                WINDOW_HEIGHT = 900f;
+
+    public static final float WINDOW_WIDTH = GameUtils.MAP_WIDTH /4,
+                                WINDOW_HEIGHT = GameUtils.MAP_HEIGHT /4;
 
 
     private Window window;
     private UserInput userInput;
 
-    private long lastTime;
-
     private WorldContainer wc;
 
-    //private CollisionDetectionSys cds;
 
 
-    private int[] players;
-    private int sandbag;
-    private int hole;
-
-    private ServerNetworkSys serverSys;
+    private long lastTime;
 
 
 
     public void init() {
-        window = new Window(WINDOW_WIDTH/4, WINDOW_HEIGHT/4, "SIIII");
+        window = new Window(WINDOW_WIDTH, WINDOW_HEIGHT, "Server   SIIII");
         userInput = new UserInput(window);
 
         wc = new WorldContainer();
 
-
         System.out.println("HEELLLLLOOOOO");
 
 
-        //assign component types
-        wc.assignComponentType(PositionComp.class);
-        wc.assignComponentType(ColoredMeshComp.class);
-        wc.assignComponentType(TexturedMeshComp.class);
-        wc.assignComponentType(CollisionComp.class);
-        wc.assignComponentType(PhysicsComp.class);
-        wc.assignComponentType(CharacterComp.class);
-        wc.assignComponentType(CharacterInputComp.class);
-//        wc.assignComponentType(UserCharacterInputComp.class);
-        wc.assignComponentType(RotationComp.class);
-        wc.assignComponentType(MeshCenterComp.class);
-        wc.assignComponentType(HoleComp.class);
-        wc.assignComponentType(DamageableComp.class);
-        wc.assignComponentType(DamagerComp.class);
-        wc.assignComponentType(AffectedByHoleComp.class);
+        //create entities
+        GameUtils.ON_SERVER = true;
+
+        GameUtils.assignComponentTypes(wc);
+
+        GameUtils.assignSystems(wc, window, userInput);
 
 
-        //add systems
-//        wc.addSystem(new UserCharacterInputSys(userInput));
-
-        wc.addSystem(new CharacterSys());
-
-        wc.addSystem(new CollisionDetectionSys());
-        wc.addSystem(new HoleResolutionSys());
-        wc.addSystem(new DamageResolutionSys());
-        wc.addSystem(new CollisionResolutionSys());
-
-        wc.addSystem(new PhysicsSys());
+        GameUtils.createInitialEntities(wc);
 
 
-        serverSys = new ServerNetworkSys();
-        wc.addSystem(serverSys);
-
-        wc.addSystem(new RenderSys(window));
-
-
-        players= new int[2];
-
-        players[0] = createPlayer(wc);
-        players[1] = createPlayer(wc);
-
-        //sandbag = createSandbag(wc);
-
-        float wallThickness = 64f;
-        createWall(wc, wallThickness/2, WINDOW_HEIGHT/2, wallThickness, WINDOW_HEIGHT);
-        createWall(wc, WINDOW_WIDTH-wallThickness/2, WINDOW_HEIGHT/2, wallThickness, WINDOW_HEIGHT);
-
-        createWall(wc, WINDOW_WIDTH/2, wallThickness/2, WINDOW_WIDTH-wallThickness*2, wallThickness);
-        createWall(wc, WINDOW_WIDTH/2, WINDOW_HEIGHT-wallThickness/2, WINDOW_WIDTH-wallThickness*2, wallThickness);
-
-
-        hole = createHole(wc);
+//        players= new int[2];
+//
+//        players[0] = GameUtils.createPlayer(wc);
+//        players[1] = GameUtils.createPlayer(wc);
+//
+//        //sandbag = createSandbag(wc);
+//
+//        float wallThickness = 64f;
+//        createWall(wc, wallThickness/2, WINDOW_HEIGHT/2, wallThickness, WINDOW_HEIGHT);
+//        createWall(wc, WINDOW_WIDTH-wallThickness/2, WINDOW_HEIGHT/2, wallThickness, WINDOW_HEIGHT);
+//
+//        createWall(wc, WINDOW_WIDTH/2, wallThickness/2, WINDOW_WIDTH-wallThickness*2, wallThickness);
+//        createWall(wc, WINDOW_WIDTH/2, WINDOW_HEIGHT-wallThickness/2, WINDOW_WIDTH-wallThickness*2, wallThickness);
+//
+//
+//        hole = createHole(wc);
 
 //        createBackground(wc);
 
@@ -136,83 +104,11 @@ public class ServerGame {
                 break;
         }
 
-        close();
+        terminate();
 
     }
 
-    private int createPlayer(WorldContainer wc) {
-        int player = wc.createEntity();
-        float radius = 32f;
-        float xoffset = 16f;
-        wc.addComponent(player, new CharacterComp());
-        wc.addComponent(player, new CharacterInputComp());
-//        wc.addComponent(player, new UserCharacterInputComp());
 
-        wc.addComponent(player, new PositionComp(WINDOW_WIDTH/2f, WINDOW_HEIGHT/2f));
-        wc.addComponent(player, new RotationComp());
-
-        wc.addComponent(player, new PhysicsComp(80, 2.5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
-        wc.addComponent(player, new CollisionComp(new Circle(radius)));
-
-        wc.addComponent(player, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sol_frank.png", 4*radius*2, 2*radius*2)));
-        wc.addComponent(player, new MeshCenterComp(radius*2+xoffset, radius*2));
-        wc.addComponent(player, new AffectedByHoleComp());
-
-        //wc.addComponent(player, new DamageableComp());
-
-        //wc.addComponent(player, new DamagerComp());
-
-        return player;
-    }
-    private int createSandbag(WorldContainer wc) {
-        float radius = 32f;
-        int sandbag = wc.createEntity();
-        wc.addComponent(sandbag, new PositionComp(500, 300) );
-        wc.addComponent(sandbag, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sandbag.png", radius*2, radius*2)));
-        wc.addComponent(sandbag, new MeshCenterComp(radius, radius));
-
-        wc.addComponent(sandbag, new PhysicsComp(80, 2.5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
-        wc.addComponent(sandbag, new CollisionComp(new Rectangle(radius*2, radius*2)));
-
-        wc.addComponent(sandbag, new DamageableComp());
-
-        return sandbag;
-    }
-
-    private int createHole(WorldContainer wc) {
-        float radius = 32.0f;
-        int hole = wc.createEntity();
-        wc.addComponent(hole, new PositionComp(1000, 300));
-        wc.addComponent(hole, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sandbag.png", radius * 2, radius * 2)));
-        wc.addComponent(hole, new MeshCenterComp(radius, radius));
-
-        wc.addComponent(hole, new PhysicsComp(500f, 10.0f));
-        wc.addComponent(hole, new CollisionComp(new Rectangle(radius, radius)));
-        wc.addComponent(hole, new HoleComp());
-
-
-        return hole;
-    }
-
-//    private int createBackground(WorldContainer wc) {
-//        int bg = wc.createEntity();
-//        wc.addComponent(bg, new PositionComp(0, 0));
-//        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", 1600, 900)));
-//
-//        return bg;
-//    }
-
-    private int createWall(WorldContainer wc, float x, float y, float width, float height) {
-        int w = wc.createEntity();
-        wc.addComponent(w, new PositionComp(x, y));
-        wc.addComponent(w, new PhysicsComp(0, 1, 1));
-        wc.addComponent(w, new CollisionComp(new Rectangle(width, height)));
-
-//        wc.addComponent(w, new ColoredMeshComp(ColoredMeshUtils.createRectangle(width, height)));
-//        wc.addComponent(w, new MeshCenterComp(width/2, height/2)); //physical rectangle is defined with position being the center, while the graphical square is defined in the upper left corner
-
-        return w;
-    }
 
 
     public void update() {
@@ -223,8 +119,8 @@ public class ServerGame {
 
     }
 
-    private void close() {
-        serverSys.close();
+    private void terminate() {
+        wc.terminate();
 
         window.close();
     }

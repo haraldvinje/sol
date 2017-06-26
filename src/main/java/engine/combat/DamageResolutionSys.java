@@ -37,6 +37,11 @@ public class DamageResolutionSys implements Sys {
 
     }
 
+    @Override
+    public void terminate() {
+
+    }
+
     private void updateDamageableEntity(int entity, CollisionComp collComp) {
         //check for each colliding object if it is a damager
         CollisionCompIterator collIt = collComp.collisionCompIterator();

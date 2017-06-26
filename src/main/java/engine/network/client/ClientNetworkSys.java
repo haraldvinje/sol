@@ -57,6 +57,21 @@ public class ClientNetworkSys implements Sys{
         updateServerByInput();
 
         updateGameStateByServer();
+
+
+        //destroy bullet on timeout
+        for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class)) {
+            CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
+            if (charComp.timeToDestroy == 0) {
+                charComp.deactivateBullet(wc);
+            }
+            charComp.timeToDestroy -= 1.0f;
+        }
+    }
+
+    @Override
+    public void terminate() {
+
     }
 
     private void updateServerByInput() {
@@ -95,23 +110,8 @@ public class ClientNetworkSys implements Sys{
     }
 
     public void sendInputData(CharacterInputData id) {
-        DataOutputStream ds = outputStream;
 
-        try {
-            ds.writeBoolean(id.isMoveLeft());
-            ds.writeBoolean(id.isMoveRight());
-            ds.writeBoolean(id.isMoveUp());
-            ds.writeBoolean(id.isMoveDown());
-
-            ds.writeBoolean(id.isAction1());
-            ds.writeBoolean(id.isAction2());
-
-            ds.writeFloat(id.getAimX());
-            ds.writeFloat(id.getAimY());
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+        NetworkUtils.characterInputToStream(id, outputStream); //protocol
     }
 
     private void applyGameState(GameStateData gameState) {
@@ -119,19 +119,24 @@ public class ClientNetworkSys implements Sys{
 
         int entityNumb = 0;
         for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class)) {
+            if (entityNumb >= NetworkUtils.CHARACTER_NUMB) throw new IllegalStateException("applying game state to more characters than supported by network system");
+
             PositionComp posComp = (PositionComp)wc.getComponent(entity, PositionComp.class);
             RotationComp rotComp = (RotationComp)wc.getComponent(entity, RotationComp.class);
+            CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
 
-            System.out.println("Updating game state by data: " + gameState);
-            if (entityNumb == 0) {
-                posComp.setX(gameState.getX1());
-                posComp.setY(gameState.getY1());
-                rotComp.setAngle(gameState.getRotation1());
-            }
-            else {
-                posComp.setX(gameState.getX2());
-                posComp.setY(gameState.getY2());
-                rotComp.setAngle(gameState.getRotation2());
+            //System.out.println("Updating game state by data: " + gameState);
+            posComp.setX(gameState.getX(entityNumb));
+            posComp.setY(gameState.getY(entityNumb));
+            rotComp.setAngle(gameState.getRotation(entityNumb));
+
+            //shoot bullet
+            if (gameState.getAbilityExecuted(entityNumb) == 1) {
+                if (charComp.bulletEntity == -1) {
+                    charComp.allocateBulletEntity(wc);
+                }
+                System.out.println(charComp.bulletEntity);
+                charComp.activateBullet(wc, posComp.getPos(), rotComp.getAngle() );
             }
 
             entityNumb++;
@@ -151,7 +156,7 @@ public class ClientNetworkSys implements Sys{
                     inputStream.skipBytes(messageBytes);
                 }
 
-                return streamToGameState(inputStream);
+                return NetworkUtils.streamToGameState(inputStream);
 
             }
             else {
@@ -162,26 +167,6 @@ public class ClientNetworkSys implements Sys{
             e.printStackTrace();
             throw new IllegalStateException("IO exception");
         }
-    }
-
-    private GameStateData streamToGameState(DataInputStream in) {
-        GameStateData state = new GameStateData();
-
-        try {
-            state.setX1(in.readFloat());
-            state.setY1(in.readFloat());
-            state.setRotation1(in.readFloat());
-
-            state.setX2(in.readFloat());
-            state.setY2(in.readFloat());
-            state.setRotation2(in.readFloat());
-
-            return state;
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        throw new IllegalStateException();
     }
 
 

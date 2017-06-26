@@ -52,6 +52,10 @@ public class PhysicsComp implements Component {
     public void addVelocity(Vec2 velocity) {
         this.velocity = this.velocity.add(velocity);
     }
+    public void resetVelocity() {
+        velocity.setZero();
+    }
+
     public Vec2 getImpulse() {
         return impulse;
     }
@@ -111,6 +115,13 @@ public class PhysicsComp implements Component {
     }
     public void setFrictionModel(int frictionModel) {
         this.frictionModel = frictionModel;
+    }
+
+
+    public void reset() {
+        resetAcceleration();
+        resetVelocity();
+        resetImpulse();
     }
 
     void setVelocityLen(float length) {
