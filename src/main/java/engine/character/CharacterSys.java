@@ -2,6 +2,8 @@ package engine.character;
 
 import engine.*;
 import engine.combat.DamagerComp;
+import engine.combat.abilities.Ability;
+import engine.combat.abilities.AbilityComp;
 import engine.graphics.ColoredMesh;
 import engine.graphics.ColoredMeshComp;
 import engine.graphics.ColoredMeshUtils;
@@ -43,6 +45,7 @@ public class CharacterSys implements Sys {
             CharacterInputComp inputComp = (CharacterInputComp) wc.getComponent(entity, CharacterInputComp.class);
             RotationComp rotComp = (RotationComp) wc.getComponent(entity, RotationComp.class);
             PhysicsComp phComp = (PhysicsComp) wc.getComponent(entity, PhysicsComp.class);
+            AbilityComp abComp = (AbilityComp) wc.getComponent(entity, AbilityComp.class);
 
             updateEntity(entity, charComp, posComp, inputComp, rotComp, phComp);
         }
@@ -76,18 +79,27 @@ public class CharacterSys implements Sys {
     private void updateAbilities(CharacterComp charComp, CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
         //System.out.println(inputComp.isAction1());
 
+        if (inputComp.isAction2()) {
+            abComp.requestExecution(0);
+        }
+
+        if (inputComp.isAction1()){
+            abComp.requestExecution(1);
+        }
 
         if (inputComp.isAction1() && charComp.timeToShoot <= 0) {
             if (charComp.bulletEntity == -1) {
                 charComp.allocateBulletEntity(wc);
+              
+                
+              charComp.timeToShoot = charComp.reloadTime;
+
+               charComp.activateBullet(wc, posComp.getPos(), rotComp.getAngle() );
+
+              charComp.timeToDestroy = charComp.bulletLifetime;
             }
-
-            charComp.timeToShoot = charComp.reloadTime;
-
-            charComp.activateBullet(wc, posComp.getPos(), rotComp.getAngle() );
-
-            charComp.timeToDestroy = charComp.bulletLifetime;
         }
+
         else {
             charComp.timeToShoot -= 1.0f;
         }
@@ -96,6 +108,7 @@ public class CharacterSys implements Sys {
             charComp.deactivateBullet(wc);
         }
         charComp.timeToDestroy -= 1.0f;
+
     }
 
 

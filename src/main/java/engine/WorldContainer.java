@@ -248,6 +248,10 @@ public class WorldContainer {
 
         return activeComponents.get(compType);
     }
+  
+    public void removeComponent(int entity, Class<? extends Component> compType){
+        getComponentsOfType(compType).remove(entity);
+    }
 
     public Component getComponent(int entity, Class<? extends Component> compType) {
         Component c = getComponentsOfType(compType).get(entity);

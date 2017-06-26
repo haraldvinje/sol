@@ -7,9 +7,14 @@ import engine.character.*;
 import engine.combat.DamageResolutionSys;
 import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
+import engine.combat.abilities.Ability;
+import engine.combat.abilities.AbilityComp;
+import engine.combat.abilities.AbilitySys;
+import engine.combat.abilities.MeleeAbility;
 import engine.graphics.*;
 import engine.physics.*;
 import engine.window.Window;
+import utils.maths.M;
 
 /**
  * Created by eirik on 13.06.2017.
@@ -68,6 +73,7 @@ public class Game {
         wc.assignComponentType(DamageableComp.class);
         wc.assignComponentType(DamagerComp.class);
         wc.assignComponentType(AffectedByHoleComp.class);
+        wc.assignComponentType(AbilityComp.class);
       
 
         //add systems
@@ -76,6 +82,7 @@ public class Game {
 
         wc.addSystem(new CollisionDetectionSys());
         wc.addSystem(new HoleResolutionSys());
+        wc.addSystem(new AbilitySys());
         wc.addSystem(new DamageResolutionSys());
         wc.addSystem(new CollisionResolutionSys());
 
@@ -150,7 +157,22 @@ public class Game {
 
         //wc.addComponent(player, new DamageableComp());
 
-        //wc.addComponent(player, new DamagerComp());
+        //Creating an ability for the player. Starting off with melee attacks
+        AbilityComp ability = new AbilityComp();
+
+        float hitboxRadius = 16f;
+        Circle hitbox = new Circle(hitboxRadius);
+        MeleeAbility meleeAbility = new MeleeAbility(wc, hitbox, 82.0f, M.PI/5.0f, 5, 30, 5, 5);
+        ability.addMeleeAbility(meleeAbility);
+
+        float hboxRadius = 32f;
+        Circle hbox = new Circle(hboxRadius);
+        MeleeAbility melAb = new MeleeAbility(wc, hbox, 102f,  M.PI/1.0f, 5,40,5,5);
+        ability.addMeleeAbility(melAb);
+
+        wc.addComponent(player, ability);
+
+
 
         return player;
     }
