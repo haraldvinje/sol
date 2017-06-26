@@ -248,10 +248,6 @@ public class WorldContainer {
 
         return activeComponents.get(compType);
     }
-  
-    public void removeComponent(int entity, Class<? extends Component> compType){
-        getComponentsOfType(compType).remove(entity);
-    }
 
     public Component getComponent(int entity, Class<? extends Component> compType) {
         Component c = getComponentsOfType(compType).get(entity);
@@ -277,6 +273,15 @@ public class WorldContainer {
         }
     }
 
+
+    public String entityToString(int entity) {
+        String entStr = "[Entity "+entity+": components={";
+        for (Class<? extends Component> compType : entityComponents.get(entity)) {
+            entStr += compType.getSimpleName() + "=" + hasComponent(entity, compType) + ", ";
+        }
+        entStr += "}]";
+        return entStr;
+    }
 
 }
 

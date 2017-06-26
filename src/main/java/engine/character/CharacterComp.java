@@ -2,6 +2,7 @@ package engine.character;
 
 import engine.Component;
 import engine.PositionComp;
+import engine.RotationComp;
 import engine.WorldContainer;
 import engine.combat.DamagerComp;
 import engine.graphics.ColoredMesh;
@@ -11,6 +12,7 @@ import engine.physics.Circle;
 import engine.physics.CollisionComp;
 import engine.physics.PhysicsComp;
 import game.GameUtils;
+import utils.maths.M;
 import utils.maths.Vec2;
 
 /**
@@ -19,7 +21,7 @@ import utils.maths.Vec2;
 public class CharacterComp implements Component {
 
 
-    public float reloadTime = 30f; //frames
+    public float reloadTime = 100f; //frames
     public float bulletSpeed = 600f;
     public float bulletRadius = 12;
     public float bulletLifetime = 90f; //frames
@@ -41,6 +43,7 @@ public class CharacterComp implements Component {
         int b = wc.createEntity();
 
         wc.addInactiveComponent(b, new PositionComp(0,0));
+        wc.addInactiveComponent(b, new RotationComp());
         wc.addInactiveComponent(b, new PhysicsComp(20, 0.05f, 0.3f));
         ColoredMesh bulletMesh = ColoredMeshUtils.createCircleTwocolor(bulletRadius, 8);
         wc.addInactiveComponent(b, new ColoredMeshComp(bulletMesh));
@@ -61,6 +64,8 @@ public class CharacterComp implements Component {
         shootExecuted = true;
 
         wc.activateEntity(bulletEntity);
+
+        //reset physics
         ((PhysicsComp)wc.getComponent(bulletEntity, PhysicsComp.class)).reset();
 
         System.out.println("Bullet angle: "+direction);
@@ -71,6 +76,7 @@ public class CharacterComp implements Component {
         offset.setLength(64);
         pos = pos.add(offset);
         ((PositionComp)wc.getComponent(bulletEntity, PositionComp.class)).setPos(pos);
+        ((RotationComp)wc.getComponent(bulletEntity, RotationComp.class)).setAngle(direction+M.PI); //make the target of the bullet knocked back towards you
         ((PhysicsComp)wc.getComponent(bulletEntity, PhysicsComp.class)).addVelocity(velocity);
     }
 

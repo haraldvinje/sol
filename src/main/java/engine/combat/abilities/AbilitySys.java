@@ -8,6 +8,7 @@ import engine.physics.PhysicsComp;
 import javafx.geometry.Pos;
 import utils.maths.Vec2;
 
+import java.awt.geom.RoundRectangle2D;
 import java.util.Set;
 
 /**
@@ -15,117 +16,149 @@ import java.util.Set;
  */
 public class AbilitySys implements Sys {
 
-    WorldContainer worldContainer;
+    WorldContainer wc;
 
     @Override
 
     public void setWorldContainer(WorldContainer wc) {
-        this.worldContainer = wc;
+        this.wc = wc;
     }
 
     @Override
     public void update() {
-        Set<Integer> abilityCompEntities = worldContainer.getEntitiesWithComponentType(AbilityComp.class);
+        Set<Integer> abilityCompEntities = wc.getEntitiesWithComponentType(AbilityComp.class);
 
         for (int entity: abilityCompEntities){
-            AbilityComp abComp = (AbilityComp) worldContainer.getComponent(entity, AbilityComp.class);
+            PositionComp posComp = (PositionComp) wc.getComponent(entity, PositionComp.class);
+            RotationComp rotComp = (RotationComp) wc.getComponent(entity, RotationComp.class);
+            AbilityComp abComp = (AbilityComp) wc.getComponent(entity, AbilityComp.class);
 
-
-            PositionComp posComp = (PositionComp) worldContainer.getComponent(entity, PositionComp.class);
-            RotationComp rotComp = (RotationComp) worldContainer.getComponent(entity, RotationComp.class);
+            if (abComp.isAbortExecution()) {
+                abComp.resetAbortExecution();
+                abortAbilityExecution(abComp);
+            }
 
             for (MeleeAbility meleeAbility: abComp.getMeleeAbilities()) {
-                if (abComp.getOccupiedBy() == meleeAbility || abComp.getOccupiedBy() == null){
-                    updateMeleeAbility(meleeAbility, abComp, posComp, rotComp);
-                }
+                updateMeleeAbility(meleeAbility, abComp, posComp, rotComp);
             }
         }
     }
 
-    private void updateMeleeAbility(MeleeAbility meleeAbility, AbilityComp abComp, PositionComp playerPosComp, RotationComp playerRotComp){
+    @Override
+    public void terminate() {
 
-        int hitboxEntity = meleeAbility.getHitboxEntity();
+    }
 
-       /* PhysicsComp meleePhComp = (PhysicsComp)(worldContainer.getComponent(hitboxEntity, PhysicsComp.class));
-        PositionComp meleePosComp = (PositionComp) (worldContainer.getComponent(hitboxEntity, PositionComp.class));*/
+    private void abortAbilityExecution(AbilityComp abComp) {
+        if (abComp.getOccupiedBy() != null) {
+            MeleeAbility ab = (MeleeAbility)abComp.getOccupiedBy();
+
+            //deactivate hitbox
+            //wc.deactivateEntity(ab.getHitboxEntity());
+            ab.setRecharging(false);
+
+            abComp.setOccupiedBy(null);
+        }
+    }
+
+    private void updateMeleeAbility(MeleeAbility meleeAbility, AbilityComp abComp, PositionComp posComp, RotationComp rotComp){
 
         int startupTime = meleeAbility.getStartupTime();
         int activeHitboxTime = meleeAbility.getActiveHitboxTime();
         int endingLagTime = meleeAbility.getEndlagTime();
-        int attackDurationTime = startupTime + activeHitboxTime + endingLagTime;
         int rechargeTime = meleeAbility.getRechargeTime();
 
-/*
-        meleePhComp.resetVelocity();
-*/
 
+        //move to next frame. Even thoug it is not executing
+        meleeAbility.counter++;
 
-        if (meleeAbility.isRequestingExecution()){
-            meleeAbility.execute();
-            meleeAbility.setRequestExecution(false);
-        }
+        //if this ability is recharging, continue recharging and do nothing else
+        if (! meleeAbility.isRecharging()) {
 
-        if (meleeAbility.isExecuting()) {
-            //if not occupied
-            if (meleeAbility.counter==0){
-                abComp.setOccupiedBy(meleeAbility);
+            //if no ability is executing, check if this one should be executed
+            if (abComp.getOccupiedBy() == null) {
+                //is ability is requested, execute it
+                if (meleeAbility.isRequestingExecution()) {
+
+                    System.out.println("Activating ability");
+
+                    startAbility(abComp, meleeAbility);
+                }
             }
 
-            meleeAbility.counter++;
+            //if this ability should execute, do it
+            if (abComp.getOccupiedBy() == meleeAbility) {
 
-            if (meleeAbility.counter == startupTime) {
-                activateHitbox(meleeAbility);
-            }
+                if (meleeAbility.counter < startupTime) {
+                    //do nothing, but keeps the flow straight
+                } else if (meleeAbility.counter == startupTime) {
+                    startActiveHitbox(meleeAbility, posComp, rotComp);
+                } else if (meleeAbility.counter < startupTime + activeHitboxTime) {
+                    duringActiveHitbox(meleeAbility, posComp, rotComp);
+                } else if (meleeAbility.counter == startupTime + activeHitboxTime) {
+                    endActiveHitbox(meleeAbility);
+                } else if (meleeAbility.counter == startupTime + activeHitboxTime + endingLagTime) {
+                    endExecuting(abComp, meleeAbility);
+                }
 
-            else if (startupTime + activeHitboxTime > meleeAbility.counter){
-                duringActiveHitbox(meleeAbility, playerPosComp, playerRotComp);
-
-            }
-
-            else if (startupTime + activeHitboxTime == meleeAbility.counter){
-                duringEndingLag(meleeAbility);
-            }
-
-            else if (attackDurationTime == meleeAbility.counter){
-                duringRecharge(abComp);
-            }
-
-            else if (attackDurationTime+rechargeTime == meleeAbility.counter) {
-                afterRecharge(meleeAbility);
             }
         }
+
+        //cannot use else, because rechargeTime may be 0
+        if (meleeAbility.counter == startupTime + activeHitboxTime + endingLagTime + rechargeTime) {
+            endRecharge(meleeAbility);
+        }
+
+        meleeAbility.setRequestExecution(false); //checking if a request is made each frame.
     }
 
 
+    private void startAbility(AbilityComp abComp, MeleeAbility meleeAbility) {
+        abComp.setOccupiedBy(meleeAbility);
+        meleeAbility.counter = 0;
+    }
 
-    private void activateHitbox(MeleeAbility meleeAbility){
-        meleeAbility.setActiveHitbox(true);
+    private void startActiveHitbox(MeleeAbility meleeAbility, PositionComp chrPosComp, RotationComp charRotComp){
+        int hbEnt = meleeAbility.getHitboxEntity();
+
+        wc.activateEntity(hbEnt);
+
+        //set hitbox direction
+        float hitboxAngle = charRotComp.getAngle() +meleeAbility.getRelativeAngle();
+        ((RotationComp)wc.getComponent(hbEnt, RotationComp.class)).setAngle(hitboxAngle);
+
+        //set relative positiom
+        duringActiveHitbox(meleeAbility, chrPosComp, charRotComp);
     }
 
 
-    private void duringActiveHitbox(MeleeAbility meleeAbility, PositionComp playerPosComp, RotationComp playerRotCom ){
-        float positionAngle = playerRotCom.getAngle();
-        float relativeHitboxAngle = meleeAbility.getRelativeAngle();
-        float resultAngle = positionAngle + relativeHitboxAngle;
+    private void duringActiveHitbox(MeleeAbility meleeAbility, PositionComp charPosComp, RotationComp charRotCom ){
+        int hbEnt = meleeAbility.getHitboxEntity();
 
-        Vec2 vector = Vec2.newLenDir(meleeAbility.getRelativeDistance(),resultAngle);
-        Vec2 result = playerPosComp.getPos().add(vector);
-        meleeAbility.setPosition(result);
 
-        meleeAbility.setAngle(resultAngle);
+        PositionComp hbPosComp = (PositionComp)wc.getComponent(hbEnt, PositionComp.class);
 
+        Vec2 relPos = Vec2.newLenDir(meleeAbility.getRelativeDistance(), charRotCom.getAngle() + meleeAbility.getRelativeAngle() );
+        hbPosComp.setPos( charPosComp.getPos().add(relPos) );
+
+        //reset physics
+        ((PhysicsComp)wc.getComponent(hbEnt, PhysicsComp.class) ).reset();
     }
 
-    private void duringEndingLag(MeleeAbility meleeAbility){
-        meleeAbility.setActiveHitbox(false);
+    private void endActiveHitbox(MeleeAbility meleeAbility){
+        //deactivate hitbox
+        int hbEnt = meleeAbility.getHitboxEntity();
+        wc.deactivateEntity(hbEnt);
     }
 
-    private void duringRecharge(AbilityComp abComp) {
-        abComp.setOccupiedBy(null);
+    private void endExecuting(AbilityComp abComp, MeleeAbility meleeAbility) {
+        meleeAbility.setRecharging(true);
+        abComp.setOccupiedBy(null); //release abComp
     }
 
-    private void afterRecharge(MeleeAbility meleeAbility){
-        meleeAbility.setExecuting(false);
+    private void endRecharge(MeleeAbility meleeAbility){
+        meleeAbility.setRecharging(false);
+
     }
 
 

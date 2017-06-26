@@ -2,6 +2,7 @@ package engine.network.client;
 
 import engine.*;
 import engine.character.CharacterComp;
+import engine.combat.abilities.AbilityComp;
 import engine.network.CharacterInputData;
 import engine.network.GameStateData;
 import engine.network.NetworkUtils;
@@ -60,13 +61,13 @@ public class ClientNetworkSys implements Sys{
 
 
         //destroy bullet on timeout
-        for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class)) {
-            CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
-            if (charComp.timeToDestroy == 0) {
-                charComp.deactivateBullet(wc);
-            }
-            charComp.timeToDestroy -= 1.0f;
-        }
+//        for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class)) {
+//            CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
+//            if (charComp.timeToDestroy == 0) {
+//                charComp.deactivateBullet(wc);
+//            }
+//            charComp.timeToDestroy -= 1.0f;
+//        }
     }
 
     @Override
@@ -130,14 +131,21 @@ public class ClientNetworkSys implements Sys{
             posComp.setY(gameState.getY(entityNumb));
             rotComp.setAngle(gameState.getRotation(entityNumb));
 
-            //shoot bullet
-            if (gameState.getAbilityExecuted(entityNumb) == 1) {
-                if (charComp.bulletEntity == -1) {
-                    charComp.allocateBulletEntity(wc);
-                }
-                System.out.println(charComp.bulletEntity);
-                charComp.activateBullet(wc, posComp.getPos(), rotComp.getAngle() );
+            AbilityComp abComp = (AbilityComp) wc.getComponent(entity, AbilityComp.class);
+            int newAbilityExecuting = gameState.getAbilityExecuted(entityNumb);
+            if (newAbilityExecuting != -1){
+                abComp.forceExecution(newAbilityExecuting);
+                System.out.println("Client detected shoot");
             }
+
+            //shoot bullet
+//            if (gameState.getAbilityExecuted(entityNumb) == 1) {
+//                if (charComp.bulletEntity == -1) {
+//                    charComp.allocateBulletEntity(wc);
+//                }
+//                System.out.println(charComp.bulletEntity);
+//                charComp.activateBullet(wc, posComp.getPos(), rotComp.getAngle() );
+//            }
 
             entityNumb++;
         }

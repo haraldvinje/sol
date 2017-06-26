@@ -6,6 +6,7 @@ import engine.Sys;
 import engine.WorldContainer;
 import engine.character.CharacterComp;
 import engine.character.CharacterInputComp;
+import engine.combat.abilities.AbilityComp;
 import engine.graphics.ColoredMeshComp;
 import engine.graphics.ColoredMeshUtils;
 import engine.network.CharacterInputData;
@@ -105,8 +106,6 @@ public class ServerNetworkSys implements Sys {
         //get game state
         GameStateData stateData = retrieveGameState();
 
-        System.out.println("Sending game state: " + stateData);
-
         //send game state
         sendGameState(stateData);
     }
@@ -122,16 +121,16 @@ public class ServerNetworkSys implements Sys {
         for (int c : chars) {
             PositionComp posComp = (PositionComp)wc.getComponent(c, PositionComp.class);
             RotationComp rotComp = (RotationComp)wc.getComponent(c, RotationComp.class);
-
             CharacterComp charComp = (CharacterComp)wc.getComponent(c, CharacterComp.class);
-            //add characters created
+            AbilityComp abComp = (AbilityComp)wc.getComponent(c, AbilityComp.class);
 
             sd.setX(charNumb, posComp.getX());
             sd.setY(charNumb, posComp.getY());
             sd.setRotation(charNumb, rotComp.getAngle());
-            if (charComp.shootExecuted) {
-                sd.setAbilityExecuted(charNumb, 1);
-                charComp.shootExecuted = false;
+
+            sd.setAbilityExecuted(charNumb, -1); //default -1, no ability
+            if (abComp.hasNewExecuting()) {
+                sd.setAbilityExecuted(charNumb, abComp.popNewExecuting());
             }
 
             charNumb++;

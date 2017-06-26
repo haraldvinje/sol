@@ -2,7 +2,9 @@ package engine.combat.abilities;
 
 import engine.Component;
 
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -19,8 +21,34 @@ public class AbilityComp implements Component {
 
     private Ability occupiedBy;
 
+    private boolean abortExecution = false;
+
+    private int newExecuted = -1; //to be used by network gamestate read
+
+
+    public AbilityComp(Ability... abilities) {
+        Arrays.asList(abilities).forEach(a -> {
+            if (a instanceof MeleeAbility) {
+                addMeleeAbility((MeleeAbility) a);
+            } else if (a instanceof ProjectileAbility) {
+                throw new UnsupportedOperationException("Projectile abilities not implemented");
+            }
+        });
+    }
+
     public void addMeleeAbility(MeleeAbility meleeAbility){
+        meleeAbility.setAbilityId(meleeAbilities.size());
         meleeAbilities.add(meleeAbility);
+
+    }
+
+    public boolean hasNewExecuting() {
+        return newExecuted != -1;
+    }
+    public int popNewExecuting() {
+        int n = newExecuted;
+        newExecuted = -1;
+        return n;
     }
 
     public List<MeleeAbility> getMeleeAbilities(){
@@ -36,7 +64,22 @@ public class AbilityComp implements Component {
         meleeAbilities.get(meleeId).requestExecution();
     }
 
+    public void forceExecution(int meleeId) {
+        abortExecution = true;
+        requestExecution(meleeId);
+    }
+
     public void setOccupiedBy(Ability a) {
         this.occupiedBy = a;
+        if (a != null) {
+            this.newExecuted = a.getAbilityId();
+        }
+    }
+
+    boolean isAbortExecution() {
+        return abortExecution;
+    }
+    void resetAbortExecution() {
+        abortExecution = false;
     }
 }

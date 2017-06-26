@@ -47,7 +47,7 @@ public class CharacterSys implements Sys {
             PhysicsComp phComp = (PhysicsComp) wc.getComponent(entity, PhysicsComp.class);
             AbilityComp abComp = (AbilityComp) wc.getComponent(entity, AbilityComp.class);
 
-            updateEntity(entity, charComp, posComp, inputComp, rotComp, phComp);
+            updateEntity(entity, charComp, abComp, posComp, inputComp, rotComp, phComp);
         }
     }
 
@@ -56,10 +56,10 @@ public class CharacterSys implements Sys {
 
     }
 
-    private void updateEntity(int entity, CharacterComp charComp, PositionComp posComp, CharacterInputComp inputComp, RotationComp rotComp, PhysicsComp phComp) {
+    private void updateEntity(int entity, CharacterComp charComp, AbilityComp abComp, PositionComp posComp, CharacterInputComp inputComp, RotationComp rotComp, PhysicsComp phComp) {
         updateMove(inputComp, phComp);
         updateRotation(inputComp, posComp, rotComp);
-        updateAbilities(charComp, inputComp, posComp, rotComp);
+        updateAbilities(charComp, abComp, inputComp, posComp, rotComp);
     }
 
 
@@ -76,7 +76,7 @@ public class CharacterSys implements Sys {
         rotComp.setAngle(angle);
     }
 
-    private void updateAbilities(CharacterComp charComp, CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
+    private void updateAbilities(CharacterComp charComp, AbilityComp abComp, CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
         //System.out.println(inputComp.isAction1());
 
         if (inputComp.isAction2()) {
@@ -87,27 +87,25 @@ public class CharacterSys implements Sys {
             abComp.requestExecution(1);
         }
 
-        if (inputComp.isAction1() && charComp.timeToShoot <= 0) {
-            if (charComp.bulletEntity == -1) {
-                charComp.allocateBulletEntity(wc);
-              
-                
-              charComp.timeToShoot = charComp.reloadTime;
-
-               charComp.activateBullet(wc, posComp.getPos(), rotComp.getAngle() );
-
-              charComp.timeToDestroy = charComp.bulletLifetime;
-            }
-        }
-
-        else {
-            charComp.timeToShoot -= 1.0f;
-        }
-
-        if (charComp.timeToDestroy == 0) {
-            charComp.deactivateBullet(wc);
-        }
-        charComp.timeToDestroy -= 1.0f;
+//      if (charComp.timeToShoot <= 0) {
+//            if (inputComp.isAction1()) {
+//                if (charComp.bulletEntity == -1) {
+//                    charComp.allocateBulletEntity(wc);
+//                }
+//
+//                charComp.timeToShoot = charComp.reloadTime;
+//                charComp.activateBullet(wc, posComp.getPos(), rotComp.getAngle());
+//                charComp.timeToDestroy = charComp.bulletLifetime;
+//            }
+//        }
+//        else {
+//            charComp.timeToShoot -= 1.0f;
+//        }
+//
+//        if (charComp.timeToDestroy == 0) {
+//            charComp.deactivateBullet(wc);
+//        }
+//        charComp.timeToDestroy -= 1.0f;
 
     }
 

@@ -11,11 +11,16 @@ import engine.character.UserCharacterInputComp;
 import engine.combat.DamageResolutionSys;
 import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
+import engine.combat.abilities.Ability;
+import engine.combat.abilities.AbilityComp;
+import engine.combat.abilities.AbilitySys;
+import engine.combat.abilities.MeleeAbility;
 import engine.graphics.*;
 import engine.network.client.ClientNetworkSys;
 import engine.network.server.ServerNetworkSys;
 import engine.physics.*;
 import engine.window.Window;
+import utils.maths.M;
 
 /**
  * Created by eirik on 22.06.2017.
@@ -48,6 +53,7 @@ public class GameUtils {
             wc.assignComponentType(DamageableComp.class);
             wc.assignComponentType(DamagerComp.class);
             wc.assignComponentType(AffectedByHoleComp.class);
+            wc.assignComponentType(AbilityComp.class);
 //        wc.assignComponentType(UserCharacterInputComp.class);
 
 
@@ -67,6 +73,7 @@ public class GameUtils {
 //            wc.assignComponentType(DamageableComp.class);
 //            wc.assignComponentType(DamagerComp.class);
 //            wc.assignComponentType(AffectedByHoleComp.class);
+            wc.assignComponentType(AbilityComp.class);
 
         }
 
@@ -75,8 +82,9 @@ public class GameUtils {
     public static void assignSystems(WorldContainer wc, Window window, UserInput userInput) {
         if (ON_SERVER) {
             wc.addSystem(new CharacterSys());
-//            wc.addSystem(new UserCharacterInputSys(userInput));
+            wc.addSystem(new AbilitySys());
 
+            wc.addSystem(new ServerNetworkSys());
 
             wc.addSystem(new CollisionDetectionSys());
             wc.addSystem(new HoleResolutionSys());
@@ -85,17 +93,17 @@ public class GameUtils {
 
             wc.addSystem(new PhysicsSys());
 
-            wc.addSystem(new ServerNetworkSys());
-
             wc.addSystem(new RenderSys(window));
         }
 
         else {
-            wc.addSystem(new RenderSys(window));
-
             wc.addSystem(new ClientNetworkSys(HOST_NAME, userInput) );
 
+            wc.addSystem(new AbilitySys());
+
             wc.addSystem(new PhysicsSys());
+
+            wc.addSystem(new RenderSys(window));
         }
     }
 
@@ -125,6 +133,25 @@ public class GameUtils {
     }
 
 
+    public static int allocateHitboxEntity(WorldContainer wc, Circle shape, float damage, float knockbackRatio){
+        int e = wc.createEntity();
+
+        wc.addInactiveComponent(e, new PositionComp(0, 0));
+        wc.addInactiveComponent(e, new RotationComp());
+
+        wc.addInactiveComponent(e, new PhysicsComp());
+
+        float[] redColor = {1.0f, 0f,0f};
+        wc.addInactiveComponent(e, new ColoredMeshComp(ColoredMeshUtils.createCircleSinglecolor(shape.getRadius(), 8, redColor)) );
+
+        if (ON_SERVER) {
+            wc.addInactiveComponent(e, new CollisionComp(shape));
+            wc.addInactiveComponent(e, new DamagerComp(damage, knockbackRatio));
+        }
+
+        return e;
+    }
+
     private static int createPlayer(WorldContainer wc, float x, float y) {
         int player = wc.createEntity();
         float radius = 32f;
@@ -136,6 +163,12 @@ public class GameUtils {
 
         wc.addComponent(player, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sol_frank.png", 4*radius*2, 2*radius*2)));
         wc.addComponent(player, new MeshCenterComp(radius*2+xoffset, radius*2));
+
+
+        wc.addComponent(player, new AbilityComp(
+                new MeleeAbility(wc, 8, 0.3f, new Circle(16f), 82.0f, 0f, 4, 1, 5, 5),
+                new MeleeAbility(wc, 15f, 0.7f, new Circle(32), 102f,  M.PI/1.0f, 10,1,5,5)
+        ));
 
         if (ON_SERVER) {
             wc.addComponent(player, new CharacterInputComp());
