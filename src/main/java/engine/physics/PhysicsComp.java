@@ -62,6 +62,9 @@ public class PhysicsComp implements Component {
         impulse.setZero();
     }
 
+    public void resetVelocity(){
+        this.velocity.setZero();
+    }
 
     public Vec2 getAcceleration() {
             return acceleration;
