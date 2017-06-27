@@ -113,12 +113,12 @@ public class AbilitySys implements Sys {
     }
 
 
-    private void startAbility(AbilityComp abComp, MeleeAbility meleeAbility) {
+    private void startExecution(AbilityComp abComp, MeleeAbility meleeAbility) {
         abComp.setOccupiedBy(meleeAbility);
         meleeAbility.counter = 0;
     }
 
-    private void startActiveHitbox(MeleeAbility meleeAbility, PositionComp chrPosComp, RotationComp charRotComp){
+    private void startEffect(MeleeAbility meleeAbility, PositionComp chrPosComp, RotationComp charRotComp){
         int hbEnt = meleeAbility.getHitboxEntity();
 
         wc.activateEntity(hbEnt);
@@ -132,7 +132,7 @@ public class AbilitySys implements Sys {
     }
 
 
-    private void duringActiveHitbox(MeleeAbility meleeAbility, PositionComp charPosComp, RotationComp charRotCom ){
+    private void duringEffect(MeleeAbility meleeAbility, PositionComp charPosComp, RotationComp charRotCom ){
         int hbEnt = meleeAbility.getHitboxEntity();
 
 
@@ -145,13 +145,13 @@ public class AbilitySys implements Sys {
         ((PhysicsComp)wc.getComponent(hbEnt, PhysicsComp.class) ).reset();
     }
 
-    private void endActiveHitbox(MeleeAbility meleeAbility){
+    private void endEffect(MeleeAbility meleeAbility){
         //deactivate hitbox
         int hbEnt = meleeAbility.getHitboxEntity();
         wc.deactivateEntity(hbEnt);
     }
 
-    private void endExecuting(AbilityComp abComp, MeleeAbility meleeAbility) {
+    private void endExecution(AbilityComp abComp, MeleeAbility meleeAbility) {
         meleeAbility.setRecharging(true);
         abComp.setOccupiedBy(null); //release abComp
     }
