@@ -49,7 +49,7 @@ public class ServerGame {
 
 
         //create entities
-        GameUtils.ON_SERVER = true;
+        GameUtils.PROGRAM = GameUtils.SERVER;
 
         GameUtils.assignComponentTypes(wc);
 

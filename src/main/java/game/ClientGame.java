@@ -51,7 +51,7 @@ public class ClientGame {
 
 
         //set program state
-        GameUtils.ON_SERVER = false;
+        GameUtils.PROGRAM = GameUtils.CLIENT;
 
         GameUtils.assignComponentTypes(wc);
 
