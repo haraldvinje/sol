@@ -87,25 +87,6 @@ public class CharacterSys implements Sys {
             abComp.requestExecution(1);
         }
 
-//        if (charComp.timeToShoot <= 0) {
-//            if (inputComp.isAction1()) {
-//                if (charComp.bulletEntity == -1) {
-//                    charComp.allocateBulletEntity(wc);
-//                }
-//
-//                charComp.timeToShoot = charComp.reloadTime;
-//                charComp.activateBullet(wc, posComp.getPos(), rotComp.getAngle());
-//                charComp.timeToDestroy = charComp.bulletLifetime;
-//            }
-//        }
-//        else {
-//            charComp.timeToShoot -= 1.0f;
-//        }
-//
-//        if (charComp.timeToDestroy == 0) {
-//            charComp.deactivateBullet(wc);
-//        }
-//        charComp.timeToDestroy -= 1.0f;
 
     }
 
