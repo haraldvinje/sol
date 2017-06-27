@@ -14,7 +14,7 @@ public abstract class Ability {
     private int abilityId;
 
     private int startupTime;
-    private int activeHitboxTime;
+    private int effectTime;
     private int endlagTime;
     private int rechargeTime;
 
@@ -26,9 +26,9 @@ public abstract class Ability {
 
 
 
-    public Ability(WorldContainer wc, float damage, float knockbackRatio, int startupTime, int activeHitboxTime, int endlagTime, int rechargeTime){
+    public Ability(WorldContainer wc, int startupTime, int effectTime, int endlagTime, int rechargeTime){
         this.startupTime = startupTime;
-        this.activeHitboxTime = activeHitboxTime;
+        this.effectTime = effectTime;
         this.endlagTime = endlagTime;
         this.rechargeTime = rechargeTime;
     }
@@ -36,9 +36,9 @@ public abstract class Ability {
 //        this(wc, 5, 0.5f, new Circle(5), 0.0f, 0.0f, 10, 10, 10, 10);
 //    }
 
-    abstract void startEffect();
-    abstract void duringEffect();
-    abstract void endEffect();
+    abstract void startEffect(WorldContainer wc, int requestingEntity);
+    abstract void duringEffect(WorldContainer wc, int requestingEntity);
+    abstract void endEffect(WorldContainer wc, int requestingEntity);
 
     //to be called by abilityCom
     void setAbilityId(int id) {
@@ -64,8 +64,8 @@ public abstract class Ability {
     int getStartupTime() {
         return startupTime;
     }
-    int getActiveHitboxTime() {
-        return activeHitboxTime;
+    int getEffectTime() {
+        return effectTime;
     }
     int getEndlagTime() {
         return endlagTime;

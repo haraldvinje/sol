@@ -7,17 +7,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Created by eirik on 19.06.2017.
  */
 public class AbilityComp implements Component {
 
+    private static final int EXPECTED_ABILITY_COUNT = 4;
     private static final int EXPECTED_MELEE_ABILITIES = 2;
     private static final int EXPECTED_PROJECTILE_ABILITIES = 2;
 
-    private List<MeleeAbility> meleeAbilities = new ArrayList<>(EXPECTED_MELEE_ABILITIES);
-    private List<ProjectileAbility> projectileAbilities = new ArrayList<>(EXPECTED_PROJECTILE_ABILITIES);
+    private List<Ability> abilities = new ArrayList<>(EXPECTED_ABILITY_COUNT);
+//    private List<MeleeAbility> meleeAbilities = new ArrayList<>(EXPECTED_MELEE_ABILITIES);
+//    private List<ProjectileAbility> projectileAbilities = new ArrayList<>(EXPECTED_PROJECTILE_ABILITIES);
 
     private Ability occupiedBy;
 
@@ -28,17 +31,14 @@ public class AbilityComp implements Component {
 
     public AbilityComp(Ability... abilities) {
         Arrays.asList(abilities).forEach(a -> {
-            if (a instanceof MeleeAbility) {
-                addMeleeAbility((MeleeAbility) a);
-            } else if (a instanceof ProjectileAbility) {
-                throw new UnsupportedOperationException("Projectile abilities not implemented");
-            }
+            addAbility(a);
         });
     }
 
-    public void addMeleeAbility(MeleeAbility meleeAbility){
-        meleeAbility.setAbilityId(meleeAbilities.size());
-        meleeAbilities.add(meleeAbility);
+
+    public void addAbility(Ability ability){
+        ability.setAbilityId(abilities.size());
+        abilities.add(ability);
 
     }
 
@@ -51,8 +51,8 @@ public class AbilityComp implements Component {
         return n;
     }
 
-    public List<MeleeAbility> getMeleeAbilities(){
-        return meleeAbilities;
+    public Stream<Ability> streamAbilities(){
+        return abilities.stream();
     }
 
     public Ability getOccupiedBy(){
@@ -61,7 +61,7 @@ public class AbilityComp implements Component {
 
 
     public void requestExecution(int meleeId) {
-        meleeAbilities.get(meleeId).requestExecution();
+        abilities.get(meleeId).requestExecution();
     }
 
     public void forceExecution(int meleeId) {
