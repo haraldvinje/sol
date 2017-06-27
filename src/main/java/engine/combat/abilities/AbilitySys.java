@@ -49,7 +49,7 @@ public class AbilitySys implements Sys {
 
     private void abortAbilityExecution(AbilityComp abComp) {
         if (abComp.getOccupiedBy() != null) {
-            MeleeAbility ab = (MeleeAbility)abComp.getOccupiedBy();
+            Ability ab = abComp.getOccupiedBy();
 
             //deactivate hitbox
             //wc.deactivateEntity(ab.getHitboxEntity());
