@@ -52,6 +52,16 @@ public class CollisionCompIterator implements Iterator<CollisionData> {
         return currentData;
     }
 
+    @Override
+    public void remove() {
+        if (!primaryFinished) {
+            primaryIterator.remove();
+        }
+        else {
+            secondaryIterator.remove();
+        }
+    }
+
     public int getSelfEntity() {
         if (!primaryFinished) {
             return currentData.getEntity1();
