@@ -39,23 +39,7 @@ public class CharacterComp implements Component {
 
 
     public void allocateBulletEntity(WorldContainer wc) {
-
-        int b = wc.createEntity();
-
-        wc.addInactiveComponent(b, new PositionComp(0,0));
-        wc.addInactiveComponent(b, new RotationComp());
-        wc.addInactiveComponent(b, new PhysicsComp(20, 0.05f, 0.3f));
-        ColoredMesh bulletMesh = ColoredMeshUtils.createCircleTwocolor(bulletRadius, 8);
-        wc.addInactiveComponent(b, new ColoredMeshComp(bulletMesh));
-
-        if (GameUtils.ON_SERVER) {
-            wc.addInactiveComponent(b, new CollisionComp(new Circle(bulletRadius))); //dont need this one
-
-            wc.addInactiveComponent(b, new DamagerComp(10, 1f));
-
-        }
-
-        bulletEntity = b;
+        bulletEntity = GameUtils.allocateProjectileEntity(wc, new Circle(bulletRadius), 10, 0.5f);
     }
 
     public void activateBullet(WorldContainer wc, Vec2 pos, float direction) {
