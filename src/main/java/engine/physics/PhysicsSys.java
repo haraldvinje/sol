@@ -48,16 +48,17 @@ public class PhysicsSys implements Sys {
             Vec2 deltaAcceleration = physicsComp.getAcceleration().scale(DELTA_TIME);
             physicsComp.addVelocity( deltaAcceleration.add( physicsComp.getImpulse()) );
 
-            //check if velocity is to great
-            if (physicsComp.getVelocity().getLengthSquared() > MAX_VELOCITY*MAX_VELOCITY) {
+
+            //check if velocity is to great. If so, apply greatest velocity, but dont change the velocity
+            Vec2 correctedVelocity = new Vec2(physicsComp.getVelocity());
+            if (correctedVelocity.getLengthSquared() > MAX_VELOCITY*MAX_VELOCITY) {
                 //System.out.println("Hit max velocity");
-                physicsComp.setVelocityLen(MAX_VELOCITY);
+                correctedVelocity.setLength(MAX_VELOCITY);
             }
 
             //apply velocity
-            Vec2 deltaVelocity = physicsComp.getVelocity().scale(DELTA_TIME);
-
-            posComp.addPos(deltaVelocity);
+            Vec2 deltaCorrectedVelocity = correctedVelocity.scale(DELTA_TIME);
+            posComp.addPos(deltaCorrectedVelocity);
 
 
             //reset frame-based values
