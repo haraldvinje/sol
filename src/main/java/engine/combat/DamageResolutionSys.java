@@ -48,10 +48,10 @@ public class DamageResolutionSys implements Sys {
         while(collIt.hasNext()) {
             CollisionData data = collIt.next();
 
-            //System.out.println(data);
+            if (!data.isActive()) continue;
 
             if (wc.hasComponent(collIt.getOtherEntity(), DamagerComp.class)) {
-                //System.out.println("Taking damage, bullet: "+collIt.getOtherEntity() +" victim: " + collIt.getSelfEntity());
+                System.out.println("Taking damage, bullet: "+collIt.getOtherEntity() +" victim: " + collIt.getSelfEntity());
                 takeDamage(entity, collIt.getOtherEntity());
             }
         }

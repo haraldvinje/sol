@@ -39,10 +39,12 @@ public class CollisionResolutionSys implements Sys {
             CollisionComp collisionComp = (CollisionComp) worldContainer.getComponent(entity, CollisionComp.class);
 
             for (CollisionData data: collisionComp.getPrimaryCollisionDataList()){
-                //calculate vector based on current velocity vector,  penetration depth
-                if (data.isActive()){
-                    resolveCollision(data);
-                }
+
+                //if the collision is inactive, skip it
+                if (!data.isActive()) continue;
+
+                resolveCollision(data);
+
             }
 
         }

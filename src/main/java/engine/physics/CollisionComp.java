@@ -19,6 +19,7 @@ public class CollisionComp implements Component, Iterable<CollisionData> {
     private List<CollisionData> secondaryCollisionDataList = new ArrayList<CollisionData>(5);
 
 
+
     public CollisionComp(Shape s) {
         this.shape = s;
     }
