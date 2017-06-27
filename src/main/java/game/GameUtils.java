@@ -192,14 +192,14 @@ public class GameUtils {
 
         if (PROGRAM == SERVER  || PROGRAM == OFFLINE) {
             wc.addInactiveComponent(e, new CollisionComp(shape));
-            wc.addInactiveComponent(e, new DamagerComp(damage, knockbackRatio));
+            wc.addInactiveComponent(e, new DamagerComp(damage, baseKnockback, knockbackRatio));
 
         }
 
         return e;
     }
 
-    public static int allocateProjectileEntity(WorldContainer wc, Circle shape, float damage, float knockbackRatio) {
+    public static int allocateProjectileEntity(WorldContainer wc, Circle shape, float damage, float baseKnockback, float knockbackRatio) {
         int b = wc.createEntity();
 
         wc.addInactiveComponent(b, new PositionComp(0,0));
@@ -233,8 +233,8 @@ public class GameUtils {
 
 
         wc.addComponent(player, new AbilityComp(
-                new MeleeAbility(wc, 4, 16, 3, 20, 8f, 0.2f, new Circle(64f),32.0f, 0f),
-                new ProjectileAbility(wc, 10, 15, 60, 10, 0.5f, 500f, M.PI, new Circle(8))
+                new MeleeAbility(wc, 4, 16, 3, 20, 80, 300, 0.7f, new Circle(64f),32.0f, 0f),
+                new ProjectileAbility(wc, 5, 15, 10, 20, 700, 0.2f, 500f, M.PI, new Circle(8))
                 //new MeleeAbility(wc,  15, 1,15,30,20f, 0.8f, new Circle(8f), 82f,0f)
         ));
 
