@@ -13,11 +13,11 @@ import java.util.Set;
 /**
  * Created by haraldvinje on 14-Jun-17.
  */
-public class CollisionResolutionSys implements Sys {
+public class NaturalResolutionSys implements Sys {
 
     private WorldContainer worldContainer;
 
-    public CollisionResolutionSys(){
+    public NaturalResolutionSys(){
 
     }
 
@@ -43,7 +43,11 @@ public class CollisionResolutionSys implements Sys {
                 //if the collision is inactive, skip it
                 if (!data.isActive()) continue;
 
-                resolveCollision(data);
+                if (worldContainer.hasComponent(data.getEntity1(), NaturalResolutionComp.class) &&
+                    worldContainer.hasComponent(data.getEntity2(), NaturalResolutionComp.class) ) {
+
+                    resolveCollision(data);
+                }
 
             }
 
