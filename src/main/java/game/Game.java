@@ -159,8 +159,8 @@ public class Game {
         //wc.addComponent(player, new DamageableComp());
 
         wc.addComponent(player, new AbilityComp(
-                new MeleeAbility(wc, 8f, 0.2f, new Circle(16f), 82.0f, M.PI/5.0f, 5, 1, 5, 5),
-                new MeleeAbility(wc, 15f, 0.9f, new Circle(32), 102f,  M.PI/1.0f, 5,1,5,5)
+                new MeleeAbility(wc, 8f, 0.2f, new Circle(16f), 82.0f, 0, 5, 3, 5, 5),
+                new MeleeAbility(wc, 15f, 0.9f, new Circle(32), 102f,  0, 5,3,5,5)
         ));
 
 
