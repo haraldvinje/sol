@@ -38,6 +38,7 @@ public class GameUtils {
             wc.assignComponentType(ColoredMeshComp.class);
             wc.assignComponentType(TexturedMeshComp.class);
             wc.assignComponentType(CollisionComp.class);
+            wc.assignComponentType(NaturalResolutionComp.class);
             wc.assignComponentType(PhysicsComp.class);
             wc.assignComponentType(CharacterComp.class);
             wc.assignComponentType(CharacterInputComp.class);
@@ -64,7 +65,7 @@ public class GameUtils {
 //            wc.assignComponentType(CharacterInputComp.class);
 //            wc.assignComponentType(UserCharacterInputComp.class);
 //            wc.assignComponentType(HoleComp.class);
-//            wc.assignComponentType(DamageableComp.class);
+            wc.assignComponentType(DamageableComp.class);
 //            wc.assignComponentType(DamagerComp.class);
 //            wc.assignComponentType(AffectedByHoleComp.class);
             wc.assignComponentType(AbilityComp.class);
@@ -77,6 +78,8 @@ public class GameUtils {
             wc.assignComponentType(ColoredMeshComp.class);
             wc.assignComponentType(TexturedMeshComp.class);
             wc.assignComponentType(CollisionComp.class);
+            wc.assignComponentType(NaturalResolutionComp.class);
+
             wc.assignComponentType(PhysicsComp.class);
             wc.assignComponentType(CharacterComp.class);
             wc.assignComponentType(CharacterInputComp.class);
@@ -108,7 +111,7 @@ public class GameUtils {
             wc.addSystem(new HoleResolutionSys());
             wc.addSystem(new HitboxResolutionSys());
             wc.addSystem(new DamageResolutionSys());
-            wc.addSystem(new CollisionResolutionSys());
+            wc.addSystem(new NaturalResolutionSys());
 
             wc.addSystem(new PhysicsSys());
 
@@ -132,7 +135,7 @@ public class GameUtils {
             wc.addSystem(new HoleResolutionSys());
             wc.addSystem(new HitboxResolutionSys());
             wc.addSystem(new DamageResolutionSys());
-            wc.addSystem(new CollisionResolutionSys());
+            wc.addSystem(new NaturalResolutionSys());
 
             wc.addSystem(new PhysicsSys());
 
@@ -184,7 +187,7 @@ public class GameUtils {
         wc.addInactiveComponent(e, new PositionComp(0, 0));
         wc.addInactiveComponent(e, new RotationComp());
 
-        wc.addInactiveComponent(e, new PhysicsComp());
+        //wc.addInactiveComponent(e, new PhysicsComp());
         wc.addInactiveComponent(e, new HitboxComp());
 
         float[] redColor = {1.0f, 0f,0f};
@@ -243,6 +246,7 @@ public class GameUtils {
 
             wc.addComponent(player, new PhysicsComp(80, 5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
             wc.addComponent(player, new CollisionComp(new Circle(radius)));
+            wc.addComponent(player, new NaturalResolutionComp());
 
             wc.addComponent(player, new AffectedByHoleComp());
 
@@ -265,6 +269,8 @@ public class GameUtils {
 
         wc.addComponent(sandbag, new PhysicsComp(80, 2.5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
         wc.addComponent(sandbag, new CollisionComp(new Rectangle(radius*2, radius*2)));
+        wc.addComponent(sandbag, new NaturalResolutionComp());
+
 
         wc.addComponent(sandbag, new DamageableComp());
         wc.addComponent(sandbag, new AffectedByHoleComp());
@@ -328,6 +334,7 @@ public class GameUtils {
         if (PROGRAM == SERVER || PROGRAM == OFFLINE) {
             wc.addComponent(w, new PhysicsComp(0, 1, 1));
             wc.addComponent(w, new CollisionComp(new Rectangle(width, height)));
+            wc.addComponent(w, new NaturalResolutionComp());
 
         }
 
