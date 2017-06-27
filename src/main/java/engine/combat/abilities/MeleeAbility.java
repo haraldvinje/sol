@@ -99,9 +99,6 @@ public class MeleeAbility extends Ability{
 
         Vec2 relPos = Vec2.newLenDir(relativeDistance, reqRotComp.getAngle() + relativeAngle );
         hbPosComp.setPos( reqPosComp.getPos().add(relPos) );
-
-        //reset physics
-        ((PhysicsComp)wc.getComponent(hitboxEntity, PhysicsComp.class) ).reset();
     }
 
 }
