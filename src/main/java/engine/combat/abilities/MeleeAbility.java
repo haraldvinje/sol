@@ -30,14 +30,14 @@ public class MeleeAbility extends Ability{
     private float relativeAngle;
 
 
-    public MeleeAbility(WorldContainer wc, int startupTime, int activeHitboxTime, int endlagTime, int rechargeTime,     float damage, float knockbackRatio, Shape hitboxShape, float relativeDistance, float relativeAngle){
+    public MeleeAbility(WorldContainer wc, int startupTime, int activeHitboxTime, int endlagTime, int rechargeTime,     float damage, float baseKnockback,  float knockbackRatio, Shape hitboxShape, float relativeDistance, float relativeAngle){
         super(wc, startupTime, activeHitboxTime, endlagTime, rechargeTime);
 
         this.relativeDistance = relativeDistance;
         this.relativeAngle = relativeAngle;
 
         if (hitboxShape instanceof Circle){
-            hitboxEntity = GameUtils.allocateHitboxEntity(wc, (Circle)hitboxShape, damage, knockbackRatio);
+            hitboxEntity = GameUtils.allocateHitboxEntity(wc, (Circle)hitboxShape, damage, baseKnockback, knockbackRatio);
         }
 
         if (hitboxShape instanceof Rectangle){

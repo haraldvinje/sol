@@ -9,11 +9,13 @@ public class DamagerComp implements Component {
 
 
     private float damage;
+    private float baseKnockback;
     private float knockbackRatio;
 
 
-    public DamagerComp(float damage, float knockbackRatio) {
+    public DamagerComp(float damage, float baseKnockback, float knockbackRatio) {
         setDamage(damage);
+        setBaseKnockback(baseKnockback);
         setKnockbackRatio(knockbackRatio);
     }
 
@@ -24,6 +26,13 @@ public class DamagerComp implements Component {
 
     public void setDamage(float damage) {
         this.damage = damage;
+    }
+
+    public float getBaseKnockback() {
+        return baseKnockback;
+    }
+    public void setBaseKnockback(float baseKnockback) {
+        this.baseKnockback = baseKnockback;
     }
 
     public float getKnockbackRatio() {

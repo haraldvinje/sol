@@ -3,6 +3,7 @@ package engine.physics;
 import engine.PositionComp;
 import engine.Sys;
 import engine.WorldContainer;
+import engine.combat.DamageableComp;
 import javafx.geometry.Pos;
 import utils.maths.Vec2;
 

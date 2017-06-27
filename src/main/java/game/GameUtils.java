@@ -178,7 +178,7 @@ public class GameUtils {
     }
 
 
-    public static int allocateHitboxEntity(WorldContainer wc, Circle shape, float damage, float knockbackRatio){
+    public static int allocateHitboxEntity(WorldContainer wc, Circle shape, float damage, float baseKnockback, float knockbackRatio){
         int e = wc.createEntity();
 
         wc.addInactiveComponent(e, new PositionComp(0, 0));
@@ -212,7 +212,7 @@ public class GameUtils {
 
         if (PROGRAM == SERVER || PROGRAM == OFFLINE) {
             wc.addInactiveComponent(b, new CollisionComp(shape));
-            wc.addInactiveComponent(b, new DamagerComp(damage, knockbackRatio));
+            wc.addInactiveComponent(b, new DamagerComp(damage, baseKnockback, knockbackRatio));
 
         }
 

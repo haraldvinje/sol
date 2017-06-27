@@ -64,8 +64,11 @@ public class AbilityComp implements Component {
         abilities.get(meleeId).requestExecution();
     }
 
-    public void forceExecution(int meleeId) {
+    public void abortExecution() {
         abortExecution = true;
+    }
+    public void forceExecution(int meleeId) {
+        abortExecution();
         requestExecution(meleeId);
     }
 

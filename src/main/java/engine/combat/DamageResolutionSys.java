@@ -3,6 +3,7 @@ package engine.combat;
 import engine.RotationComp;
 import engine.Sys;
 import engine.WorldContainer;
+import engine.combat.abilities.AbilityComp;
 import engine.physics.CollisionComp;
 import engine.physics.CollisionCompIterator;
 import engine.physics.CollisionData;
@@ -65,11 +66,17 @@ public class DamageResolutionSys implements Sys {
         DamageableComp dmgablComp = (DamageableComp)wc.getComponent(damaged, DamageableComp.class);
         PhysicsComp dmgablPhysComp = (PhysicsComp)wc.getComponent(damaged, PhysicsComp.class);
 
+        //calculate damage and knockback
         float damage = dmgerComp.getDamage();
-        float knockbackLen = M.pow(dmgablComp.getDamage() * dmgerComp.getKnockbackRatio(), 2 );
+        float knockbackLen = M.pow(dmgablComp.getDamage() * dmgerComp.getKnockbackRatio(), 1 ) + dmgerComp.getBaseKnockback();
         float knockbackDir = dmgerRotComp.getAngle();
 
+        //apply damage and knockback
         dmgablComp.applyDamage(damage);
         dmgablPhysComp.addImpulse( Vec2.newLenDir(knockbackLen, knockbackDir) );
+
+
+        //interrupt damageable to cancel abilities
+        dmgablComp.interrupt();
     }
 }

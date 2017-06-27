@@ -4,6 +4,7 @@ import engine.PositionComp;
 import engine.RotationComp;
 import engine.Sys;
 import engine.WorldContainer;
+import engine.combat.DamageableComp;
 import engine.physics.PhysicsComp;
 import javafx.geometry.Pos;
 import utils.maths.Vec2;
@@ -33,9 +34,18 @@ public class AbilitySys implements Sys {
             RotationComp rotComp = (RotationComp) wc.getComponent(entity, RotationComp.class);
             AbilityComp abComp = (AbilityComp) wc.getComponent(entity, AbilityComp.class);
 
+            if (wc.hasComponent(entity, DamageableComp.class)) {
+                DamageableComp dmgableComp = (DamageableComp)wc.getComponent(entity, DamageableComp.class);
+
+                if (dmgableComp.isInterrupted()) {
+                    abComp.abortExecution();
+                    dmgableComp.popInterrupt();
+                }
+            }
+
             if (abComp.isAbortExecution()) {
                 abComp.resetAbortExecution();
-                abortAbilityExecution(abComp);
+                abortAbilityExecution(abComp, entity);
             }
 
             abComp.streamAbilities().forEach(a -> updateMeleeAbility(entity, a, abComp, posComp, rotComp ) );
@@ -47,12 +57,13 @@ public class AbilitySys implements Sys {
 
     }
 
-    private void abortAbilityExecution(AbilityComp abComp) {
+    private void abortAbilityExecution(AbilityComp abComp, int requestingEntity) {
         if (abComp.getOccupiedBy() != null) {
             Ability ab = abComp.getOccupiedBy();
 
-            //deactivate hitbox
-            //wc.deactivateEntity(ab.getHitboxEntity());
+            //end effect
+            ab.endEffect(wc, requestingEntity);
+            //end recharge that should not have started
             ab.setRecharging(false);
 
             abComp.setOccupiedBy(null);

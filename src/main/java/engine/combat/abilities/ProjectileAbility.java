@@ -24,10 +24,10 @@ public class ProjectileAbility extends Ability {
 
 
 
-    public ProjectileAbility(WorldContainer wc, int startupTime, int endlagTime, int rechargeTime,     float damage, float knockbackRatio, float projStartSpeed, float projKnockbackAngle, Shape projShape) {
+    public ProjectileAbility(WorldContainer wc, int startupTime, int endlagTime, int rechargeTime,     float damage, float baseKnockback, float knockbackRatio, float projStartSpeed, float projKnockbackAngle, Shape projShape) {
         super(wc, startupTime, 0, endlagTime, rechargeTime);
 
-        projEntity = GameUtils.allocateProjectileEntity(wc, (Circle)projShape, damage, knockbackRatio);
+        projEntity = GameUtils.allocateProjectileEntity(wc, (Circle)projShape, damage, baseKnockback, knockbackRatio);
 
         this.projStartSpeed = projStartSpeed;
         this.knockbackAngle = projKnockbackAngle;
