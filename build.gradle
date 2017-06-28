@@ -75,6 +75,8 @@ task runClient(type: JavaExec) {
     systemProperty 'java.library.path', project.nativeLibsDir
 }
 
+task runServerClient(dependsOn: ['runClient', 'runServer'])
+runClient.mustRunAfter runServer
 
 run {
     mainClassName = 'game.Main'
