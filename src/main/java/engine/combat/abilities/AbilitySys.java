@@ -27,9 +27,9 @@ public class AbilitySys implements Sys {
 
     @Override
     public void update() {
-        Set<Integer> abilityCompEntities = wc.getEntitiesWithComponentType(AbilityComp.class);
 
-        for (int entity: abilityCompEntities){
+        wc.entitiesOfComponentTypeStream(AbilityComp.class).forEach(entity -> {
+
             PositionComp posComp = (PositionComp) wc.getComponent(entity, PositionComp.class);
             RotationComp rotComp = (RotationComp) wc.getComponent(entity, RotationComp.class);
             AbilityComp abComp = (AbilityComp) wc.getComponent(entity, AbilityComp.class);
@@ -48,7 +48,7 @@ public class AbilitySys implements Sys {
             }
 
             abComp.streamAbilities().forEach(a -> updateMeleeAbility(entity, a, abComp, posComp, rotComp ) );
-        }
+        });
     }
 
     @Override
