@@ -246,7 +246,7 @@ public class GameUtils {
         float radius = 32f;
         float xoffset = 16f;
 
-        wc.addComponent(player, new CharacterComp());
+        wc.addComponent(player, new CharacterComp(1500f));
         wc.addComponent(player, new PositionComp(x, y));
         wc.addComponent(player, new RotationComp());
 
