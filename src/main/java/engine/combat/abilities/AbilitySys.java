@@ -39,7 +39,6 @@ public class AbilitySys implements Sys {
 
                 if (dmgableComp.isInterrupted()) {
                     abComp.abortExecution();
-                    dmgableComp.popInterrupt();
                 }
             }
 
