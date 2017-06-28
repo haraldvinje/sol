@@ -71,7 +71,7 @@ public class ServerClientHandler {
             if (inputStream.available() >= messageBytes) {
 
                 //remove delayed data
-                while (inputStream.available() >= messageBytes*2) {
+                while (inputStream.available() >= messageBytes*(2 + NetworkUtils.SERVER_INPUT_BUFFERING) ) {
                     inputStream.skipBytes(messageBytes);
                 }
 

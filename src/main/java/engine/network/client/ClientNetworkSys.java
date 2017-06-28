@@ -3,9 +3,13 @@ package engine.network.client;
 import engine.*;
 import engine.character.CharacterComp;
 import engine.combat.abilities.AbilityComp;
+import engine.combat.abilities.HitboxComp;
+import engine.combat.abilities.ProjectileComp;
 import engine.network.CharacterInputData;
+import engine.network.CharacterStateData;
 import engine.network.GameStateData;
 import engine.network.NetworkUtils;
+import utils.maths.M;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -58,16 +62,6 @@ public class ClientNetworkSys implements Sys{
         updateServerByInput();
 
         updateGameStateByServer();
-
-
-        //destroy bullet on timeout
-//        for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class)) {
-//            CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
-//            if (charComp.timeToDestroy == 0) {
-//                charComp.deactivateBullet(wc);
-//            }
-//            charComp.timeToDestroy -= 1.0f;
-//        }
     }
 
     @Override
@@ -80,6 +74,7 @@ public class ClientNetworkSys implements Sys{
         CharacterInputData input = retrieveUserInput();
         sendInputData(input);
     }
+
 
     private void updateGameStateByServer() {
 
@@ -118,34 +113,49 @@ public class ClientNetworkSys implements Sys{
     private void applyGameState(GameStateData gameState) {
         //apply state
 
+        System.out.println("Recieved frame: " + gameState.getFrameNumber());
+
         int entityNumb = 0;
         for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class)) {
             if (entityNumb >= NetworkUtils.CHARACTER_NUMB) throw new IllegalStateException("applying game state to more characters than supported by network system");
 
-            PositionComp posComp = (PositionComp)wc.getComponent(entity, PositionComp.class);
-            RotationComp rotComp = (RotationComp)wc.getComponent(entity, RotationComp.class);
+            //PositionComp posComp = (PositionComp)wc.getComponent(entity, PositionComp.class);
+            //RotationComp rotComp = (RotationComp)wc.getComponent(entity, RotationComp.class);
             CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
 
-            //System.out.println("Updating game state by data: " + gameState);
-            posComp.setX(gameState.getX(entityNumb));
-            posComp.setY(gameState.getY(entityNumb));
-            rotComp.setAngle(gameState.getRotation(entityNumb));
+//            posComp.setX(gameState.getX(entityNumb));
+//            posComp.setY(gameState.getY(entityNumb));
+//            rotComp.setAngle(gameState.getRotation(entityNumb));
 
+            //Give new character state to interpolation component
+            InterpolationComp interpComp = (InterpolationComp)wc.getComponent(entity, InterpolationComp.class);
+            interpComp.addFrame(gameState.getFrameNumber(), new CharacterStateData( gameState.getX(entityNumb), gameState.getY(entityNumb), gameState.getRotation(entityNumb) ));
+
+            //execute abilities in abSystem according to input
             AbilityComp abComp = (AbilityComp) wc.getComponent(entity, AbilityComp.class);
             int newAbilityExecuting = gameState.getAbilityExecuted(entityNumb);
             if (newAbilityExecuting != -1){
                 abComp.forceExecution(newAbilityExecuting);
-                System.out.println("Client detected shoot");
+                //System.out.println("Client detected shoot");
             }
 
-            //shoot bullet
-//            if (gameState.getAbilityExecuted(entityNumb) == 1) {
-//                if (charComp.bulletEntity == -1) {
-//                    charComp.allocateBulletEntity(wc);
-//                }
-//                System.out.println(charComp.bulletEntity);
-//                charComp.activateBullet(wc, posComp.getPos(), rotComp.getAngle() );
-//            }
+
+            //deactivate projectile abilities. Only deactivates ONE!
+            int projAbilityId = gameState.getAbilityTerminated(entityNumb);
+
+            for (int projEntity : wc.getEntitiesWithComponentType(ProjectileComp.class)) {
+                ProjectileComp projComp = (ProjectileComp)wc.getComponent(projEntity, ProjectileComp.class);
+                HitboxComp hitbComp = (HitboxComp)wc.getComponent(projEntity, HitboxComp.class);
+
+                //if projectile does not belong to current character, skip it
+                if (hitbComp.getOwner() != entity) continue;
+
+                if (projComp.getAbilityId() == projAbilityId) {
+
+                    projComp.setShouldDeactivateFlag();
+                    break; //as said before, it only finds ONE!
+                }
+            }
 
             entityNumb++;
         }
@@ -160,15 +170,18 @@ public class ClientNetworkSys implements Sys{
             if (inputStream.available() >= messageBytes) {
 
                 //remove delayed data
-                while (inputStream.available() >= messageBytes*2) {
+                while (inputStream.available() >= messageBytes*(2 + NetworkUtils.CLIENT_INPUT_BUFFERING) ) {
+                    System.err.println("Skipping a game state to read newest state");
                     inputStream.skipBytes(messageBytes);
                 }
 
-                return NetworkUtils.streamToGameState(inputStream);
+                GameStateData gameState = NetworkUtils.streamToGameState(inputStream);
+
+                return gameState;
 
             }
             else {
-                System.err.println("Not enough input for a gameState, numb of bytes ready: " + inputStream.available());
+                //System.err.println("Not enough input for a gameState, numb of bytes ready: " + inputStream.available());
                 return null;
             }
         } catch (IOException e) {
