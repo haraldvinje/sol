@@ -4,6 +4,7 @@ import engine.RotationComp;
 import engine.Sys;
 import engine.WorldContainer;
 import engine.combat.abilities.AbilityComp;
+import engine.combat.abilities.ProjectileComp;
 import engine.physics.CollisionComp;
 import engine.physics.CollisionCompIterator;
 import engine.physics.CollisionData;
@@ -29,10 +30,20 @@ public class DamageResolutionSys implements Sys {
     @Override
     public void update() {
 
+        //reset deltDamage flags in damager
+        for (int entity : wc.getEntitiesWithComponentType(DamagerComp.class)) {
+            DamagerComp dmgerComp = (DamagerComp) wc.getComponent(entity, DamagerComp.class);
+
+            dmgerComp.resetDeltDamage();
+        }
+
         for (int entity : wc.getEntitiesWithComponentType(DamageableComp.class)) {
+            //reset flags
+            DamageableComp dmgableComp = (DamageableComp) wc.getComponent(entity, DamageableComp.class);
+            dmgableComp.resetInterrupt();
 
+            //update damageable with respect to damagers
             CollisionComp collComp = (CollisionComp) wc.getComponent(entity, CollisionComp.class);
-
             updateDamageableEntity(entity, collComp);
         }
 
@@ -44,14 +55,18 @@ public class DamageResolutionSys implements Sys {
     }
 
     private void updateDamageableEntity(int entity, CollisionComp collComp) {
+
         //check for each colliding object if it is a damager
         CollisionCompIterator collIt = collComp.collisionCompIterator();
+
         while(collIt.hasNext()) {
             CollisionData data = collIt.next();
 
             if (!data.isActive()) continue;
 
-            if (wc.hasComponent(collIt.getOtherEntity(), DamagerComp.class)) {
+            int damagerEntity = collIt.getOtherEntity();
+
+            if (wc.hasComponent(damagerEntity, DamagerComp.class)) {
                 System.out.println("Taking damage, bullet: "+collIt.getOtherEntity() +" victim: " + collIt.getSelfEntity());
                 takeDamage(entity, collIt.getOtherEntity());
             }
@@ -76,7 +91,8 @@ public class DamageResolutionSys implements Sys {
         dmgablPhysComp.addImpulse( Vec2.newLenDir(knockbackLen, knockbackDir) );
 
 
-        //interrupt damageable to cancel abilities
+        //set deltDamage and interrupt flags
+        dmgerComp.deltDamage();
         dmgablComp.interrupt();
     }
 }

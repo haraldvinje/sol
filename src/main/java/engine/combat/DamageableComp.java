@@ -28,7 +28,7 @@ public class DamageableComp implements Component {
     public boolean isInterrupted() {
         return interrupted;
     }
-    public void popInterrupt() {
+    void resetInterrupt() {
         interrupted = false;
     }
 
