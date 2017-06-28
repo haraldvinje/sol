@@ -57,14 +57,16 @@ public class CharacterSys implements Sys {
     }
 
     private void updateEntity(int entity, CharacterComp charComp, AbilityComp abComp, PositionComp posComp, CharacterInputComp inputComp, RotationComp rotComp, PhysicsComp phComp) {
-        updateMove(inputComp, phComp);
+        if (abComp.getOccupiedBy() != null) return;
+
+        updateMove(charComp, inputComp, phComp);
         updateRotation(inputComp, posComp, rotComp);
         updateAbilities(charComp, abComp, inputComp, posComp, rotComp);
     }
 
 
-    private void updateMove(CharacterInputComp inputComp, PhysicsComp phComp) {
-        float accel = 1200.0f;
+    private void updateMove(CharacterComp charComp, CharacterInputComp inputComp, PhysicsComp phComp) {
+        float accel = charComp.getMoveAccel();
         float stepX = ( (inputComp.isMoveRight()? 1:0) - (inputComp.isMoveLeft()? 1:0) );
         float stepY = ( (inputComp.isMoveDown()? 1:0) - (inputComp.isMoveUp()? 1:0) );
 
@@ -72,8 +74,11 @@ public class CharacterSys implements Sys {
     }
 
     private void updateRotation(CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
-        float angle = TrigUtils.pointDirection(posComp.getX(), posComp.getY(), inputComp.getAimX(), inputComp.getAimY());
-        rotComp.setAngle(angle);
+        float newAngle = TrigUtils.pointDirection(posComp.getX(), posComp.getY(), inputComp.getAimX(), inputComp.getAimY());
+        float diffAngle = TrigUtils.shortesAngleBetween(rotComp.getAngle(), newAngle);
+
+        //add a portion of diffAngle
+        rotComp.addAngle(diffAngle * 0.2f);
     }
 
     private void updateAbilities(CharacterComp charComp, AbilityComp abComp, CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
