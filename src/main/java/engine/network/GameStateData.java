@@ -8,7 +8,9 @@ import java.util.Arrays;
 public class GameStateData {
 
 
-    public static final int BYTES = Float.BYTES*6 + Integer.BYTES*2 *2;
+    public static final int BYTES = Integer.BYTES + Float.BYTES*6 + Integer.BYTES*2 *2;
+
+    private int frameNumber;
 
     private float[] x = new float[NetworkUtils.CHARACTER_NUMB],
                     y = new float[NetworkUtils.CHARACTER_NUMB],

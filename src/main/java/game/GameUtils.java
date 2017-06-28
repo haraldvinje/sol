@@ -53,6 +53,7 @@ public class GameUtils {
             wc.assignComponentType(AbilityComp.class);
             wc.assignComponentType(HitboxComp.class);
 //        wc.assignComponentType(UserCharacterInputComp.class);
+            wc.assignComponentType(ProjectileComp.class);
 
         }
         else if (PROGRAM == CLIENT){
@@ -68,10 +69,13 @@ public class GameUtils {
 //            wc.assignComponentType(UserCharacterInputComp.class);
 //            wc.assignComponentType(HoleComp.class);
             wc.assignComponentType(DamageableComp.class);
-//            wc.assignComponentType(DamagerComp.class);
+            wc.assignComponentType(DamagerComp.class);
 //            wc.assignComponentType(AffectedByHoleComp.class);
             wc.assignComponentType(AbilityComp.class);
             wc.assignComponentType(HitboxComp.class);
+            wc.assignComponentType(InterpolationComp.class);
+            wc.assignComponentType(ProjectileComp.class);
+
         }
 
         else if (PROGRAM == OFFLINE) {
@@ -94,6 +98,8 @@ public class GameUtils {
             wc.assignComponentType(AbilityComp.class);
             wc.assignComponentType(UserCharacterInputComp.class);
             wc.assignComponentType(HitboxComp.class);
+            wc.assignComponentType(ProjectileComp.class);
+
         }
 
         else {
@@ -117,6 +123,8 @@ public class GameUtils {
 
             wc.addSystem(new PhysicsSys());
 
+            wc.addSystem(new ProjectileSys());
+
             wc.addSystem(new RenderSys(window));
         }
 
@@ -124,6 +132,10 @@ public class GameUtils {
             wc.addSystem(new ClientNetworkSys(HOST_NAME, userInput) );
             wc.addSystem(new AbilitySys());
             wc.addSystem(new PhysicsSys());
+
+            wc.addSystem(new InterpolationSys());
+
+            wc.addSystem(new ProjectileSys());
 
             wc.addSystem(new RenderSys(window));
         }
@@ -140,6 +152,8 @@ public class GameUtils {
             wc.addSystem(new NaturalResolutionSys());
 
             wc.addSystem(new PhysicsSys());
+
+            wc.addSystem(new ProjectileSys());
 
             wc.addSystem(new RenderSys(window));
         }
@@ -212,12 +226,15 @@ public class GameUtils {
 
         wc.addInactiveComponent(b, new PhysicsComp(20, 0.05f, 0.3f));
         wc.addInactiveComponent(b, new HitboxComp());
+        wc.addInactiveComponent(b, new ProjectileComp());
+
+        wc.addInactiveComponent(b, new DamagerComp(damage, baseKnockback, knockbackRatio)); //because of ability system
+
 
         wc.addInactiveComponent(b, new ColoredMeshComp( ColoredMeshUtils.createCircleTwocolor(shape.getRadius(), 12) ));
 
         if (PROGRAM == SERVER || PROGRAM == OFFLINE) {
             wc.addInactiveComponent(b, new CollisionComp(shape));
-            wc.addInactiveComponent(b, new DamagerComp(damage, baseKnockback, knockbackRatio));
 
         }
 

@@ -7,16 +7,15 @@ import engine.WorldContainer;
 import engine.character.CharacterComp;
 import engine.character.CharacterInputComp;
 import engine.combat.abilities.AbilityComp;
+import engine.combat.abilities.HitboxComp;
+import engine.combat.abilities.ProjectileComp;
 import engine.graphics.ColoredMeshComp;
 import engine.graphics.ColoredMeshUtils;
 import engine.network.CharacterInputData;
 import engine.network.GameStateData;
 import engine.network.NetworkUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by eirik on 21.06.2017.
@@ -25,20 +24,30 @@ public class ServerNetworkSys implements Sys {
 
     private WorldContainer wc;
 
+    private int frameNumber = 0; //Integer.MIN_VALUE;
 
     private ServerConnectionInput connectionInput;
     private Thread serverConnectionInputThread;
 
     private List<ServerClientHandler> clientHandlers;
 
+    private LinkedList<Integer> allocatedClientIcons = new LinkedList<>();
+    private Map<ServerClientHandler, Integer> activeClientIcons = new HashMap<>();
 
-    public ServerNetworkSys() {
+
+    public ServerNetworkSys(WorldContainer wc) {
 
         connectionInput = new ServerConnectionInput(NetworkUtils.PORT_NUMBER);
         serverConnectionInputThread = new Thread(connectionInput);
 
         clientHandlers = new ArrayList<>();
 
+        //allocate client icons
+        float iconStartX = 100, iconStartY = 100;
+        float iconRadius = 64;
+        for (int i = 0; i < NetworkUtils.CHARACTER_NUMB; i++) {
+            allocatedClientIcons.add( allocateClientIcon(wc, iconStartX+iconRadius*2*i, iconStartY, iconRadius) );
+        }
 
         serverConnectionInputThread.start();
     }
@@ -133,9 +142,27 @@ public class ServerNetworkSys implements Sys {
             sd.setY(charNumb, posComp.getY());
             sd.setRotation(charNumb, rotComp.getAngle());
 
+            //reset ability executed and terminated values
             sd.setAbilityExecuted(charNumb, -1); //default -1, no ability
+            sd.setAbilityTerminated(charNumb, -1);
+
+            //find newly executed abilities
             if (abComp.hasNewExecuting()) {
                 sd.setAbilityExecuted(charNumb, abComp.popNewExecuting());
+            }
+
+            //find terminating projectiles. Only sends ONE for the moment, even though there might be more
+            for (int entity : wc.getEntitiesWithComponentType(ProjectileComp.class)) {
+                ProjectileComp projComp = (ProjectileComp)wc.getComponent(entity, ProjectileComp.class);
+                HitboxComp hitbComp = (HitboxComp)wc.getComponent(entity, HitboxComp.class);
+
+                //if the projectile dont belong to the current character, skip it
+                if (hitbComp.getOwner() != c) continue;
+
+                if (projComp.isShouldDeactivateFlag()) {
+                    sd.setAbilityTerminated(charNumb, projComp.getAbilityId());
+                    break; //as said before, it only finds ONE!
+                }
             }
 
             charNumb++;
@@ -152,7 +179,7 @@ public class ServerNetworkSys implements Sys {
 
             if (!handler.sendStateData(gameState) ) {
                 //client has disconnected, remove it
-
+                deactivateClientIcon(handler);
                 it.remove();
             }
         }
