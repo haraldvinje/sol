@@ -11,6 +11,8 @@ import engine.combat.DamagerComp;
 import engine.combat.abilities.*;
 import engine.graphics.*;
 import engine.network.client.ClientNetworkSys;
+import engine.network.client.InterpolationComp;
+import engine.network.client.InterpolationSys;
 import engine.network.server.ServerNetworkSys;
 import engine.physics.*;
 import engine.window.Window;
@@ -237,9 +239,13 @@ public class GameUtils {
 
         wc.addComponent(player, new AbilityComp(
                 new MeleeAbility(wc, 4, 16, 3, 20, 80, 300, 0.7f, new Circle(64f),32.0f, 0f),
-                new ProjectileAbility(wc, 5, 15, 10, 20, 700, 0.2f, 500f, M.PI, new Circle(8))
+                new ProjectileAbility(wc, 5, 23, 50, 20, 700, 0.2f, 700f, 30, M.PI, new Circle(8))
                 //new MeleeAbility(wc,  15, 1,15,30,20f, 0.8f, new Circle(8f), 82f,0f)
         ));
+
+        if (PROGRAM == CLIENT) {
+            wc.addComponent(player, new InterpolationComp());
+        }
 
         if (PROGRAM == SERVER || PROGRAM == OFFLINE) {
             wc.addComponent(player, new CharacterInputComp());

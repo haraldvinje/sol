@@ -17,6 +17,12 @@ public class GameStateData {
     private int[] abilityTerminated = new int[NetworkUtils.CHARACTER_NUMB];
 
 
+    public int getFrameNumber() {
+        return frameNumber;
+    }
+    public void setFrameNumber(int frameNumber) {
+        this.frameNumber = frameNumber;
+    }
 
     public float getX(int charNumb) {
         return x[charNumb];

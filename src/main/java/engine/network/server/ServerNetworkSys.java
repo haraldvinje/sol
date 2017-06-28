@@ -57,6 +57,9 @@ public class ServerNetworkSys implements Sys {
         updateCharactersByInput();
 
         updateClientsByGameState();
+
+        frameNumber++;
+        if (frameNumber == Integer.MAX_VALUE) throw new IllegalStateException("max frame number value reached. Make it wrap");
     }
 
     @Override
@@ -113,6 +116,8 @@ public class ServerNetworkSys implements Sys {
 
     private GameStateData retrieveGameState() {
         GameStateData sd = new GameStateData();
+
+        sd.setFrameNumber(frameNumber);
 
         Set<Integer> chars = wc.getEntitiesWithComponentType(CharacterComp.class);
         if (chars.size() != 2) throw new IllegalStateException("THere is not 2 characters on the field :(");
