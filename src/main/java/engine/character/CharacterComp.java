@@ -20,10 +20,20 @@ import utils.maths.Vec2;
  */
 public class CharacterComp implements Component {
 
+    private float moveAccel;
 
 
-    public CharacterComp() {
+
+    public CharacterComp(float moveAccel) {
+        setMoveAccel(moveAccel);
     }
 
 
+    public float getMoveAccel() {
+        return moveAccel;
+    }
+
+    public void setMoveAccel(float moveAccel) {
+        this.moveAccel = moveAccel;
+    }
 }
