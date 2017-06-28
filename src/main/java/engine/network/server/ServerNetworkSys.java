@@ -90,7 +90,7 @@ public class ServerNetworkSys implements Sys {
 
             clientHandlers.add(clientHandler);
 
-            createClientIcon();
+            activateClientIcon(clientHandler);
         }
     }
 
@@ -187,16 +187,27 @@ public class ServerNetworkSys implements Sys {
 
 
 
-    /**
-     * Cannot be removed as of now
-     */
-    private void createClientIcon() {
-        float startX = 100, startY = 100;
-        float iconRadius = 64;
-        int e = wc.createEntity();
-        wc.addComponent(e, new PositionComp(startX+clientHandlers.size()*iconRadius*2,   startY));
-        wc.addComponent(e, new ColoredMeshComp(ColoredMeshUtils.createCircleTwocolor(iconRadius, 9)));
+    private void activateClientIcon(ServerClientHandler clientHandeler) {
+        if (allocatedClientIcons.isEmpty()) return;
 
+        int icon = allocatedClientIcons.poll();
+        activeClientIcons.put(clientHandeler, icon);
+        wc.activateEntity(icon);
+    }
+    private void deactivateClientIcon(ServerClientHandler clientHandler) {
+        if (! activeClientIcons.containsKey(clientHandler)) return;
+
+        int icon = activeClientIcons.remove(clientHandler);
+        allocatedClientIcons.add(icon);
+        wc.deactivateEntity(icon);
+    }
+
+    private int allocateClientIcon(WorldContainer wc, float x, float y, float radius) {
+        int e = wc.createEntity();
+        wc.addInactiveComponent(e, new PositionComp(x, y));
+        wc.addInactiveComponent(e, new ColoredMeshComp(ColoredMeshUtils.createCircleTwocolor(radius, 9)));
+
+        return e;
     }
 
 

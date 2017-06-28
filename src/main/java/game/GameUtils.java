@@ -113,7 +113,7 @@ public class GameUtils {
             wc.addSystem(new CharacterSys());
             wc.addSystem(new AbilitySys());
 
-            wc.addSystem(new ServerNetworkSys());
+            wc.addSystem(new ServerNetworkSys(wc)); //takes wc because it allocates icons
 
             wc.addSystem(new CollisionDetectionSys());
             wc.addSystem(new HoleResolutionSys());
