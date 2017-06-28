@@ -4,12 +4,16 @@ import engine.Sys;
 import engine.WorldContainer;
 import engine.combat.DamagerComp;
 
+import java.util.LinkedList;
+
 /**
  * Created by eirik on 28.06.2017.
  */
 public class ProjectileSys implements Sys {
 
     private WorldContainer wc;
+
+    private LinkedList<Integer> deactivateEntities = new LinkedList<>();
 
     @Override
     public void setWorldContainer(WorldContainer wc) {
@@ -22,6 +26,14 @@ public class ProjectileSys implements Sys {
         wc.entitiesOfComponentTypeStream(ProjectileComp.class).forEach(entity -> {
             updateProjectile(entity);
         });
+
+        deactivateEntities();
+    }
+
+    private void deactivateEntities() {
+        while(!deactivateEntities.isEmpty()) {
+            deactivateProj(deactivateEntities.poll());
+        }
     }
 
     private void updateProjectile(int projEntity){
@@ -32,7 +44,7 @@ public class ProjectileSys implements Sys {
         if (projComp.isShouldDeactivateFlag()) {
             projComp.resetShouldDeactivateFlag();
 
-            deactivateProj(projEntity);
+            deactivateEntities.add(projEntity);
             return;
         }
 
