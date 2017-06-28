@@ -19,9 +19,9 @@ public class ProjectileSys implements Sys {
     @Override
     public void update() {
 
-        for (int entity : wc.getEntitiesWithComponentType(ProjectileComp.class)) {
+        wc.entitiesOfComponentTypeStream(ProjectileComp.class).forEach(entity -> {
             updateProjectile(entity);
-        }
+        });
     }
 
     private void updateProjectile(int projEntity){
