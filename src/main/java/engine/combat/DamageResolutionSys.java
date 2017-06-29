@@ -81,6 +81,10 @@ public class DamageResolutionSys implements Sys {
         DamageableComp dmgablComp = (DamageableComp)wc.getComponent(damaged, DamageableComp.class);
         PhysicsComp dmgablPhysComp = (PhysicsComp)wc.getComponent(damaged, PhysicsComp.class);
 
+
+        //reset physics for damageable. Should happen before naturalResolution
+        dmgablPhysComp.reset();
+
         //calculate damage and knockback
         float damage = dmgerComp.getDamage();
         float knockbackLen = M.pow(dmgablComp.getDamage() * dmgerComp.getKnockbackRatio(), 1 ) + dmgerComp.getBaseKnockback();
