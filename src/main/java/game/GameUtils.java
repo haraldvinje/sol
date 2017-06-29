@@ -30,7 +30,7 @@ public class GameUtils {
     public static final int SERVER = 0, CLIENT = 1, OFFLINE = 2;
     public static int PROGRAM = -1;
     //public static boolean SERVER_RENDER;
-    public static String HOST_NAME;
+    public static String HOST_NAME; //set by mainClient args
 
 
     public static void assignComponentTypes(WorldContainer wc) {
