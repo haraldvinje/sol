@@ -70,6 +70,7 @@ task runClient(type: JavaExec) {
 
     classpath = sourceSets.main.runtimeClasspath
 
+    args = ["127.0.0.1"]
     main = 'game.MainClient'
 
     systemProperty 'java.library.path', project.nativeLibsDir
