@@ -1,6 +1,7 @@
 package engine.character;
 
 import engine.*;
+import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
 import engine.combat.abilities.Ability;
 import engine.combat.abilities.AbilityComp;
@@ -46,8 +47,9 @@ public class CharacterSys implements Sys {
             RotationComp rotComp = (RotationComp) wc.getComponent(entity, RotationComp.class);
             PhysicsComp phComp = (PhysicsComp) wc.getComponent(entity, PhysicsComp.class);
             AbilityComp abComp = (AbilityComp) wc.getComponent(entity, AbilityComp.class);
+            DamageableComp dmgableComp = (DamageableComp)wc.getComponent(entity, DamageableComp.class);
 
-            updateEntity(entity, charComp, abComp, posComp, inputComp, rotComp, phComp);
+            updateEntity(entity, charComp, abComp, posComp, inputComp, rotComp, phComp, dmgableComp);
         }
     }
 
@@ -56,8 +58,10 @@ public class CharacterSys implements Sys {
 
     }
 
-    private void updateEntity(int entity, CharacterComp charComp, AbilityComp abComp, PositionComp posComp, CharacterInputComp inputComp, RotationComp rotComp, PhysicsComp phComp) {
+    private void updateEntity(int entity, CharacterComp charComp, AbilityComp abComp, PositionComp posComp, CharacterInputComp inputComp, RotationComp rotComp, PhysicsComp phComp, DamageableComp dmgableComp) {
+        //do not take input if character is executing ability or is stunned
         if (abComp.getOccupiedBy() != null) return;
+        if (dmgableComp.isStunned()) return;
 
         updateMove(charComp, inputComp, phComp);
         updateRotation(inputComp, posComp, rotComp);

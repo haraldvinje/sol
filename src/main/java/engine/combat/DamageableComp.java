@@ -9,6 +9,8 @@ public class DamageableComp implements Component {
 
     private float damaged = 0;
 
+    private int stunTimer = 0;
+
     private boolean interrupted = false;
 
 
@@ -32,7 +34,21 @@ public class DamageableComp implements Component {
         interrupted = false;
     }
 
+    public boolean isStunned() {
+        return stunTimer > 0;
+    }
+    void decrementStunTimer() {
+        stunTimer--;
+    }
+    int getStunTimer() {
+        return stunTimer;
+    }
+    void setStunTimer(int time) {
+        stunTimer = time;
+    }
+
     public void reset() {
         damaged = 0;
+        stunTimer = 0;
     }
 }

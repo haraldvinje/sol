@@ -56,6 +56,9 @@ public class DamageResolutionSys implements Sys {
 
     private void updateDamageableEntity(int entity, CollisionComp collComp) {
 
+        //decrement stun timer if stunned
+        updateStunTimer(entity);
+
         //check for each colliding object if it is a damager
         CollisionCompIterator collIt = collComp.collisionCompIterator();
 
@@ -64,13 +67,25 @@ public class DamageResolutionSys implements Sys {
 
             if (!data.isActive()) continue;
 
+
             int damagerEntity = collIt.getOtherEntity();
 
             if (wc.hasComponent(damagerEntity, DamagerComp.class)) {
                 System.out.println("Taking damage, bullet: "+collIt.getOtherEntity() +" victim: " + collIt.getSelfEntity());
                 takeDamage(entity, collIt.getOtherEntity());
             }
+
         }
+    }
+
+    private void updateStunTimer(int dmgableEntity) {
+        DamageableComp dmgablComp = (DamageableComp)wc.getComponent(dmgableEntity, DamageableComp.class);
+
+        if (dmgablComp.isStunned()) {
+            dmgablComp.decrementStunTimer();
+        }
+
+        System.out.println("Entity:"+dmgableEntity+" stun timer:" + dmgablComp.getStunTimer());
     }
 
     private void takeDamage(int damaged, int damager) {
@@ -90,9 +105,15 @@ public class DamageResolutionSys implements Sys {
         float knockbackLen = M.pow(dmgablComp.getDamage() * dmgerComp.getKnockbackRatio(), 1 ) + dmgerComp.getBaseKnockback();
         float knockbackDir = dmgerRotComp.getAngle();
 
+        //frames stunned
+        int stunDuration = (int)knockbackLen/60;
+
         //apply damage and knockback
         dmgablComp.applyDamage(damage);
         dmgablPhysComp.addImpulse( Vec2.newLenDir(knockbackLen, knockbackDir) );
+
+        //apply hitstun
+        dmgablComp.setStunTimer(stunDuration);
 
 
         //set deltDamage and interrupt flags
