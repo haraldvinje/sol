@@ -13,10 +13,13 @@ import engine.graphics.*;
 import engine.network.client.ClientNetworkSys;
 import engine.network.client.InterpolationComp;
 import engine.network.client.InterpolationSys;
+import engine.network.server.ServerClientHandler;
 import engine.network.server.ServerNetworkSys;
 import engine.physics.*;
 import engine.window.Window;
 import utils.maths.M;
+
+import java.util.List;
 
 /**
  * Created by eirik on 22.06.2017.
@@ -31,6 +34,8 @@ public class GameUtils {
     public static int PROGRAM = -1;
     //public static boolean SERVER_RENDER;
     public static String HOST_NAME; //set by mainClient args
+
+    public static List<ServerClientHandler> CLIENT_HANDELERS;
 
 
     public static void assignComponentTypes(WorldContainer wc) {
@@ -113,7 +118,7 @@ public class GameUtils {
             wc.addSystem(new CharacterSys());
             wc.addSystem(new AbilitySys());
 
-            wc.addSystem(new ServerNetworkSys(wc)); //takes wc because it allocates icons
+            wc.addSystem(new ServerNetworkSys(CLIENT_HANDELERS)); //takes wc because it allocates icons
 
             wc.addSystem(new CollisionDetectionSys());
             wc.addSystem(new HoleResolutionSys());
@@ -166,7 +171,7 @@ public class GameUtils {
         float centerSeparation = 300f;
         if (PROGRAM == OFFLINE) {
             createCharacter(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
-            //createPlayer(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
+            createCharacter(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
 
             createSandbag(wc);
         }

@@ -26,30 +26,14 @@ public class ServerNetworkSys implements Sys {
 
     private int frameNumber = 0; //Integer.MIN_VALUE;
 
-    private ServerConnectionInput connectionInput;
-    private Thread serverConnectionInputThread;
-
     private List<ServerClientHandler> clientHandlers;
 
-    private LinkedList<Integer> allocatedClientIcons = new LinkedList<>();
-    private Map<ServerClientHandler, Integer> activeClientIcons = new HashMap<>();
 
 
-    public ServerNetworkSys(WorldContainer wc) {
+    public ServerNetworkSys(List<ServerClientHandler> clientHandlers) {
 
-        connectionInput = new ServerConnectionInput(NetworkUtils.PORT_NUMBER);
-        serverConnectionInputThread = new Thread(connectionInput);
+        this.clientHandlers = clientHandlers;
 
-        clientHandlers = new ArrayList<>();
-
-        //allocate client icons
-        float iconStartX = 100, iconStartY = 100;
-        float iconRadius = 64;
-        for (int i = 0; i < NetworkUtils.CHARACTER_NUMB; i++) {
-            allocatedClientIcons.add( allocateClientIcon(wc, iconStartX+iconRadius*2*i, iconStartY, iconRadius) );
-        }
-
-        serverConnectionInputThread.start();
     }
 
 
@@ -61,8 +45,6 @@ public class ServerNetworkSys implements Sys {
     @Override
     public void update() {
 
-        checkNewConnections();
-
         updateCharactersByInput();
 
         updateClientsByGameState();
@@ -73,26 +55,10 @@ public class ServerNetworkSys implements Sys {
 
     @Override
     public void terminate() {
-        connectionInput.terminate();
 
-
-        try {
-            serverConnectionInputThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
-    private void checkNewConnections() {
-        if (connectionInput.hasConnectedClients()) {
-            System.out.println("Retrieving new connection, connections= "+clientHandlers.size());
-            ServerClientHandler clientHandler = connectionInput.getConnectedClient();
 
-            clientHandlers.add(clientHandler);
-
-            activateClientIcon(clientHandler);
-        }
-    }
 
     private void updateCharactersByInput() {
         //update each character. WATCH THE ORDERING OF CHARACTERS CORRESPONDING TO CLIENTS
@@ -179,7 +145,6 @@ public class ServerNetworkSys implements Sys {
 
             if (!handler.sendStateData(gameState) ) {
                 //client has disconnected, remove it
-                deactivateClientIcon(handler);
                 it.remove();
             }
         }
@@ -187,28 +152,7 @@ public class ServerNetworkSys implements Sys {
 
 
 
-    private void activateClientIcon(ServerClientHandler clientHandeler) {
-        if (allocatedClientIcons.isEmpty()) return;
 
-        int icon = allocatedClientIcons.poll();
-        activeClientIcons.put(clientHandeler, icon);
-        wc.activateEntity(icon);
-    }
-    private void deactivateClientIcon(ServerClientHandler clientHandler) {
-        if (! activeClientIcons.containsKey(clientHandler)) return;
-
-        int icon = activeClientIcons.remove(clientHandler);
-        allocatedClientIcons.add(icon);
-        wc.deactivateEntity(icon);
-    }
-
-    private int allocateClientIcon(WorldContainer wc, float x, float y, float radius) {
-        int e = wc.createEntity();
-        wc.addInactiveComponent(e, new PositionComp(x, y));
-        wc.addInactiveComponent(e, new ColoredMeshComp(ColoredMeshUtils.createCircleTwocolor(radius, 9)));
-
-        return e;
-    }
 
 
     private void writeInDataToComp(CharacterInputData inData, CharacterInputComp inpComp) {
