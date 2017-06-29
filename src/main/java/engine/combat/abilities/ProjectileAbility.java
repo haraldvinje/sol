@@ -3,6 +3,7 @@ package engine.combat.abilities;
 import engine.PositionComp;
 import engine.RotationComp;
 import engine.WorldContainer;
+import engine.combat.DamagerComp;
 import engine.physics.Circle;
 import engine.physics.PhysicsComp;
 import engine.physics.Shape;
@@ -25,15 +26,23 @@ public class ProjectileAbility extends Ability {
 
 
 
-    public ProjectileAbility(WorldContainer wc, int startupTime, int endlagTime, int rechargeTime,
+    public ProjectileAbility(WorldContainer wc, int projectileEntity, int startupTime, int endlagTime, int rechargeTime,
                              float damage, float baseKnockback, float knockbackRatio, float projStartSpeed, int projLifeTime, float projKnockbackAngle, Shape projShape) {
         super(wc, startupTime, 0, endlagTime, rechargeTime);
 
-        projEntity = GameUtils.allocateProjectileEntity(wc, (Circle)projShape, damage, baseKnockback, knockbackRatio);
+        this.projEntity = projectileEntity;
 
         this.projStartSpeed = projStartSpeed;
         this.projLifeTime = projLifeTime;
         this.knockbackAngle = projKnockbackAngle;
+
+        //set projectile attributes
+        wc.activateComponent(projectileEntity, DamagerComp.class);
+        DamagerComp dmgrComp = (DamagerComp) wc.getComponent(projEntity, DamagerComp.class);
+        dmgrComp.setDamage(damage);
+        dmgrComp.setBaseKnockback(baseKnockback);
+        dmgrComp.setKnockbackRatio(knockbackRatio);
+        wc.deactivateComponent(projectileEntity, DamagerComp.class);
     }
 
     @Override

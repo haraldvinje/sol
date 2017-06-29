@@ -170,14 +170,14 @@ public class GameUtils {
         //create players
         float centerSeparation = 300f;
         if (PROGRAM == OFFLINE) {
-            createCharacter(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
-            createCharacter(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
+            createShrank(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
+            //createSchmathias(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
 
             createSandbag(wc);
         }
         else {
-            createCharacter(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
-            createCharacter(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
+            createShrank(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
+            createSchmathias(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
         }
 
 
@@ -192,13 +192,34 @@ public class GameUtils {
         //create holes
         createRectangleHoleInvisible(wc, MAP_WIDTH/2, wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
         createRectangleHoleInvisible(wc, MAP_WIDTH/2, MAP_HEIGHT-wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
-        createCircleHole(wc, MAP_WIDTH/2, MAP_HEIGHT/2, 64f);
+        createCircleHole(wc, MAP_WIDTH/2, MAP_HEIGHT/2, 48f);
 
 
         //create background
         createBackground(wc);
 
 
+    }
+
+    private static int createShrank(WorldContainer wc, float x, float y) {
+        int proj1Entity = allocateTwocolorProjectileAbility(wc, 8);
+        int proj2Entity = allocateTwocolorProjectileAbility(wc, 12);
+
+        return createCharacter(wc, x, y, "sol_frank.png", 160f/2f, 512f, 256f, 180, 130, 32,
+                new ProjectileAbility(wc, proj1Entity, 2, 2, 30, 60, 100, 0.3f, 1200f, 30, 0, new Circle(8) ),
+                new ProjectileAbility(wc, proj2Entity, 15, 10, 120, 120, 700, 0.8f, 1800f, 60, 0, new Circle(12)),
+                new MeleeAbility(wc, 8, 2, 8, 60*3, 20, 700f, 0.1f, new Circle(128f), 0f, 0f)
+        );
+    }
+
+    private static int createSchmathias(WorldContainer wc, float x, float y) {
+        int hookProjEntity = allocateImageProjectileEntity(wc, "hook.png", -256/2, 512, 256, 24); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
+
+        return createCharacter(wc, x, y, "sandbag.png", 32, 64, 64, 32, 32, 32,
+                new MeleeAbility(wc, 4, 16, 3, 20, 80, 300, 0.7f, new Circle(64f),32.0f, 0f),
+                new ProjectileAbility(wc, hookProjEntity, 5, 23, 50, 20, 850, 0.3f, 700f, 30, M.PI, new Circle(16)),
+                new MeleeAbility(wc, 15, 3, 4, 60, 200, 1000, 0.9f, new Circle(16), 32f+16, 0)
+        );
     }
 
 
@@ -211,19 +232,35 @@ public class GameUtils {
         //wc.addInactiveComponent(e, new PhysicsComp());
         wc.addInactiveComponent(e, new HitboxComp());
 
+        wc.addInactiveComponent(e, new DamagerComp(damage, baseKnockback, knockbackRatio));
+
         float[] redColor = {1.0f, 0f,0f};
         wc.addInactiveComponent(e, new ColoredMeshComp(ColoredMeshUtils.createCircleSinglecolor(shape.getRadius(), 16, redColor)) );
 
         if (PROGRAM == SERVER  || PROGRAM == OFFLINE) {
             wc.addInactiveComponent(e, new CollisionComp(shape));
-            wc.addInactiveComponent(e, new DamagerComp(damage, baseKnockback, knockbackRatio));
-
         }
 
         return e;
     }
 
-    public static int allocateProjectileEntity(WorldContainer wc, Circle shape, float damage, float baseKnockback, float knockbackRatio) {
+    public static int allocateTwocolorProjectileAbility(WorldContainer wc, float radius) {
+        int p = allocateNonRenderableProjectileEntity(wc, radius);
+        wc.addInactiveComponent(p, new ColoredMeshComp( ColoredMeshUtils.createCircleTwocolor(radius, 12) ));
+        return p;
+    }
+    public static int allocateImageProjectileEntity(WorldContainer wc, String imagePath, float radiusOnImage, float imageWidth, float imageHeight, float radius) {
+        float scale = radius/radiusOnImage;
+        float width = imageWidth*scale;
+        float height = imageHeight*scale;
+
+        int p = allocateNonRenderableProjectileEntity(wc, radius);
+        wc.addInactiveComponent(p, new TexturedMeshComp(TexturedMeshUtils.createRectangle(imagePath, width, height)) );
+        wc.addInactiveComponent(p, new MeshCenterComp(width/2, height/2));
+
+        return p;
+    }
+    public static int allocateNonRenderableProjectileEntity(WorldContainer wc, float radius) {
         int b = wc.createEntity();
 
         wc.addInactiveComponent(b, new PositionComp(0,0));
@@ -233,37 +270,35 @@ public class GameUtils {
         wc.addInactiveComponent(b, new HitboxComp());
         wc.addInactiveComponent(b, new ProjectileComp());
 
-        wc.addInactiveComponent(b, new DamagerComp(damage, baseKnockback, knockbackRatio)); //because of ability system
-
-
-        wc.addInactiveComponent(b, new ColoredMeshComp( ColoredMeshUtils.createCircleTwocolor(shape.getRadius(), 12) ));
+        wc.addInactiveComponent(b, new DamagerComp()); //because of ability system
 
         if (PROGRAM == SERVER || PROGRAM == OFFLINE) {
-            wc.addInactiveComponent(b, new CollisionComp(shape));
+            wc.addInactiveComponent(b, new CollisionComp(new Circle(radius)));
 
         }
 
         return b;
     }
 
-    private static int createCharacter(WorldContainer wc, float x, float y) {
+
+    private static int createCharacter(WorldContainer wc, float x, float y, String imagePath, float radiusOnImage, float imageWidth, float imageHeight, float offsetXOnImage, float offsetYOnImage, float radius, Ability ab1, Ability ab2, Ability ab3) {
         int player = wc.createEntity();
-        float radius = 32f;
-        float xoffset = 16f;
+
+        float scale = radius/radiusOnImage;
+        float width = imageWidth*scale;
+        float height = imageHeight*scale;
+        float offsetX = offsetXOnImage*scale;
+        float offsetY = offsetYOnImage*scale;
 
         wc.addComponent(player, new CharacterComp(1500f));
         wc.addComponent(player, new PositionComp(x, y));
         wc.addComponent(player, new RotationComp());
 
-        wc.addComponent(player, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sol_frank.png", 4*radius*2, 2*radius*2)));
-        wc.addComponent(player, new MeshCenterComp(radius*2+xoffset, radius*2));
+        wc.addComponent(player, new TexturedMeshComp(TexturedMeshUtils.createRectangle(imagePath, width, height)));
+        wc.addComponent(player, new MeshCenterComp(offsetX, offsetY));
 
 
-        wc.addComponent(player, new AbilityComp(
-                new MeleeAbility(wc, 4, 16, 3, 20, 80, 300, 0.7f, new Circle(64f),32.0f, 0f),
-                new ProjectileAbility(wc, 5, 23, 50, 20, 700, 0.2f, 700f, 30, M.PI, new Circle(8))
-                //new MeleeAbility(wc,  15, 1,15,30,20f, 0.8f, new Circle(8f), 82f,0f)
-        ));
+        wc.addComponent(player, new AbilityComp(ab1, ab2, ab3));
 
         if (PROGRAM == CLIENT) {
             wc.addComponent(player, new InterpolationComp());
