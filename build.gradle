@@ -38,12 +38,12 @@ dependencies {
 
     // LWJGL
     compile "org.lwjgl:lwjgl:${lwjglVersion}"
-    nativeBundle "org.lwjgl:lwjgl:${lwjglVersion}:natives-windows@jar"
     compile "org.lwjgl:lwjgl-glfw:${lwjglVersion}"
-    nativeBundle "org.lwjgl:lwjgl-glfw:${lwjglVersion}:natives-windows@jar"
     compile "org.lwjgl:lwjgl-opengl:${lwjglVersion}"
+
+    nativeBundle "org.lwjgl:lwjgl:${lwjglVersion}:natives-windows@jar"
+    nativeBundle "org.lwjgl:lwjgl-glfw:${lwjglVersion}:natives-windows@jar"
     nativeBundle "org.lwjgl:lwjgl-opengl:${lwjglVersion}:natives-windows@jar"
-    //compile "org.lwjgl:lwjgl-glfw:${lwjglVersion}:natives-windows"
 
 
     // Use JUnit test framework
@@ -80,18 +80,67 @@ runClient.mustRunAfter runServer
 
 run {
     mainClassName = 'game.Main'
-    systemProperty 'java.library.path', project.nativeLibsDir
 
+    systemProperty 'java.library.path', project.nativeLibsDir
 }
 
-shadowJar {
+shadowJar() {
+
+
     baseName = 'shadow'
     classifier = null
     version = null
 }
 
-build.finalizedBy(shadowJar)
+task createFatOfflineJar(type: Jar) {
+    ext.jarTypeInfo = ["-offline", "game.Main"]
 
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example',
+                'Implementation-Version': 1.1,
+                'Main-Class': jarTypeInfo[1]
+    }
+    baseName = project.name + jarTypeInfo[0] + '-SII'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from { configurations.nativeBundle.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar //includes classes form project
+}
+
+task createFatServerJar(type: Jar) {
+    ext.jarTypeInfo = ["-server","game.MainServer"]
+
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example',
+                'Implementation-Version': 1.1,
+                'Main-Class': jarTypeInfo[1]
+    }
+    baseName = project.name + jarTypeInfo[0] + '-SII'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from { configurations.nativeBundle.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar //includes classes form project
+}
+
+task createFatClientJar(type: Jar) {
+    ext.jarTypeInfo = ["-client","game.MainClient"]
+
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example',
+                'Implementation-Version': 1.1,
+                'Main-Class': jarTypeInfo[1]
+    }
+    baseName = project.name + jarTypeInfo[0] + '-SII'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from { configurations.nativeBundle.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar //includes classes form project
+}
+
+//create a single Jar with all dependencies
+task createFatJars(dependsOn: [createFatOfflineJar, createFatServerJar, createFatClientJar]) {
+
+}
+
+build.finalizedBy(extractNativeBundle)
+//build.finalizedBy(shadowJar)
 
 
 
