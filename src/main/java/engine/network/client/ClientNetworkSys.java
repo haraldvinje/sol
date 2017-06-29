@@ -98,6 +98,7 @@ public class ClientNetworkSys implements Sys{
 
         input.setAction1(userInput.isMousePressed(UserInput.MOUSE_BUTTON_1));
         input.setAction2(userInput.isMousePressed(UserInput.MOUSE_BUTTON_2));
+        input.setAction3(userInput.isKeyboardPressed(UserInput.KEY_SPACE));
 
         input.setAimX(userInput.getMouseX());
         input.setAimY(userInput.getMouseY());
@@ -113,7 +114,7 @@ public class ClientNetworkSys implements Sys{
     private void applyGameState(GameStateData gameState) {
         //apply state
 
-        System.out.println("Recieved frame: " + gameState.getFrameNumber());
+        //System.out.println("Recieved frame: " + gameState.getFrameNumber());
 
         int entityNumb = 0;
         for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class)) {

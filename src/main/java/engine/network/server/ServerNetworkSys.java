@@ -163,6 +163,7 @@ public class ServerNetworkSys implements Sys {
 
         inpComp.setAction1( inData.isAction1() );
         inpComp.setAction2( inData.isAction2() );
+        inpComp.setAction3( inData.isAction3() );
 
         inpComp.setAimX( inData.getAimX() );
         inpComp.setAimY( inData.getAimY() );

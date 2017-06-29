@@ -14,6 +14,7 @@ public class CharacterInputComp implements Component {
     private float aimY;
     private boolean action1;
     private boolean action2;
+    private boolean action3;
 
 
     public boolean isMoveLeft() {
@@ -78,5 +79,13 @@ public class CharacterInputComp implements Component {
 
     public void setAction2(boolean action2) {
         this.action2 = action2;
+    }
+
+    public boolean isAction3() {
+        return action3;
+    }
+
+    public void setAction3(boolean action3) {
+        this.action3 = action3;
     }
 }

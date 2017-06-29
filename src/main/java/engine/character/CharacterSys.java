@@ -88,12 +88,16 @@ public class CharacterSys implements Sys {
     private void updateAbilities(CharacterComp charComp, AbilityComp abComp, CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
         //System.out.println(inputComp.isAction1());
 
-        if (inputComp.isAction2()) {
+        if (inputComp.isAction1()){
             abComp.requestExecution(0);
         }
 
-        if (inputComp.isAction1()){
+        if (inputComp.isAction2()) {
             abComp.requestExecution(1);
+        }
+
+        if (inputComp.isAction3()) {
+            abComp.requestExecution(2);
         }
 
 

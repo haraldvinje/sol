@@ -22,7 +22,7 @@ public class NetworkUtils {
 
     //network smoothening attributes
     public static int SERVER_INPUT_BUFFERING = 1;
-    public static int CLIENT_INPUT_BUFFERING = 1;
+    public static int CLIENT_INPUT_BUFFERING = 2;
 
     public static float CLIENT_INTERPOLATION_FRAME_COUNT = 1.0f;
 
@@ -99,6 +99,7 @@ public class NetworkUtils {
 
             out.writeBoolean(charInput.isAction1());
             out.writeBoolean(charInput.isAction2());
+            out.writeBoolean(charInput.isAction3());
 
             out.writeFloat(charInput.getAimX());
             out.writeFloat(charInput.getAimY());
@@ -117,7 +118,7 @@ public class NetworkUtils {
         CharacterInputData id = new CharacterInputData();
         try {
             id.setMovement(in.readBoolean(), in.readBoolean(), in.readBoolean(), in.readBoolean());
-            id.setActions(in.readBoolean(), in.readBoolean());
+            id.setActions(in.readBoolean(), in.readBoolean(), in.readBoolean());
             id.setAim(in.readFloat(), in.readFloat());
         }
         catch(IOException e) {
