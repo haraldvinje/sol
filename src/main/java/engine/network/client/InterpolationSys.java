@@ -47,8 +47,8 @@ public class InterpolationSys implements Sys{
             rotComp.addAngle(diffAngle * interpolationRatio);
 
 
-            posComp.setPos(interpComp.getNextFrameState().getPos()); //just sets position to newest state
-            rotComp.setAngle(interpComp.getNextFrameState().getRotation());
+//            posComp.setPos(interpComp.getNextFrameState().getPos()); //just sets position to newest state
+//            rotComp.setAngle(interpComp.getNextFrameState().getRotation());
         }
     }
 
