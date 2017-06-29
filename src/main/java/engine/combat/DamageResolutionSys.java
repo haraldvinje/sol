@@ -71,7 +71,7 @@ public class DamageResolutionSys implements Sys {
             int damagerEntity = collIt.getOtherEntity();
 
             if (wc.hasComponent(damagerEntity, DamagerComp.class)) {
-                System.out.println("Taking damage, bullet: "+collIt.getOtherEntity() +" victim: " + collIt.getSelfEntity());
+                //System.out.println("Taking damage, bullet: "+collIt.getOtherEntity() +" victim: " + collIt.getSelfEntity());
                 takeDamage(entity, collIt.getOtherEntity());
             }
 
@@ -84,8 +84,6 @@ public class DamageResolutionSys implements Sys {
         if (dmgablComp.isStunned()) {
             dmgablComp.decrementStunTimer();
         }
-
-        System.out.println("Entity:"+dmgableEntity+" stun timer:" + dmgablComp.getStunTimer());
     }
 
     private void takeDamage(int damaged, int damager) {

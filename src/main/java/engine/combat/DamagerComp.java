@@ -16,10 +16,14 @@ public class DamagerComp implements Component {
     private boolean deltDamageFlag = false; //is reset by damageResolutionSys every frame
 
 
+
     public DamagerComp(float damage, float baseKnockback, float knockbackRatio) {
         setDamage(damage);
         setBaseKnockback(baseKnockback);
         setKnockbackRatio(knockbackRatio);
+    }
+    public DamagerComp() {
+        this(0, 0,0);
     }
 
 
