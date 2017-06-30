@@ -79,7 +79,7 @@ public class ServerClientHandler {
 
             }
             else {
-                System.err.println("Not enough input for a inputState, numb of bytes ready: " + inputStream.available());
+                //System.err.println("Not enough input for a inputState, numb of bytes ready: " + inputStream.available());
                 return null;
             }
         } catch (IOException e) {

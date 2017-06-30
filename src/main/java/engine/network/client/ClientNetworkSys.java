@@ -172,7 +172,7 @@ public class ClientNetworkSys implements Sys{
 
                 //remove delayed data
                 while (inputStream.available() >= messageBytes*(2 + NetworkUtils.CLIENT_INPUT_BUFFERING) ) {
-                    System.err.println("Skipping a game state to read newest state");
+                    //System.err.println("Skipping a game state to read newest state");
                     inputStream.skipBytes(messageBytes);
                 }
 
