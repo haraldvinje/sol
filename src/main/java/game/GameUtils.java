@@ -170,8 +170,8 @@ public class GameUtils {
         //create players
         float centerSeparation = 300f;
         if (PROGRAM == OFFLINE) {
-            //createShrank(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
-            createSchmathias(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
+            createShrank(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
+            //createSchmathias(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
 
             createSandbag(wc);
         }
@@ -202,13 +202,15 @@ public class GameUtils {
     }
 
     private static int createShrank(WorldContainer wc, float x, float y) {
-        int proj1Entity = allocateTwocolorProjectileAbility(wc, 8);
-        int proj2Entity = allocateTwocolorProjectileAbility(wc, 12);
+        float[] color1 = {1, 1, 0};
+        float[] color2 = {1, 0, 1};
+        int proj1Entity = allocateSinglecolorProjectileAbility(wc, 8, color1);
+        int proj2Entity = allocateSinglecolorProjectileAbility(wc, 20, color2);
 
         return createCharacter(wc, x, y, "sol_frank.png", 160f/2f, 512f, 256f, 180, 130, 32,
-                new ProjectileAbility(wc, proj1Entity, 2, 2, 30, 60, 100, 0.3f, 1200f, 30, 0, new Circle(8) ),
-                new ProjectileAbility(wc, proj2Entity, 15, 10, 120, 120, 700, 0.8f, 1800f, 60, 0, new Circle(12)),
-                new MeleeAbility(wc, 8, 2, 8, 60*3, 20, 700f, 0.1f, new Circle(128f), 0f, 0f)
+                new ProjectileAbility(wc, proj1Entity, 2, 2, 30, 100, 170, 0.5f, 1200f, 30, 0, new Circle(8) ),
+                new ProjectileAbility(wc, proj2Entity, 15, 10, 120, 500, 900, 1.1f, 1800f, 60, 0, new Circle(18)),
+                new MeleeAbility(wc, 8, 2, 8, 60*3, 20, 900f, 0.1f, new Circle(128f), 0f, 0f)
         );
     }
 
@@ -216,9 +218,9 @@ public class GameUtils {
         int hookProjEntity = allocateImageProjectileEntity(wc, "hook.png", -256/2, 512, 256, 24); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
 
         return createCharacter(wc, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32,
-                new MeleeAbility(wc, 4, 8, 3, 20, 80, 300, 0.7f, new Circle(64f),32.0f, 0f),
-                new ProjectileAbility(wc, hookProjEntity, 5, 23, 50, 20, 850, 0.3f, 700f, 30, M.PI, new Circle(16)),
-                new MeleeAbility(wc, 15, 3, 4, 60, 200, 1000, 0.9f, new Circle(16), 64, 0)
+                new MeleeAbility(wc, 3, 5, 3, 20, 150, 700, 0.8f, new Circle(64f),48.0f, 0f),
+                new ProjectileAbility(wc, hookProjEntity, 5, 23, 50, 100, 1500, 0.3f, 900f, 30, M.PI, new Circle(16)),
+                new MeleeAbility(wc, 15, 3, 4, 60, 500, 1000, 1.5f, new Circle(32), 64, 0)
         );
     }
 
@@ -242,6 +244,12 @@ public class GameUtils {
         }
 
         return e;
+    }
+
+    public static int allocateSinglecolorProjectileAbility(WorldContainer wc, float radius, float[] color) {
+        int p = allocateNonRenderableProjectileEntity(wc, radius);
+        wc.addInactiveComponent(p, new ColoredMeshComp( ColoredMeshUtils.createCircleSinglecolor(radius, 12, color) ));
+        return p;
     }
 
     public static int allocateTwocolorProjectileAbility(WorldContainer wc, float radius) {
