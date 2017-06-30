@@ -5,7 +5,7 @@ package engine.network;
  */
 public class CharacterInputData {
 
-    public static final int BYTES = Float.BYTES*2 + 1 * 6; //a boolean is sent as one byte with the dataStreams
+    public static final int BYTES = Float.BYTES*2 + 1 * 7; //a boolean is sent as one byte with the dataStreams
 
     private boolean moveLeft, moveRight, moveUp, moveDown;
 
@@ -13,6 +13,7 @@ public class CharacterInputData {
     private float aimY;
     private boolean action1;
     private boolean action2;
+    private boolean action3;
 
 
     public CharacterInputData() {
@@ -28,9 +29,10 @@ public class CharacterInputData {
 
     }
 
-    public void setActions(boolean action1, boolean action2) {
+    public void setActions(boolean action1, boolean action2, boolean action3) {
         this.action1 = action1;
         this.action2 = action2;
+        this.action3 = action3;
     }
 
     public void setAim(float aimX, float aimY) {
@@ -103,6 +105,13 @@ public class CharacterInputData {
         this.action2 = action2;
     }
 
+    public boolean isAction3() {
+        return action3;
+    }
+
+    public void setAction3(boolean action3) {
+        this.action3 = action3;
+    }
 
     @Override
     public String toString() {

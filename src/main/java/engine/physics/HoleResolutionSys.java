@@ -3,6 +3,7 @@ package engine.physics;
 import engine.PositionComp;
 import engine.Sys;
 import engine.WorldContainer;
+import engine.combat.DamageableComp;
 import javafx.geometry.Pos;
 import utils.maths.Vec2;
 
@@ -21,6 +22,13 @@ public class HoleResolutionSys implements Sys {
 
     @Override
     public void update() {
+
+        worldContainer.entitiesOfComponentTypeStream(AffectedByHoleComp.class).forEach( affholeEntity -> {
+            //reset affected flag
+            AffectedByHoleComp affholeComp = (AffectedByHoleComp) worldContainer.getComponent(affholeEntity, AffectedByHoleComp.class);
+            affholeComp.resetHoleAffectedFlag();
+        });
+
         Set<Integer> holeEntities = worldContainer.getEntitiesWithComponentType(HoleComp.class);
         int otherEntity = -1;
         for (int entity: holeEntities){
@@ -53,15 +61,22 @@ public class HoleResolutionSys implements Sys {
 
     }
 
-    private void onCollision(CollisionData data, int entity) {
-        respawnEntities(data, entity);
+    private void onCollision(CollisionData data, int affectedEntity) {
+        AffectedByHoleComp affholeComp = (AffectedByHoleComp) worldContainer.getComponent(affectedEntity, AffectedByHoleComp.class);
+
+        affholeComp.setHoleAffectedFlag();
+
+//        respawnEntities(data, entity);
     }
 
-    private void respawnEntities(CollisionData data, int entity){
-        //TODO: Make this method much more general
-        PositionComp posComp = (PositionComp) worldContainer.getComponent(entity, PositionComp.class);
-        posComp.setPos(new Vec2(300,600));
-
-    }
+//    private void respawnEntities(CollisionData data, int entity){
+//        //TODO: Make this method much more general
+//        PositionComp posComp = (PositionComp) worldContainer.getComponent(entity, PositionComp.class);
+//
+//        posComp.setPos(new Vec2(300,450));
+//
+//        ((DamageableComp)worldContainer.getComponent(entity, DamageableComp.class)).reset();
+//
+//    }
 
 }

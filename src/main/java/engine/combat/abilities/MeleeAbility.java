@@ -24,63 +24,29 @@ import java.util.Timer;
 public class MeleeAbility extends Ability{
 
 
-    private int abilityId;
-
     private int hitboxEntity;
 
     private float relativeDistance;
     private float relativeAngle;
 
-    private int startupTime;
-    private int activeHitboxTime;
-    private int endlagTime;
-    private int rechargeTime;
 
-    private boolean recharging = false;
-
-    private boolean requestExecution;
-//    private boolean activeHitbox = false;
-
-//    private boolean executing = false;
-    public int counter;
-
-
-
-    public MeleeAbility(WorldContainer wc, float damage, float knockbackRatio, Shape hitboxShape, float relativeDistance, float relativeAngle, int startupTime, int activeHitboxTime, int endlagTime, int rechargeTime){
-        this.startupTime = startupTime;
-        this.activeHitboxTime = activeHitboxTime;
-        this.endlagTime = endlagTime;
-        this.rechargeTime = rechargeTime;
+    public MeleeAbility(WorldContainer wc, int startupTime, int activeHitboxTime, int endlagTime, int rechargeTime,     float damage, float baseKnockback,  float knockbackRatio, Shape hitboxShape, float relativeDistance, float relativeAngle){
+        super(wc, startupTime, activeHitboxTime, endlagTime, rechargeTime);
 
         this.relativeDistance = relativeDistance;
         this.relativeAngle = relativeAngle;
 
         if (hitboxShape instanceof Circle){
-            hitboxEntity = GameUtils.allocateHitboxEntity(wc, (Circle)hitboxShape, damage, knockbackRatio);
+            hitboxEntity = GameUtils.allocateHitboxEntity(wc, (Circle)hitboxShape, damage, baseKnockback, knockbackRatio);
         }
 
         if (hitboxShape instanceof Rectangle){
             throw new UnsupportedOperationException("Cannot have rectangle hitboxes as of now");
         }
     }
-    public MeleeAbility(WorldContainer wc){
-        this(wc, 5, 0.5f, new Circle(5), 0.0f, 0.0f, 10, 10, 10, 10);
-    }
-
-    //to be called by abilityComp
-    @Override
-    void setAbilityId(int id) {
-        this.abilityId = id;
-    }
-    @Override
-    public int getAbilityId() {
-        return abilityId;
-    }
-
-    public void requestExecution() {
-        requestExecution = true;
-
-    }
+//    public MeleeAbility(WorldContainer wc){
+//        this(wc, 5, 0.5f, new Circle(5), 0.0f, 0.0f, 10, 10, 10, 10);
+//    }
 
 
     float getRelativeDistance() {
@@ -88,84 +54,51 @@ public class MeleeAbility extends Ability{
     }
     float getRelativeAngle() {return relativeAngle;}
 
-    boolean isRequestingExecution() {
-        return requestExecution;
-    }
-    void setRequestExecution(boolean b){
-        this.requestExecution = b;
-    }
-
-    @Override
     int getHitboxEntity() {
         return hitboxEntity;
     }
 
-    int getStartupTime() {
-        return startupTime;
+    @Override
+    public void startEffect(WorldContainer wc, int requestingEntity) {
+        wc.activateEntity(hitboxEntity);
+
+        PositionComp reqPosComp = (PositionComp)wc.getComponent(requestingEntity, PositionComp.class);
+        RotationComp reqRotComp = (RotationComp)wc.getComponent(requestingEntity, RotationComp.class);
+
+        RotationComp hbRotComp = (RotationComp)wc.getComponent(hitboxEntity, RotationComp.class);
+        HitboxComp hbHitbComp = (HitboxComp) wc.getComponent(hitboxEntity, HitboxComp.class);
+
+        //set hitbox comp state
+        hbHitbComp.reset();
+        hbHitbComp.setOwner(requestingEntity);
+
+        //set hitbox knockback direction
+        float hitboxAngle = reqRotComp.getAngle() + relativeAngle;
+        hbRotComp.setAngle(hitboxAngle);
+
+        //set relative positiom
+        positionHitbox(wc, requestingEntity);
     }
-    int getActiveHitboxTime() {
-        return activeHitboxTime;
-    }
-    int getEndlagTime() {
-        return endlagTime;
-    }
-    int getRechargeTime() {
-        return rechargeTime;
+
+    @Override
+    public void duringEffect(WorldContainer wc, int requestingEntity) {
+        positionHitbox(wc, requestingEntity);
     }
 
-    boolean isRecharging() {
-        return recharging;
+    @Override
+    public void endEffect(WorldContainer wc, int requestingEntity) {
+        //deactivate hitbox
+        wc.deactivateEntity(hitboxEntity);
     }
-    void setRecharging(boolean recharge) {
-        this.recharging = recharge;
+
+    private void positionHitbox(WorldContainer wc, int requestingEntity) {
+        PositionComp reqPosComp = (PositionComp)wc.getComponent(requestingEntity, PositionComp.class);
+        RotationComp reqRotComp = (RotationComp)wc.getComponent(requestingEntity, RotationComp.class);
+
+        PositionComp hbPosComp = (PositionComp)wc.getComponent(hitboxEntity, PositionComp.class);
+
+        Vec2 relPos = Vec2.newLenDir(relativeDistance, reqRotComp.getAngle() + relativeAngle );
+        hbPosComp.setPos( reqPosComp.getPos().add(relPos) );
     }
-
-
-//    public void setExecuting(boolean status){
-//        this.executing = status;
-//    }
-//    public boolean isExecuting(){
-//        return this.executing;
-//    }
-
-
-//    public void setActiveHitbox(boolean active) {
-//        if (!this.activeHitbox && active){
-//            activateComponents();
-//        }
-//        else if (this.activeHitbox && !active){
-//            deactivateComponents();
-//        }
-//        this.activeHitbox = active;
-//    }
-
-
-//    private void deactivateComponents(){
-//        worldContainer.deactivateEntity(hitboxEntity);
-//    }
-//
-//    private void activateComponents(){
-//        worldContainer.activateEntity(hitboxEntity);
-//        PhysicsComp phComp = (PhysicsComp) worldContainer.getComponent(hitboxEntity, PhysicsComp.class);
-//        phComp.resetVelocity();
-//    }
-
-
-
-//    public boolean isActiveHitbox() {
-//        return activeHitbox;
-//    }
-
-
-
-//    public Shape getHitbox() {
-//        return hitbox;
-//    }
-
-//    public void setHitbox(Shape hitbox) {
-//        this.hitbox = hitbox;
-//    }
-
-
 
 }

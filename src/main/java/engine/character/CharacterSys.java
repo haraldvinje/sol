@@ -1,6 +1,7 @@
 package engine.character;
 
 import engine.*;
+import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
 import engine.combat.abilities.Ability;
 import engine.combat.abilities.AbilityComp;
@@ -8,6 +9,7 @@ import engine.graphics.ColoredMesh;
 import engine.graphics.ColoredMeshComp;
 import engine.graphics.ColoredMeshUtils;
 import engine.physics.*;
+import game.GameUtils;
 import utils.maths.TrigUtils;
 import utils.maths.Vec2;
 
@@ -39,15 +41,13 @@ public class CharacterSys implements Sys {
     public void update() {
         //float aimAngle = TrigUtils.pointDirection(posComp.getX(), posComp.getY(),   userInput.getMouseX(), userInput.getMouseY());
 
-        for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class)) {
-            CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
-            PositionComp posComp = (PositionComp) wc.getComponent(entity, PositionComp.class);
-            CharacterInputComp inputComp = (CharacterInputComp) wc.getComponent(entity, CharacterInputComp.class);
-            RotationComp rotComp = (RotationComp) wc.getComponent(entity, RotationComp.class);
-            PhysicsComp phComp = (PhysicsComp) wc.getComponent(entity, PhysicsComp.class);
-            AbilityComp abComp = (AbilityComp) wc.getComponent(entity, AbilityComp.class);
+        int charNumb = 0;
 
-            updateEntity(entity, charComp, abComp, posComp, inputComp, rotComp, phComp);
+        for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class)) {
+
+            updateEntity(entity, charNumb);
+
+            charNumb++;
         }
     }
 
@@ -56,15 +56,48 @@ public class CharacterSys implements Sys {
 
     }
 
-    private void updateEntity(int entity, CharacterComp charComp, AbilityComp abComp, PositionComp posComp, CharacterInputComp inputComp, RotationComp rotComp, PhysicsComp phComp) {
-        updateMove(inputComp, phComp);
+    private void updateEntity(int entity, int charNumb) {
+        CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
+        PositionComp posComp = (PositionComp) wc.getComponent(entity, PositionComp.class);
+        CharacterInputComp inputComp = (CharacterInputComp) wc.getComponent(entity, CharacterInputComp.class);
+        RotationComp rotComp = (RotationComp) wc.getComponent(entity, RotationComp.class);
+        PhysicsComp phComp = (PhysicsComp) wc.getComponent(entity, PhysicsComp.class);
+        AbilityComp abComp = (AbilityComp) wc.getComponent(entity, AbilityComp.class);
+        DamageableComp dmgableComp = (DamageableComp)wc.getComponent(entity, DamageableComp.class);
+        AffectedByHoleComp affholeComp = (AffectedByHoleComp)wc.getComponent(entity, AffectedByHoleComp.class);
+
+
+        checkHoleAffected(charNumb, posComp, phComp, charComp, dmgableComp, affholeComp);
+
+        //do not take input if character is executing ability or is stunned
+        if (abComp.getOccupiedBy() != null) return;
+        if (dmgableComp.isStunned()) return;
+
+        updateMove(charComp, inputComp, phComp);
         updateRotation(inputComp, posComp, rotComp);
         updateAbilities(charComp, abComp, inputComp, posComp, rotComp);
     }
 
+    private void checkHoleAffected(int charNumb, PositionComp posComp, PhysicsComp physComp, CharacterComp charComp, DamageableComp dmgablComp, AffectedByHoleComp affholeComp) {
+        if (affholeComp.isHoleAffectedFlag()) {
 
-    private void updateMove(CharacterInputComp inputComp, PhysicsComp phComp) {
-        float accel = 1200.0f;
+            Vec2 respawnPos = (charNumb == 0)? new Vec2(GameUtils.MAP_WIDTH/4f, GameUtils.MAP_HEIGHT/2f) : new Vec2(GameUtils.MAP_WIDTH*3f/4f, GameUtils.MAP_HEIGHT/2f);
+
+            dmgablComp.reset();
+            physComp.reset();
+
+            charComp.incrementRespawnCount();
+
+            posComp.setPos(respawnPos);
+
+            System.out.println("Character numb: "+charNumb+" stocks lost: "+charComp.getRespawnCount());
+        }
+    }
+
+
+    private void updateMove(CharacterComp charComp, CharacterInputComp inputComp, PhysicsComp phComp) {
+
+        float accel = charComp.getMoveAccel();
         float stepX = ( (inputComp.isMoveRight()? 1:0) - (inputComp.isMoveLeft()? 1:0) );
         float stepY = ( (inputComp.isMoveDown()? 1:0) - (inputComp.isMoveUp()? 1:0) );
 
@@ -72,40 +105,28 @@ public class CharacterSys implements Sys {
     }
 
     private void updateRotation(CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
-        float angle = TrigUtils.pointDirection(posComp.getX(), posComp.getY(), inputComp.getAimX(), inputComp.getAimY());
-        rotComp.setAngle(angle);
+        float newAngle = TrigUtils.pointDirection(posComp.getX(), posComp.getY(), inputComp.getAimX(), inputComp.getAimY());
+        float diffAngle = TrigUtils.shortesAngleBetween(rotComp.getAngle(), newAngle);
+
+        //add a portion of diffAngle
+        rotComp.addAngle(diffAngle * 0.2f);
     }
 
     private void updateAbilities(CharacterComp charComp, AbilityComp abComp, CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
         //System.out.println(inputComp.isAction1());
 
-        if (inputComp.isAction2()) {
+        if (inputComp.isAction1()){
             abComp.requestExecution(0);
         }
 
-        if (inputComp.isAction1()){
+        if (inputComp.isAction2()) {
             abComp.requestExecution(1);
         }
 
-//      if (charComp.timeToShoot <= 0) {
-//            if (inputComp.isAction1()) {
-//                if (charComp.bulletEntity == -1) {
-//                    charComp.allocateBulletEntity(wc);
-//                }
-//
-//                charComp.timeToShoot = charComp.reloadTime;
-//                charComp.activateBullet(wc, posComp.getPos(), rotComp.getAngle());
-//                charComp.timeToDestroy = charComp.bulletLifetime;
-//            }
-//        }
-//        else {
-//            charComp.timeToShoot -= 1.0f;
-//        }
-//
-//        if (charComp.timeToDestroy == 0) {
-//            charComp.deactivateBullet(wc);
-//        }
-//        charComp.timeToDestroy -= 1.0f;
+        if (inputComp.isAction3()) {
+            abComp.requestExecution(2);
+        }
+
 
     }
 

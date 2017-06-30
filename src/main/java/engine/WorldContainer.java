@@ -2,6 +2,7 @@ package engine;
 
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Created by eirik on 13.06.2017.
@@ -121,8 +122,12 @@ public class WorldContainer {
      * @param compType
      * @return
      */
+    @Deprecated
     public Set<Integer> getEntitiesWithComponentType(Class<? extends Component> compType) {
         return activeComponents.get(compType).keySet();
+    }
+    public Stream<Integer> entitiesOfComponentTypeStream(Class<? extends Component> compType) {
+        return activeComponents.get(compType).keySet().stream();
     }
 
     private int retrieveEntityId() {

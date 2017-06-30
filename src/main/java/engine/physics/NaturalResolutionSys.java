@@ -13,11 +13,11 @@ import java.util.Set;
 /**
  * Created by haraldvinje on 14-Jun-17.
  */
-public class CollisionResolutionSys implements Sys {
+public class NaturalResolutionSys implements Sys {
 
     private WorldContainer worldContainer;
 
-    public CollisionResolutionSys(){
+    public NaturalResolutionSys(){
 
     }
 
@@ -39,10 +39,16 @@ public class CollisionResolutionSys implements Sys {
             CollisionComp collisionComp = (CollisionComp) worldContainer.getComponent(entity, CollisionComp.class);
 
             for (CollisionData data: collisionComp.getPrimaryCollisionDataList()){
-                //calculate vector based on current velocity vector,  penetration depth
-                if (data.isActive()){
+
+                //if the collision is inactive, skip it
+                if (!data.isActive()) continue;
+
+                if (worldContainer.hasComponent(data.getEntity1(), NaturalResolutionComp.class) &&
+                    worldContainer.hasComponent(data.getEntity2(), NaturalResolutionComp.class) ) {
+
                     resolveCollision(data);
                 }
+
             }
 
         }

@@ -7,16 +7,15 @@ import engine.WorldContainer;
 import engine.character.CharacterComp;
 import engine.character.CharacterInputComp;
 import engine.combat.abilities.AbilityComp;
+import engine.combat.abilities.HitboxComp;
+import engine.combat.abilities.ProjectileComp;
 import engine.graphics.ColoredMeshComp;
 import engine.graphics.ColoredMeshUtils;
 import engine.network.CharacterInputData;
 import engine.network.GameStateData;
 import engine.network.NetworkUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by eirik on 21.06.2017.
@@ -25,22 +24,16 @@ public class ServerNetworkSys implements Sys {
 
     private WorldContainer wc;
 
-
-    private ServerConnectionInput connectionInput;
-    private Thread serverConnectionInputThread;
+    private int frameNumber = 0; //Integer.MIN_VALUE;
 
     private List<ServerClientHandler> clientHandlers;
 
 
-    public ServerNetworkSys() {
 
-        connectionInput = new ServerConnectionInput(NetworkUtils.PORT_NUMBER);
-        serverConnectionInputThread = new Thread(connectionInput);
+    public ServerNetworkSys(List<ServerClientHandler> clientHandlers) {
 
-        clientHandlers = new ArrayList<>();
+        this.clientHandlers = clientHandlers;
 
-
-        serverConnectionInputThread.start();
     }
 
 
@@ -52,35 +45,20 @@ public class ServerNetworkSys implements Sys {
     @Override
     public void update() {
 
-        checkNewConnections();
-
         updateCharactersByInput();
 
         updateClientsByGameState();
+
+        frameNumber++;
+        if (frameNumber == Integer.MAX_VALUE) throw new IllegalStateException("max frame number value reached. Make it wrap");
     }
 
     @Override
     public void terminate() {
-        connectionInput.terminate();
 
-
-        try {
-            serverConnectionInputThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
-    private void checkNewConnections() {
-        if (connectionInput.hasConnectedClients()) {
-            System.out.println("Retrieving new connection, connections= "+clientHandlers.size());
-            ServerClientHandler clientHandler = connectionInput.getConnectedClient();
 
-            clientHandlers.add(clientHandler);
-
-            createClientIcon();
-        }
-    }
 
     private void updateCharactersByInput() {
         //update each character. WATCH THE ORDERING OF CHARACTERS CORRESPONDING TO CLIENTS
@@ -114,6 +92,8 @@ public class ServerNetworkSys implements Sys {
     private GameStateData retrieveGameState() {
         GameStateData sd = new GameStateData();
 
+        sd.setFrameNumber(frameNumber);
+
         Set<Integer> chars = wc.getEntitiesWithComponentType(CharacterComp.class);
         if (chars.size() != 2) throw new IllegalStateException("THere is not 2 characters on the field :(");
 
@@ -128,9 +108,27 @@ public class ServerNetworkSys implements Sys {
             sd.setY(charNumb, posComp.getY());
             sd.setRotation(charNumb, rotComp.getAngle());
 
+            //reset ability executed and terminated values
             sd.setAbilityExecuted(charNumb, -1); //default -1, no ability
+            sd.setAbilityTerminated(charNumb, -1);
+
+            //find newly executed abilities
             if (abComp.hasNewExecuting()) {
                 sd.setAbilityExecuted(charNumb, abComp.popNewExecuting());
+            }
+
+            //find terminating projectiles. Only sends ONE for the moment, even though there might be more
+            for (int entity : wc.getEntitiesWithComponentType(ProjectileComp.class)) {
+                ProjectileComp projComp = (ProjectileComp)wc.getComponent(entity, ProjectileComp.class);
+                HitboxComp hitbComp = (HitboxComp)wc.getComponent(entity, HitboxComp.class);
+
+                //if the projectile dont belong to the current character, skip it
+                if (hitbComp.getOwner() != c) continue;
+
+                if (projComp.isShouldDeactivateFlag()) {
+                    sd.setAbilityTerminated(charNumb, projComp.getAbilityId());
+                    break; //as said before, it only finds ONE!
+                }
             }
 
             charNumb++;
@@ -147,7 +145,6 @@ public class ServerNetworkSys implements Sys {
 
             if (!handler.sendStateData(gameState) ) {
                 //client has disconnected, remove it
-
                 it.remove();
             }
         }
@@ -155,17 +152,7 @@ public class ServerNetworkSys implements Sys {
 
 
 
-    /**
-     * Cannot be removed as of now
-     */
-    private void createClientIcon() {
-        float startX = 100, startY = 100;
-        float iconRadius = 64;
-        int e = wc.createEntity();
-        wc.addComponent(e, new PositionComp(startX+clientHandlers.size()*iconRadius*2,   startY));
-        wc.addComponent(e, new ColoredMeshComp(ColoredMeshUtils.createCircleTwocolor(iconRadius, 9)));
 
-    }
 
 
     private void writeInDataToComp(CharacterInputData inData, CharacterInputComp inpComp) {
@@ -176,6 +163,7 @@ public class ServerNetworkSys implements Sys {
 
         inpComp.setAction1( inData.isAction1() );
         inpComp.setAction2( inData.isAction2() );
+        inpComp.setAction3( inData.isAction3() );
 
         inpComp.setAimX( inData.getAimX() );
         inpComp.setAimY( inData.getAimY() );

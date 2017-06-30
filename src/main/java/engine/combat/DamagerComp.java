@@ -9,12 +9,21 @@ public class DamagerComp implements Component {
 
 
     private float damage;
+    private float baseKnockback;
     private float knockbackRatio;
 
 
-    public DamagerComp(float damage, float knockbackRatio) {
+    private boolean deltDamageFlag = false; //is reset by damageResolutionSys every frame
+
+
+
+    public DamagerComp(float damage, float baseKnockback, float knockbackRatio) {
         setDamage(damage);
+        setBaseKnockback(baseKnockback);
         setKnockbackRatio(knockbackRatio);
+    }
+    public DamagerComp() {
+        this(0, 0,0);
     }
 
 
@@ -26,11 +35,28 @@ public class DamagerComp implements Component {
         this.damage = damage;
     }
 
+    public float getBaseKnockback() {
+        return baseKnockback;
+    }
+    public void setBaseKnockback(float baseKnockback) {
+        this.baseKnockback = baseKnockback;
+    }
+
     public float getKnockbackRatio() {
         return knockbackRatio;
     }
 
     public void setKnockbackRatio(float knockbackRatio) {
         this.knockbackRatio = knockbackRatio;
+    }
+
+    public boolean hasDeltDamage() {
+        return deltDamageFlag;
+    }
+    public void deltDamage() {
+        deltDamageFlag = true;
+    }
+    void resetDeltDamage() {
+        deltDamageFlag = false;
     }
 }

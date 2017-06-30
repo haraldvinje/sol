@@ -18,7 +18,8 @@ public class UserInput {
     public static final int KEY_F = GLFW_KEY_F;
 
     public static final int KEY_ENTER = GLFW_KEY_ENTER,
-                            KEY_ESCAPE = GLFW_KEY_ESCAPE;
+                            KEY_ESCAPE = GLFW_KEY_ESCAPE,
+                            KEY_SPACE = GLFW_KEY_SPACE;
 
 
     public static final int MOUSE_BUTTON_1 = GLFW_MOUSE_BUTTON_1;
