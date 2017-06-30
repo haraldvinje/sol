@@ -22,6 +22,7 @@ public class CharacterComp implements Component {
 
     private float moveAccel;
 
+    private int respawnCount = 0;
 
 
     public CharacterComp(float moveAccel) {
@@ -35,5 +36,12 @@ public class CharacterComp implements Component {
 
     public void setMoveAccel(float moveAccel) {
         this.moveAccel = moveAccel;
+    }
+
+    public void incrementRespawnCount() {
+        respawnCount++;
+    }
+    public int getRespawnCount() {
+        return respawnCount;
     }
 }
