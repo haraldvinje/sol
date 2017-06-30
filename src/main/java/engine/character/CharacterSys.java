@@ -9,6 +9,7 @@ import engine.graphics.ColoredMesh;
 import engine.graphics.ColoredMeshComp;
 import engine.graphics.ColoredMeshUtils;
 import engine.physics.*;
+import game.GameUtils;
 import utils.maths.TrigUtils;
 import utils.maths.Vec2;
 
@@ -40,16 +41,13 @@ public class CharacterSys implements Sys {
     public void update() {
         //float aimAngle = TrigUtils.pointDirection(posComp.getX(), posComp.getY(),   userInput.getMouseX(), userInput.getMouseY());
 
-        for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class)) {
-            CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
-            PositionComp posComp = (PositionComp) wc.getComponent(entity, PositionComp.class);
-            CharacterInputComp inputComp = (CharacterInputComp) wc.getComponent(entity, CharacterInputComp.class);
-            RotationComp rotComp = (RotationComp) wc.getComponent(entity, RotationComp.class);
-            PhysicsComp phComp = (PhysicsComp) wc.getComponent(entity, PhysicsComp.class);
-            AbilityComp abComp = (AbilityComp) wc.getComponent(entity, AbilityComp.class);
-            DamageableComp dmgableComp = (DamageableComp)wc.getComponent(entity, DamageableComp.class);
+        int charNumb = 0;
 
-            updateEntity(entity, charComp, abComp, posComp, inputComp, rotComp, phComp, dmgableComp);
+        for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class)) {
+
+            updateEntity(entity, charNumb);
+
+            charNumb++;
         }
     }
 
@@ -58,7 +56,19 @@ public class CharacterSys implements Sys {
 
     }
 
-    private void updateEntity(int entity, CharacterComp charComp, AbilityComp abComp, PositionComp posComp, CharacterInputComp inputComp, RotationComp rotComp, PhysicsComp phComp, DamageableComp dmgableComp) {
+    private void updateEntity(int entity, int charNumb) {
+        CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
+        PositionComp posComp = (PositionComp) wc.getComponent(entity, PositionComp.class);
+        CharacterInputComp inputComp = (CharacterInputComp) wc.getComponent(entity, CharacterInputComp.class);
+        RotationComp rotComp = (RotationComp) wc.getComponent(entity, RotationComp.class);
+        PhysicsComp phComp = (PhysicsComp) wc.getComponent(entity, PhysicsComp.class);
+        AbilityComp abComp = (AbilityComp) wc.getComponent(entity, AbilityComp.class);
+        DamageableComp dmgableComp = (DamageableComp)wc.getComponent(entity, DamageableComp.class);
+        AffectedByHoleComp affholeComp = (AffectedByHoleComp)wc.getComponent(entity, AffectedByHoleComp.class);
+
+
+        checkHoleAffected(charNumb, posComp, phComp, charComp, dmgableComp, affholeComp);
+
         //do not take input if character is executing ability or is stunned
         if (abComp.getOccupiedBy() != null) return;
         if (dmgableComp.isStunned()) return;
@@ -68,8 +78,25 @@ public class CharacterSys implements Sys {
         updateAbilities(charComp, abComp, inputComp, posComp, rotComp);
     }
 
+    private void checkHoleAffected(int charNumb, PositionComp posComp, PhysicsComp physComp, CharacterComp charComp, DamageableComp dmgablComp, AffectedByHoleComp affholeComp) {
+        if (affholeComp.isHoleAffectedFlag()) {
+
+            Vec2 respawnPos = (charNumb == 0)? new Vec2(GameUtils.MAP_WIDTH/4f, GameUtils.MAP_HEIGHT/2f) : new Vec2(GameUtils.MAP_WIDTH*3f/4f, GameUtils.MAP_HEIGHT/2f);
+
+            dmgablComp.reset();
+            physComp.reset();
+
+            charComp.incrementRespawnCount();
+
+            posComp.setPos(respawnPos);
+
+            System.out.println("Character numb: "+charNumb+" stocks lost: "+charComp.getRespawnCount());
+        }
+    }
+
 
     private void updateMove(CharacterComp charComp, CharacterInputComp inputComp, PhysicsComp phComp) {
+
         float accel = charComp.getMoveAccel();
         float stepX = ( (inputComp.isMoveRight()? 1:0) - (inputComp.isMoveLeft()? 1:0) );
         float stepY = ( (inputComp.isMoveDown()? 1:0) - (inputComp.isMoveUp()? 1:0) );
