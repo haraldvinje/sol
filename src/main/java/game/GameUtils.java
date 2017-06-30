@@ -170,8 +170,8 @@ public class GameUtils {
         //create players
         float centerSeparation = 300f;
         if (PROGRAM == OFFLINE) {
-            createShrank(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
-            //createSchmathias(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
+            //createShrank(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
+            createSchmathias(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
 
             createSandbag(wc);
         }
@@ -215,10 +215,10 @@ public class GameUtils {
     private static int createSchmathias(WorldContainer wc, float x, float y) {
         int hookProjEntity = allocateImageProjectileEntity(wc, "hook.png", -256/2, 512, 256, 24); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
 
-        return createCharacter(wc, x, y, "sandbag.png", 32, 64, 64, 32, 32, 32,
-                new MeleeAbility(wc, 4, 16, 3, 20, 80, 300, 0.7f, new Circle(64f),32.0f, 0f),
+        return createCharacter(wc, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32,
+                new MeleeAbility(wc, 4, 8, 3, 20, 80, 300, 0.7f, new Circle(64f),32.0f, 0f),
                 new ProjectileAbility(wc, hookProjEntity, 5, 23, 50, 20, 850, 0.3f, 700f, 30, M.PI, new Circle(16)),
-                new MeleeAbility(wc, 15, 3, 4, 60, 200, 1000, 0.9f, new Circle(16), 32f+16, 0)
+                new MeleeAbility(wc, 15, 3, 4, 60, 200, 1000, 0.9f, new Circle(16), 64, 0)
         );
     }
 
@@ -290,7 +290,7 @@ public class GameUtils {
         float offsetX = offsetXOnImage*scale;
         float offsetY = offsetYOnImage*scale;
 
-        wc.addComponent(player, new CharacterComp(1500f));
+        wc.addComponent(player, new CharacterComp(2000f));//1500f));
         wc.addComponent(player, new PositionComp(x, y));
         wc.addComponent(player, new RotationComp());
 
@@ -331,7 +331,7 @@ public class GameUtils {
         wc.addComponent(sandbag, new MeshCenterComp(radius, radius));
 
         wc.addComponent(sandbag, new PhysicsComp(80, 2.5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
-        wc.addComponent(sandbag, new CollisionComp(new Rectangle(radius*2, radius*2)));
+        wc.addComponent(sandbag, new CollisionComp(new Circle(radius)));
         wc.addComponent(sandbag, new NaturalResolutionComp());
 
 
