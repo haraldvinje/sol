@@ -14,6 +14,7 @@ import engine.network.server.ServerNetworkSys;
 import engine.physics.*;
 import engine.window.Window;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -30,6 +31,9 @@ public class ServerGame implements Runnable{
                                 WINDOW_HEIGHT = GameUtils.MAP_HEIGHT /4;
 
 
+    private boolean shouldTerminate = false;
+
+
     private Window window;
     private UserInput userInput;
 
@@ -40,12 +44,16 @@ public class ServerGame implements Runnable{
 
     private long lastTime;
 
+    private int[] stockLossCount;
+
 
     public void init( List<ServerClientHandler> clientHandlers) {
 
         //window = new Window(WINDOW_WIDTH, WINDOW_HEIGHT, "Server   SIIII");
         //userInput = new UserInput(window);
 
+        //add an stockLoss entry for every client
+        stockLossCount = new int[clientHandlers.size()];
 
         GameUtils.CLIENT_HANDELERS = clientHandlers;
 
@@ -104,12 +112,43 @@ public class ServerGame implements Runnable{
 
         wc.updateSystems();
 
+        //check stocks left
+        Integer charNumb = 0;
+        for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class) ) {
+            AffectedByHoleComp affholeComp = (AffectedByHoleComp) wc.getComponent(entity, AffectedByHoleComp.class);
+            if (affholeComp.isHoleAffectedFlag()) {
+                stockLossCount[charNumb]++;
+            }
+
+            if (stockLossCount[charNumb] >= 3) {
+                gameOver(1-charNumb);
+            }
+
+            charNumb++;
+        }
+
+    }
+    private void gameOver(int winner) {
+        System.out.println("Player "+ winner + " won!");
+        setShouldTerminate();
+
     }
 
     private void onTerminate() {
         wc.terminate();
 
         window.close();
+    }
+
+    private void setShouldTerminate() {
+        synchronized (this) {
+            shouldTerminate = true;
+        }
+    }
+    public boolean isShouldTerminate(){
+        synchronized (this) {
+            return shouldTerminate;
+        }
     }
 
     public void terminate() {

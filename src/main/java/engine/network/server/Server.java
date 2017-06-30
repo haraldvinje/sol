@@ -60,7 +60,7 @@ public class Server {
         //allocate client icons
         float iconStartX = 100, iconStartY = 100;
         float iconRadius = 64;
-        for (int i = 0; i < NetworkUtils.CHARACTER_NUMB; i++) {
+        for (int i = 0; i < NetworkUtils.CHARACTER_NUMB*3; i++) {
             allocatedClientIcons.add( allocateClientIcon(wc, iconStartX+iconRadius*2*i, iconStartY, iconRadius) );
         }
     }
@@ -99,6 +99,12 @@ public class Server {
 
         if (clientsWaiting.size() >= 2) {
             createGame(clientsWaiting.pop(), clientsWaiting.pop());
+        }
+
+        for (ServerGame game : gamesRunning.keySet()) {
+            if (game.isShouldTerminate()) {
+                terminateRunningGame(game);
+            }
         }
 
         window.pollEvents();
