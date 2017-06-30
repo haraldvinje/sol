@@ -88,8 +88,6 @@ public class AbilitySys implements Sys {
                 //is ability is requested, execute it
                 if (ability.isRequestingExecution()) {
 
-                    System.out.println("Activating ability");
-
                     startExecution(abComp, ability);
                 }
             }
