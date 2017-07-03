@@ -253,9 +253,19 @@ public class WorldContainer {
 
         return activeComponents.get(compType);
     }
+    public Map<Integer, Component> getInactiveComponentsOfType(Class<? extends Component> compType) {
+        validateComponentType(compType);
+
+        return inactiveComponents.get(compType);
+    }
 
     public Component getComponent(int entity, Class<? extends Component> compType) {
         Component c = getComponentsOfType(compType).get(entity);
+        if (c == null) throw new IllegalStateException("No component of the given type is assigned to the given entity, type="+compType);
+        return c;
+    }
+    public Component getInactiveComponent(int entity, Class<? extends Component> compType) {
+        Component c = getInactiveComponentsOfType(compType).get(entity);
         if (c == null) throw new IllegalStateException("No component of the given type is assigned to the given entity, type="+compType);
         return c;
     }
