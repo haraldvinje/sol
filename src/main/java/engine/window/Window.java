@@ -58,6 +58,8 @@ public class Window {
             throw new IllegalStateException("Could not create GLFW window!");
         }
 
+        System.out.println("Created GLFW window");
+
         // Get the resolution of the primary monitor
         GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         // Center our window
@@ -81,15 +83,15 @@ public class Window {
 
         GL.createCapabilities(); //get opengl context
 
+        //print version
+        System.out.println("OpenGL: " + glGetString(GL_VERSION));
+
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glEnable(GL_DEPTH_TEST);
         glActiveTexture(GL_TEXTURE0);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        //print version
-        System.out.println("OpenGL: " + glGetString(GL_VERSION));
 
         GLinitialized = true;
     }
