@@ -207,8 +207,8 @@ public class GameUtils {
         int proj1Entity = allocateSinglecolorProjectileAbility(wc, 8, color1);
         int proj2Entity = allocateSinglecolorProjectileAbility(wc, 20, color2);
 
-        return createCharacter(wc, x, y, "sol_frank.png", 160f/2f, 512f, 256f, 180, 130, 32,
-                new ProjectileAbility(wc, proj1Entity, 2, 2, 30, 100, 170, 0.5f, 1200f, 30, 0, new Circle(8) ),
+        return createCharacter(wc, x, y, "sol_frank.png", 160f/2f, 512f, 256f, 180, 130, 32, 1800f,
+                new ProjectileAbility(wc, proj1Entity, 2, 2, 30, 100, 180, 0.5f, 1200f, 30, 0, new Circle(8) ),
                 new ProjectileAbility(wc, proj2Entity, 15, 10, 120, 500, 900, 1.1f, 1800f, 60, 0, new Circle(18)),
                 new MeleeAbility(wc, 8, 2, 8, 60*3, 20, 900f, 0.1f, new Circle(128f), 0f, 0f)
         );
@@ -217,7 +217,7 @@ public class GameUtils {
     private static int createSchmathias(WorldContainer wc, float x, float y) {
         int hookProjEntity = allocateImageProjectileEntity(wc, "hook.png", -256/2, 512, 256, 24); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
 
-        return createCharacter(wc, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32,
+        return createCharacter(wc, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
                 new MeleeAbility(wc, 3, 5, 3, 20, 150, 700, 0.8f, new Circle(64f),48.0f, 0f),
                 new ProjectileAbility(wc, hookProjEntity, 5, 23, 50, 100, 1500, 0.3f, 900f, 30, M.PI, new Circle(16)),
                 new MeleeAbility(wc, 15, 3, 4, 60, 500, 1000, 1.5f, new Circle(32), 64, 0)
@@ -289,7 +289,7 @@ public class GameUtils {
     }
 
 
-    private static int createCharacter(WorldContainer wc, float x, float y, String imagePath, float radiusOnImage, float imageWidth, float imageHeight, float offsetXOnImage, float offsetYOnImage, float radius, Ability ab1, Ability ab2, Ability ab3) {
+    private static int createCharacter(WorldContainer wc, float x, float y, String imagePath, float radiusOnImage, float imageWidth, float imageHeight, float offsetXOnImage, float offsetYOnImage, float radius, float moveAccel, Ability ab1, Ability ab2, Ability ab3) {
         int player = wc.createEntity();
 
         float scale = radius/radiusOnImage;
@@ -298,7 +298,7 @@ public class GameUtils {
         float offsetX = offsetXOnImage*scale;
         float offsetY = offsetYOnImage*scale;
 
-        wc.addComponent(player, new CharacterComp(2000f));//1500f));
+        wc.addComponent(player, new CharacterComp(moveAccel));//1500f));
         wc.addComponent(player, new PositionComp(x, y));
         wc.addComponent(player, new RotationComp());
 
