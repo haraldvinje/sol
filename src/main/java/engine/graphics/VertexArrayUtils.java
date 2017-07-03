@@ -3,6 +3,7 @@ package engine.graphics;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 import utils.BufferUtils;
 import utils.maths.M;
 
@@ -11,6 +12,17 @@ import utils.maths.M;
  */
 public class VertexArrayUtils {
 
+    public static int createVertexArray() {
+        int id = GL30.glGenVertexArrays();
+        GL30.glBindVertexArray(id);
+        return id;
+    }
+    public static void bindVertexArray(int vaoId) {
+        GL30.glBindVertexArray(vaoId);
+    }
+    public static void unbindVertexArray() {
+        GL30.glBindVertexArray(0);
+    }
 
     public static int createVertexBuffer(int attribIndex, int size, float[] data) {
         int vboId = GL15.glGenBuffers();
