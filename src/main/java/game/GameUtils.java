@@ -168,7 +168,7 @@ public class GameUtils {
     public static void createInitialEntities(WorldContainer wc) {
 
         //create players
-        float centerSeparation = 300f;
+        float centerSeparation = 600f;
         if (PROGRAM == OFFLINE) {
             createShrank(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
             //createSchmathias(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
@@ -180,6 +180,97 @@ public class GameUtils {
             createSchmathias(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
         }
 
+        float scale = 0.5f;
+
+        //create walls for new map!
+        float w1Thickness = 400;
+        float w1Height = 100f;
+        float w2Thickness = 100f;
+        float w2Height = 400f;
+        float w3Thickness = w1Thickness;
+        float w3Height = w1Height;
+
+
+        //creating first wall w1, centered at (100, 325)
+        createWall(wc, 200*scale, 650*scale, w1Thickness*scale, w1Height*scale);
+
+
+        //creating second wall w2, centered at (25, 450)
+        createWall(wc, 50*scale, 900*scale, w2Thickness*scale, w2Height*scale);
+
+        //creating third wall w3, centered at (100, 575)
+        createWall(wc, 200*scale, 1150*scale, w3Thickness*scale, w3Height*scale);
+
+        float radius = 400;
+
+        createCircleHole(wc, 400*scale, 0, radius*scale);
+        createCircleHole(wc, 400*scale, 2*scale*MAP_HEIGHT, radius*scale);
+
+
+        float h1Thickness = 400;
+        float h1Height = 600;
+
+        float h2Thickness = h1Thickness;
+        float h2Height = h1Height;
+
+        createRectangleHole(wc, 200*scale, 300*scale, h1Thickness*scale, h1Height*scale);
+        createRectangleHole(wc, 200*scale, 1500*scale, h2Thickness*scale, h2Height*scale);
+
+
+
+
+        //Right side of the map
+        createWall(wc, 3000*scale, 650*scale, w1Thickness*scale, w1Height*scale);
+
+        //creating second wall w2
+        createWall(wc, 3150*scale, 900*scale, w2Thickness*scale, w2Height*scale);
+
+        //creating third wall w3
+        createWall(wc, 3000*scale, 1150*scale, w3Thickness*scale, w3Height*scale);
+
+
+
+        createCircleHole(wc, 2800*scale, 0, radius*scale);
+        createCircleHole(wc, 2800*scale, 2*scale*MAP_HEIGHT, radius*scale);
+
+
+
+
+
+        createRectangleHole(wc, 3000*scale, 300*scale, h1Thickness*scale, h1Height*scale);
+        createRectangleHole(wc, 3000*scale, 1500*scale, h2Thickness*scale, h2Height*scale);
+
+
+
+/*
+        TODO: Fix circular walls. Bug now
+        float c1WallRadius = 0f;
+        createCircleWall(wc, 1000*scale, 2*(MAP_HEIGHT/2)*scale, c1WallRadius*scale);
+        createCircleWall(wc, 1000*scale, 2*(MAP_HEIGHT/2)*scale, c1WallRadius*scale);
+
+*/
+
+        float centerSep = 200f;
+
+
+        createRectangleHole(wc, 2*(MAP_WIDTH / 2 - centerSep)*scale, 1150*scale, 400*scale, 100*scale );
+
+        createRectangleHole(wc, 2*(MAP_WIDTH / 2 + centerSep)*scale, 1150*scale, 400*scale, 100*scale );
+
+
+
+        createWall(wc, 2*(MAP_WIDTH/2)*scale, 650*scale, 200*scale, 100*scale);
+
+
+
+
+
+
+     /*   createRectangleHoleInvisible(wc, MAP_WIDTH/2, wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
+        createRectangleHoleInvisible(wc, MAP_WIDTH/2, MAP_HEIGHT-wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);*/
+
+
+/*
 
         //create walls
         float wallThickness = 64f;
@@ -193,10 +284,10 @@ public class GameUtils {
         createRectangleHoleInvisible(wc, MAP_WIDTH/2, wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
         createRectangleHoleInvisible(wc, MAP_WIDTH/2, MAP_HEIGHT-wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
         createCircleHole(wc, MAP_WIDTH/2, MAP_HEIGHT/2, 48f);
-
+        */
 
         //create background
-        createBackground(wc);
+        createBackgroundScale(wc, 2*scale);
 
 
     }
@@ -355,7 +446,7 @@ public class GameUtils {
 
         wc.addComponent(hole, new PositionComp(x, y));
 
-        wc.addComponent(hole, new ColoredMeshComp(ColoredMeshUtils.createCircleSinglecolor(radius, 16, color)));
+        wc.addComponent(hole, new ColoredMeshComp(ColoredMeshUtils.createCircleSinglecolor(radius, 32, color)));
         //wc.addComponent(hole, new MeshCenterComp(radius, radius));
 
         if (PROGRAM == SERVER || PROGRAM == OFFLINE) {
@@ -387,10 +478,30 @@ public class GameUtils {
         return hole;
     }
 
+    private static int createRectangleHole(WorldContainer wc, float x, float y, float width, float height) {
+        int hole = wc.createEntity();
+        float[] color = {0.0f, 0.0f, 0.0f};
+
+        wc.addComponent(hole, new PositionComp(x, y));
+
+        wc.addComponent(hole, new ColoredMeshComp(ColoredMeshUtils.createRectangleSingleColor(width, height, color)));
+        wc.addComponent(hole, new MeshCenterComp(width/2, height/2)); //physical rectangle is defined with position being the center, while the graphical square is defined in the upper left corner
+
+        if (PROGRAM == SERVER || PROGRAM == OFFLINE) {
+            wc.addComponent(hole, new CollisionComp(new Rectangle(width, height)));
+            //wc.addComponent(hole, new PhysicsComp(500f, 10.0f));
+
+            wc.addComponent(hole, new HoleComp());
+        }
+
+        return hole;
+    }
+
     private static int createBackground(WorldContainer wc) {
         int bg = wc.createEntity();
         wc.addComponent(bg, new PositionComp(0, 0));
-        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", 1600, 900)));
+        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", 1600
+                , 900)));
 
         return bg;
     }

@@ -119,6 +119,10 @@ public class ColoredMeshUtils {
 
         return new ColoredMesh( vertices, normals, colors, indices );
     }
+
+
+
+
     public static ColoredMesh createCircleSinglecolor(float radius, int sides, float[] color) {
         if (color.length != 3) throw new IllegalStateException("illegal color data given");
 
