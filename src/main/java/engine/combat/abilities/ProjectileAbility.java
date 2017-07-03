@@ -80,8 +80,8 @@ public class ProjectileAbility extends Ability {
         //set proj lifetime
         projProjComp.setLifeTime(projLifeTime);
 
-        //set knockback direction
-        projRotComp.setAngle(velDir + knockbackAngle);
+        //set direction to movement
+        projRotComp.setAngle(velDir);
     }
 
     @Override

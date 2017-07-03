@@ -12,25 +12,29 @@ public class DamagerComp implements Component {
     private float baseKnockback;
     private float knockbackRatio;
 
+    private float knockbackPoint; //along rotation direction
+    private boolean towardPoint; //from or towards point
+
 
     private boolean deltDamageFlag = false; //is reset by damageResolutionSys every frame
 
 
 
-    public DamagerComp(float damage, float baseKnockback, float knockbackRatio) {
+    public DamagerComp(float damage, float baseKnockback, float knockbackRatio, float knockbackPoint, boolean towardPoint) {
         setDamage(damage);
         setBaseKnockback(baseKnockback);
         setKnockbackRatio(knockbackRatio);
+        setKnockbackPoint(knockbackPoint);
+        setTowardPoint(towardPoint);
     }
     public DamagerComp() {
-        this(0, 0,0);
+        this(0, 0,0, 0, false);
     }
 
 
     public float getDamage() {
         return damage;
     }
-
     public void setDamage(float damage) {
         this.damage = damage;
     }
@@ -45,9 +49,22 @@ public class DamagerComp implements Component {
     public float getKnockbackRatio() {
         return knockbackRatio;
     }
-
     public void setKnockbackRatio(float knockbackRatio) {
         this.knockbackRatio = knockbackRatio;
+    }
+
+    public float getKnockbackPoint() {
+        return knockbackPoint;
+    }
+    public void setKnockbackPoint(float knockbackPoint) {
+        this.knockbackPoint = knockbackPoint;
+    }
+
+    public boolean isTowardPoint() {
+        return towardPoint;
+    }
+    public void setTowardPoint(boolean towardPoint) {
+        this.towardPoint = towardPoint;
     }
 
     public boolean hasDeltDamage() {

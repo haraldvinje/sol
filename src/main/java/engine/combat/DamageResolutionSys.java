@@ -1,5 +1,6 @@
 package engine.combat;
 
+import engine.PositionComp;
 import engine.RotationComp;
 import engine.Sys;
 import engine.WorldContainer;
@@ -88,29 +89,36 @@ public class DamageResolutionSys implements Sys {
 
     private void takeDamage(int damaged, int damager) {
         DamagerComp dmgerComp = (DamagerComp)wc.getComponent(damager, DamagerComp.class);
-        //PhysicsComp dmgerPhysComp = (PhysicsComp)wc.getComponent(damager, PhysicsComp.class);
+        PositionComp dmgerPosComp = (PositionComp)wc.getComponent(damager, PositionComp.class);
         RotationComp dmgerRotComp = (RotationComp)wc.getComponent(damager, RotationComp.class);
 
         DamageableComp dmgablComp = (DamageableComp)wc.getComponent(damaged, DamageableComp.class);
+        PositionComp dmgablPosComp = (PositionComp)wc.getComponent(damaged, PositionComp.class);
         PhysicsComp dmgablPhysComp = (PhysicsComp)wc.getComponent(damaged, PhysicsComp.class);
 
 
         //reset physics for damageable. Should happen before naturalResolution
         dmgablPhysComp.reset();
 
-        //calculate damage and knockback
+        //apply damage
         float damage = dmgerComp.getDamage();
-        float knockbackLen = M.pow(dmgablComp.getDamage() * dmgerComp.getKnockbackRatio(), 1 ) + dmgerComp.getBaseKnockback();
-        float knockbackDir = dmgerRotComp.getAngle();
-
-        //frames stunned
-        int stunDuration = (int)knockbackLen/60;
-
-        //apply damage and knockback
         dmgablComp.applyDamage(damage);
-        dmgablPhysComp.addImpulse( Vec2.newLenDir(knockbackLen, knockbackDir) );
+
+        //apply knockback
+        float knockbackLen = M.pow(dmgablComp.getDamage() * dmgerComp.getKnockbackRatio(), 1 ) + dmgerComp.getBaseKnockback();
+
+        Vec2 knockbackPoint = dmgerPosComp.getPos().add( Vec2.newLenDir(dmgerComp.getKnockbackPoint(), dmgerRotComp.getAngle()) );
+        Vec2 damagedPos = dmgablPosComp.getPos();
+        Vec2 knockbackDir = dmgerComp.isTowardPoint()?
+                TrigUtils.pointDirectionVec(damagedPos, knockbackPoint) :
+                TrigUtils.pointDirectionVec(knockbackPoint, damagedPos);
+        Vec2 knockback = knockbackDir.scale(knockbackLen);
+
+        dmgablPhysComp.addImpulse( knockback );
+
 
         //apply hitstun
+        int stunDuration = (int)knockbackLen/60;
         dmgablComp.setStunTimer(stunDuration);
 
 
