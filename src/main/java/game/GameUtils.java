@@ -522,4 +522,31 @@ public class GameUtils {
 
         return w;
     }
+
+
+    private static int createCircleWall(WorldContainer wc, float x, float y, float radius) {
+        int w = wc.createEntity();
+        wc.addComponent(w, new PositionComp(x, y));
+
+        wc.addComponent(w, new ColoredMeshComp(ColoredMeshUtils.createCircleMulticolor(radius, 32)));
+
+        if (PROGRAM == SERVER || PROGRAM == OFFLINE) {
+            wc.addComponent(w, new PhysicsComp(0, 1, 1));
+            wc.addComponent(w, new CollisionComp(new Circle(radius)));
+            wc.addComponent(w, new NaturalResolutionComp());
+
+        }
+
+        return w;
+    }
+
+
+    private static int createBackgroundScale(WorldContainer wc, float scale) {
+        int bg = wc.createEntity();
+        wc.addComponent(bg, new PositionComp(0, 0));
+        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", scale*1600
+                , scale*900)));
+
+        return bg;
+    }
 }
