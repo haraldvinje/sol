@@ -27,22 +27,23 @@ public class ProjectileAbility extends Ability {
 
 
     public ProjectileAbility(WorldContainer wc, int projectileEntity, int startupTime, int endlagTime, int rechargeTime,
-                             float damage, float baseKnockback, float knockbackRatio, float projStartSpeed, int projLifeTime, float projKnockbackAngle, Shape projShape) {
+                             float projStartSpeed, int projLifeTime) {
         super(wc, startupTime, 0, endlagTime, rechargeTime);
 
         this.projEntity = projectileEntity;
 
         this.projStartSpeed = projStartSpeed;
         this.projLifeTime = projLifeTime;
-        this.knockbackAngle = projKnockbackAngle;
+        this.knockbackAngle = 0; //knockback point on movement line is now used
+    }
 
-        //set projectile attributes
-        wc.activateComponent(projectileEntity, DamagerComp.class);
-        DamagerComp dmgrComp = (DamagerComp) wc.getComponent(projEntity, DamagerComp.class);
+    public void setDamagerValues(WorldContainer wc, float damage, float baseKnockback, float knockbackRatio, float knockbackPoint, boolean towardKnockbackPoint) {
+        DamagerComp dmgrComp = (DamagerComp)wc.getInactiveComponent(projEntity, DamagerComp.class);
         dmgrComp.setDamage(damage);
         dmgrComp.setBaseKnockback(baseKnockback);
         dmgrComp.setKnockbackRatio(knockbackRatio);
-        wc.deactivateComponent(projectileEntity, DamagerComp.class);
+        dmgrComp.setKnockbackPoint(knockbackPoint);
+        dmgrComp.setTowardPoint(towardKnockbackPoint);
     }
 
     @Override

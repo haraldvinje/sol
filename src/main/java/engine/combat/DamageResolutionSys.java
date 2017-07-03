@@ -11,6 +11,7 @@ import engine.physics.CollisionCompIterator;
 import engine.physics.CollisionData;
 import engine.physics.PhysicsComp;
 import utils.maths.M;
+import utils.maths.TrigUtils;
 import utils.maths.Vec2;
 
 /**

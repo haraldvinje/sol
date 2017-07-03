@@ -30,23 +30,34 @@ public class MeleeAbility extends Ability{
     private float relativeAngle;
 
 
-    public MeleeAbility(WorldContainer wc, int startupTime, int activeHitboxTime, int endlagTime, int rechargeTime,     float damage, float baseKnockback,  float knockbackRatio, Shape hitboxShape, float relativeDistance, float relativeAngle){
+    public MeleeAbility(WorldContainer wc, int startupTime, int activeHitboxTime, int endlagTime, int rechargeTime,
+                        Shape hitboxShape, float distance){
         super(wc, startupTime, activeHitboxTime, endlagTime, rechargeTime);
 
-        this.relativeDistance = relativeDistance;
-        this.relativeAngle = relativeAngle;
+        this.relativeDistance = distance;
+        this.relativeAngle = 0;
 
         if (hitboxShape instanceof Circle){
-            hitboxEntity = GameUtils.allocateHitboxEntity(wc, (Circle)hitboxShape, damage, baseKnockback, knockbackRatio);
+            hitboxEntity = GameUtils.allocateHitboxEntity(wc, (Circle)hitboxShape);
         }
 
         if (hitboxShape instanceof Rectangle){
             throw new UnsupportedOperationException("Cannot have rectangle hitboxes as of now");
         }
+
+
     }
 //    public MeleeAbility(WorldContainer wc){
 //        this(wc, 5, 0.5f, new Circle(5), 0.0f, 0.0f, 10, 10, 10, 10);
 //    }
+    public void setDamagerValues(WorldContainer wc, float damage, float baseKnockback, float knockbackRatio, float knockbackPoint, boolean towardKnockbackPoint) {
+        DamagerComp dmgrComp = (DamagerComp)wc.getInactiveComponent(hitboxEntity, DamagerComp.class);
+        dmgrComp.setDamage(damage);
+        dmgrComp.setBaseKnockback(baseKnockback);
+        dmgrComp.setKnockbackRatio(knockbackRatio);
+        dmgrComp.setKnockbackPoint(knockbackPoint);
+        dmgrComp.setTowardPoint(towardKnockbackPoint);
+    }
 
 
     float getRelativeDistance() {
