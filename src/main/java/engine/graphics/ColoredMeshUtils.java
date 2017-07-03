@@ -48,6 +48,42 @@ public class ColoredMeshUtils {
         return new ColoredMesh( vertices, normals, colors, indices );
     }
 
+    public static ColoredMesh createRectangleSingleColor(float width, float height, float [] color) {
+
+        float[] vertices = new float[] {
+                0.0f, 0.0f, 0.0f,
+                0.0f, height, 0.0f,
+                width, height, 0.0f,
+                width, 0.0f, 0.0f
+        };
+
+        //gets normalized in fragment shader
+//		float[] normals = new float[] {
+//			-0.7f, -0.7f, -0.7f,
+//			-0.7f, 0.7f, -0.7f,
+//			0.7f, 0.7f, -0.7f,
+//			0.07f, -0.7f, -0.7f
+//		};
+
+        float[] normals = new float[] {
+                0f, 0f, -1f,
+                0f, 0f, -1f,
+                0f, 0f, -1f,
+                0f, 0f, -1f
+        };
+
+        byte[] indices = new byte[] {
+                0, 1, 2,
+                2, 3, 0
+        };
+
+        return new ColoredMesh( vertices, normals, color, indices );
+    }
+
+
+
+
+
     private static ColoredMesh createCircleColored(float radius, int sides, float[] colors) {
         int verticesCount = (1+sides);
         int verticesLength = verticesCount*3;
