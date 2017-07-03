@@ -182,7 +182,7 @@ public class GameUtils {
 
         float scale = 0.5f;
 
-        //create walls for new map!
+        //create walls for new map. First walls in the base of each competitor
         float w1Thickness = 400;
         float w1Height = 100f;
         float w2Thickness = 100f;
@@ -190,53 +190,42 @@ public class GameUtils {
         float w3Thickness = w1Thickness;
         float w3Height = w1Height;
 
-
-        //creating first wall w1, centered at (100, 325)
+        //walls on left side
         createWall(wc, 200*scale, 650*scale, w1Thickness*scale, w1Height*scale);
-
-
-        //creating second wall w2, centered at (25, 450)
         createWall(wc, 50*scale, 900*scale, w2Thickness*scale, w2Height*scale);
-
-        //creating third wall w3, centered at (100, 575)
         createWall(wc, 200*scale, 1150*scale, w3Thickness*scale, w3Height*scale);
 
-        float circHoleRadius = 300;
+        //walls on right side
+        createWall(wc, 3000*scale, 650*scale, w1Thickness*scale, w1Height*scale);
+        createWall(wc, 3150*scale, 900*scale, w2Thickness*scale, w2Height*scale);
+        createWall(wc, 3000*scale, 1150*scale, w3Thickness*scale, w3Height*scale);
 
+
+
+        //creating holes
+
+        //circular holes first on the left side
+        float circHoleRadius = 300;
         createCircleHole(wc, 400*scale, 230*scale, circHoleRadius*scale);
         createCircleHole(wc, 400*scale, (2*(MAP_HEIGHT)-230)*scale, circHoleRadius*scale);
 
+        //circular holes on the right side
+        createCircleHole(wc, 2800*scale, 230*scale, circHoleRadius*scale);
+        createCircleHole(wc, 2800*scale, (2*(MAP_HEIGHT)-230)*scale, circHoleRadius*scale);
 
+        //creating rectangle holes
         float h1Thickness = 400;
         float h1Height = 600;
 
         float h2Thickness = h1Thickness;
         float h2Height = h1Height;
 
+
+        //first on left side
         createRectangleHole(wc, 200*scale, 300*scale, h1Thickness*scale, h1Height*scale);
         createRectangleHole(wc, 200*scale, 1500*scale, h2Thickness*scale, h2Height*scale);
 
-
-
-
-        //Right side of the map
-        createWall(wc, 3000*scale, 650*scale, w1Thickness*scale, w1Height*scale);
-
-        //creating second wall w2
-        createWall(wc, 3150*scale, 900*scale, w2Thickness*scale, w2Height*scale);
-
-        //creating third wall w3
-        createWall(wc, 3000*scale, 1150*scale, w3Thickness*scale, w3Height*scale);
-
-
-
-        createCircleHole(wc, 2800*scale, 230*scale, circHoleRadius*scale);
-        createCircleHole(wc, 2800*scale, (2*(MAP_HEIGHT)-230)*scale, circHoleRadius*scale);
-
-
-
-
-
+        //rectangle holes on right side
         createRectangleHole(wc, 3000*scale, 300*scale, h1Thickness*scale, h1Height*scale);
         createRectangleHole(wc, 3000*scale, 1500*scale, h2Thickness*scale, h2Height*scale);
 
@@ -250,35 +239,24 @@ public class GameUtils {
 
 */
 
+        //creating walls and holes in center
         float centerSep = 180f;
-
-
         createRectangleHole(wc, 2*(MAP_WIDTH / 2 - centerSep)*scale, 1150*scale, 500*scale, 100*scale );
-
         createRectangleHole(wc, 2*(MAP_WIDTH / 2 + centerSep)*scale, 1150*scale, 500*scale, 100*scale );
-
-
-
         createWall(wc, 2*(MAP_WIDTH/2)*scale, 650*scale, 300*scale, 100*scale);
 
 
 
         createWall(wc, 2*(MAP_WIDTH/2)*scale, 230*scale, 600*scale, 100*scale);
-
         float cSep = 300f;
-
         createRectangleHole(wc, 2*(MAP_WIDTH / 2 - cSep)*scale, 230*scale, 600*scale, 100*scale );
-
         createRectangleHole(wc, 2*(MAP_WIDTH / 2 + cSep)*scale, 230*scale, 600*scale, 100*scale );
 
 
 
         createRectangleHole(wc, 2*(MAP_WIDTH/2)*scale, (2*(MAP_HEIGHT)-230)*scale, 600*scale, 100*scale);
-
         float cSepp = 300f;
-
         createWall(wc, 2*(MAP_WIDTH / 2 - cSepp)*scale, (2*(MAP_HEIGHT)-230)*scale, 600*scale, 100*scale );
-
         createWall(wc, 2*(MAP_WIDTH / 2 + cSepp)*scale, (2*(MAP_HEIGHT)-230)*scale, 600*scale, 100*scale );
 
 
