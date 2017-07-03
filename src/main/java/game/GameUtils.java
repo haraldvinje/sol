@@ -201,10 +201,10 @@ public class GameUtils {
         //creating third wall w3, centered at (100, 575)
         createWall(wc, 200*scale, 1150*scale, w3Thickness*scale, w3Height*scale);
 
-        float radius = 400;
+        float circHoleRadius = 300;
 
-        createCircleHole(wc, 400*scale, 0, radius*scale);
-        createCircleHole(wc, 400*scale, 2*scale*MAP_HEIGHT, radius*scale);
+        createCircleHole(wc, 400*scale, 230*scale, circHoleRadius*scale);
+        createCircleHole(wc, 400*scale, (2*(MAP_HEIGHT)-230)*scale, circHoleRadius*scale);
 
 
         float h1Thickness = 400;
@@ -230,8 +230,8 @@ public class GameUtils {
 
 
 
-        createCircleHole(wc, 2800*scale, 0, radius*scale);
-        createCircleHole(wc, 2800*scale, 2*scale*MAP_HEIGHT, radius*scale);
+        createCircleHole(wc, 2800*scale, 230*scale, circHoleRadius*scale);
+        createCircleHole(wc, 2800*scale, (2*(MAP_HEIGHT)-230)*scale, circHoleRadius*scale);
 
 
 
@@ -250,18 +250,36 @@ public class GameUtils {
 
 */
 
-        float centerSep = 200f;
+        float centerSep = 180f;
 
 
-        createRectangleHole(wc, 2*(MAP_WIDTH / 2 - centerSep)*scale, 1150*scale, 400*scale, 100*scale );
+        createRectangleHole(wc, 2*(MAP_WIDTH / 2 - centerSep)*scale, 1150*scale, 500*scale, 100*scale );
 
-        createRectangleHole(wc, 2*(MAP_WIDTH / 2 + centerSep)*scale, 1150*scale, 400*scale, 100*scale );
-
-
-
-        createWall(wc, 2*(MAP_WIDTH/2)*scale, 650*scale, 200*scale, 100*scale);
+        createRectangleHole(wc, 2*(MAP_WIDTH / 2 + centerSep)*scale, 1150*scale, 500*scale, 100*scale );
 
 
+
+        createWall(wc, 2*(MAP_WIDTH/2)*scale, 650*scale, 300*scale, 100*scale);
+
+
+
+        createWall(wc, 2*(MAP_WIDTH/2)*scale, 230*scale, 600*scale, 100*scale);
+
+        float cSep = 300f;
+
+        createRectangleHole(wc, 2*(MAP_WIDTH / 2 - cSep)*scale, 230*scale, 600*scale, 100*scale );
+
+        createRectangleHole(wc, 2*(MAP_WIDTH / 2 + cSep)*scale, 230*scale, 600*scale, 100*scale );
+
+
+
+        createRectangleHole(wc, 2*(MAP_WIDTH/2)*scale, (2*(MAP_HEIGHT)-230)*scale, 600*scale, 100*scale);
+
+        float cSepp = 300f;
+
+        createWall(wc, 2*(MAP_WIDTH / 2 - cSepp)*scale, (2*(MAP_HEIGHT)-230)*scale, 600*scale, 100*scale );
+
+        createWall(wc, 2*(MAP_WIDTH / 2 + cSepp)*scale, (2*(MAP_HEIGHT)-230)*scale, 600*scale, 100*scale );
 
 
 
