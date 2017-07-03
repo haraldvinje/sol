@@ -6,7 +6,6 @@ import engine.WorldContainer;
 import utils.maths.M;
 import utils.maths.Vec2;
 
-import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -29,6 +28,7 @@ public class CollisionDetectionSys implements Sys {
         this.worldContainer = wc;
     }
 
+
     public void update(){
 
 
@@ -36,27 +36,41 @@ public class CollisionDetectionSys implements Sys {
         //System.out.println(Arrays.toString(cea));
         int length = collisionEntities.length;
 
+
+        //reseting all collision entities. Need to reset before to avoid resetting from secondary list in collComp.
+        for (int i = 0; i<length; i++) {
+            int entity1 = collisionEntities[i];
+            CollisionComp collComp1 = (CollisionComp) worldContainer.getComponent(entity1, CollisionComp.class);
+            collComp1.reset();
+        }
+
         for (int i = 0; i<length; i++){
             int entity1 = collisionEntities[i];
 
             CollisionComp collComp1 = (CollisionComp)worldContainer.getComponent(entity1, CollisionComp.class);
+
             PositionComp posComp1 = (PositionComp)worldContainer.getComponent(entity1, PositionComp.class);
-            PhysicsComp physComp1 = (PhysicsComp)worldContainer.getComponent(entity1, PhysicsComp.class);
 
             for (int j = i+1; j<length; j++){
                 int entity2 = collisionEntities[j];
 
                 CollisionComp collComp2 = (CollisionComp)worldContainer.getComponent(entity2, CollisionComp.class);
                 PositionComp posComp2 = (PositionComp)worldContainer.getComponent(entity2, PositionComp.class);
-                PhysicsComp physComp2 = (PhysicsComp)worldContainer.getComponent(entity2, PhysicsComp.class);
 
-                CollisionData collData = new CollisionData(entity1, collComp1, posComp1, physComp1, entity2, collComp2, posComp2, physComp2);
-
-                if (detectCollision(collData)) {
-                    collComp1.addCollisionData(collData);
+                CollisionData collData = new CollisionData(entity1, entity2);
+              
+                if (detectCollision(collData, collComp1, posComp1, collComp2, posComp2)) {
+                  
+                    collComp1.addPrimaryCollisionData(collData);
+                    collComp2.addSecondaryCollisionData(collData);
                 }
             }
         }
+    }
+
+    @Override
+    public void terminate() {
+
     }
 
     private Integer[] createCollisionEntitiesArray(){
@@ -66,32 +80,38 @@ public class CollisionDetectionSys implements Sys {
     }
 
 
-    public boolean detectCollision(CollisionData data){
-        Shape shape1 = data.getCollComp1().getShape();
-        Shape shape2 = data.getCollComp2().getShape();
+    public boolean detectCollision(CollisionData data, CollisionComp colComp1, PositionComp posComp1, CollisionComp colComp2, PositionComp posComp2){
+        Shape shape1 = colComp1.getShape();
+        Shape shape2 = colComp2.getShape();
 
         if (shape1 instanceof Circle && shape2 instanceof Circle){
-            return detectCollisionCircCirc(data);
+            return detectCollisionCircCirc(data, colComp1, posComp1, colComp2, posComp2);
         }
         else if (shape1 instanceof Rectangle && shape2 instanceof Rectangle) {
-            return detectCollisionRectRect(data);
+            return detectCollisionRectRect(data, colComp1, posComp1, colComp2, posComp2);
         }
         else if (shape1 instanceof Rectangle && shape2 instanceof Circle) {
-            return detectCollisionRectCirc(data);
+            return detectCollisionRectCirc(data, colComp1, posComp1, colComp2, posComp2);
         }
         else if (shape1 instanceof Circle && shape2 instanceof Rectangle) {
+          
             data.swapEntities();
-            return detectCollisionRectCirc(data);
+            boolean result = detectCollisionRectCirc(data, colComp2, posComp2, colComp1, posComp1);
+            if (result) {
+                data.swapEntities();
+                data.reverseCollisionVector();
+            }
+            return result;
         }
 
         throw new IllegalArgumentException("trying to detect collision between nonsupported shapes");
     }
 
-    private boolean detectCollisionCircCirc(CollisionData data){
-        Circle circ1 = (Circle)data.getCollComp1().getShape();
-        Circle circ2 = (Circle)data.getCollComp2().getShape();
-        Vec2 pos1 = data.getPosComp1().getPos();
-        Vec2 pos2 = data.getPosComp2().getPos();
+    private boolean detectCollisionCircCirc(CollisionData data, CollisionComp colComp1, PositionComp posComp1, CollisionComp colComp2, PositionComp posComp2){
+        Circle circ1 = (Circle) colComp1.getShape();
+        Circle circ2 = (Circle) colComp2.getShape();
+        Vec2 pos1 = posComp1.getPos();
+        Vec2 pos2 = posComp2.getPos();
 
         float r1 = circ1.getRadius();
         float r2 = circ2.getRadius();
@@ -119,12 +139,12 @@ public class CollisionDetectionSys implements Sys {
         return true;
     }
 
-    private boolean detectCollisionRectRect(CollisionData data) {
-        Rectangle rect1 = (Rectangle)data.getCollComp1().getShape();
-        Rectangle rect2 = (Rectangle)data.getCollComp2().getShape();
+    private boolean detectCollisionRectRect(CollisionData data, CollisionComp colComp1, PositionComp posComp1, CollisionComp colComp2, PositionComp posComp2) {
+        Rectangle rect1 = (Rectangle)colComp1.getShape();
+        Rectangle rect2 = (Rectangle)colComp2.getShape();
 
-        Vec2 pos1 = data.getPosComp1().getPos();
-        Vec2 pos2 = data.getPosComp2().getPos();
+        Vec2 pos1 = posComp1.getPos();
+        Vec2 pos2 = posComp2.getPos();
 
         Vec2 distVec = pos2.subtract(pos1);
 
@@ -175,11 +195,11 @@ public class CollisionDetectionSys implements Sys {
         return false;
     }
 
-    private boolean detectCollisionRectCirc(CollisionData data) {
-        Rectangle rect = (Rectangle)data.getCollComp1().getShape();
-        Circle circ = (Circle)data.getCollComp2().getShape();
-        Vec2 posRect = data.getPosComp1().getPos();
-        Vec2 posCirc = data.getPosComp2().getPos();
+    private boolean detectCollisionRectCirc(CollisionData data, CollisionComp colComp1, PositionComp posComp1, CollisionComp colComp2, PositionComp posComp2) {
+        Rectangle rect = (Rectangle)colComp1.getShape();
+        Circle circ = (Circle)colComp2.getShape();
+        Vec2 posRect = posComp1.getPos();
+        Vec2 posCirc = posComp2.getPos();
 
         // Vector from A to B
         Vec2 distVec = posCirc.subtract(posRect);

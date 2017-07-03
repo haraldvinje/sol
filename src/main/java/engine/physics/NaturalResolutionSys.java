@@ -4,6 +4,7 @@ import engine.PositionComp;
 import engine.Sys;
 import engine.WorldContainer;
 
+import javafx.geometry.Pos;
 import utils.maths.M;
 import utils.maths.Vec2;
 
@@ -12,11 +13,11 @@ import java.util.Set;
 /**
  * Created by haraldvinje on 14-Jun-17.
  */
-public class CollisionResolutionSys implements Sys {
+public class NaturalResolutionSys implements Sys {
 
     private WorldContainer worldContainer;
 
-    public CollisionResolutionSys(){
+    public NaturalResolutionSys(){
 
     }
 
@@ -30,20 +31,36 @@ public class CollisionResolutionSys implements Sys {
     public void update() {
         Set<Integer> collisionEntitiesSet = worldContainer.getEntitiesWithComponentType(CollisionComp.class);
         //TODO: assuming that all entities with collisioncomp also have velocitycomp. Write test for this later
-        for (int entity: collisionEntitiesSet){
-            CollisionComp cc1 = (CollisionComp) worldContainer.getComponent(entity, CollisionComp.class);
 
-            for (CollisionData data: cc1.getCollisionDataList()){
-                //calculate vector based on current velocity vector,  penetration depth
-                resolveCollision(data);
+        for (int entity: collisionEntitiesSet) {
+            CollisionComp collisionComp = (CollisionComp) worldContainer.getComponent(entity, CollisionComp.class);
+        }
+        for (int entity: collisionEntitiesSet){
+            CollisionComp collisionComp = (CollisionComp) worldContainer.getComponent(entity, CollisionComp.class);
+
+            for (CollisionData data: collisionComp.getPrimaryCollisionDataList()){
+
+                //if the collision is inactive, skip it
+                if (!data.isActive()) continue;
+
+                if (worldContainer.hasComponent(data.getEntity1(), NaturalResolutionComp.class) &&
+                    worldContainer.hasComponent(data.getEntity2(), NaturalResolutionComp.class) ) {
+
+                    resolveCollision(data);
+                }
+
             }
 
-            cc1.reset();
         }
         //need to get all collisionComponents
         //run over every collisionDataList for every collisionComponent
         //add CorrectVector to velocitycomponent of based on ID
         //success
+    }
+
+    @Override
+    public void terminate() {
+
     }
 
     private void resolveCollision(CollisionData data) {
@@ -78,13 +95,15 @@ public class CollisionResolutionSys implements Sys {
     }
 
 
-    private void positionalCorrection(CollisionData data)
-    {
-        PhysicsComp physComp1 = data.getPhysicsComp1();
-        PhysicsComp physComp2 = data.getPhysicsComp2();
+    private void positionalCorrection(CollisionData data) {
+        int entity1 = data.getEntity1();
+        int entity2 = data.getEntity2();
+        PhysicsComp physComp1 = (PhysicsComp)worldContainer.getComponent(entity1, PhysicsComp.class);
+        PhysicsComp physComp2 = (PhysicsComp)worldContainer.getComponent(entity2, PhysicsComp.class);
 
-        PositionComp posComp1 = data.getPosComp1();
-        PositionComp posComp2 = data.getPosComp2();
+
+        PositionComp posComp1 = (PositionComp)worldContainer.getComponent(entity1, PositionComp.class);
+        PositionComp posComp2 = (PositionComp)worldContainer.getComponent(entity2, PositionComp.class);
 
         float percent = 0.2f; // usually 20% to 80%
         float slop = 0.01f; // usually 0.01 to 0.1

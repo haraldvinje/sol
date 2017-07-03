@@ -1,12 +1,11 @@
-package engine.character;
-
-import engine.Component;
+package engine.network;
 
 /**
- * Created by eirik on 15.06.2017.
+ * Created by eirik on 21.06.2017.
  */
-public class CharacterInputComp implements Component {
+public class CharacterInputData {
 
+    public static final int BYTES = Float.BYTES*2 + 1 * 7; //a boolean is sent as one byte with the dataStreams
 
     private boolean moveLeft, moveRight, moveUp, moveDown;
 
@@ -15,6 +14,31 @@ public class CharacterInputComp implements Component {
     private boolean action1;
     private boolean action2;
     private boolean action3;
+
+
+    public CharacterInputData() {
+
+    }
+
+    public void setMovement(boolean moveLeft, boolean moveRight, boolean moveUp, boolean moveDown) {
+        this.moveLeft = moveLeft;
+        this.moveRight = moveRight;
+        this.moveUp = moveUp;
+        this.moveDown = moveDown;
+
+
+    }
+
+    public void setActions(boolean action1, boolean action2, boolean action3) {
+        this.action1 = action1;
+        this.action2 = action2;
+        this.action3 = action3;
+    }
+
+    public void setAim(float aimX, float aimY) {
+        this.aimX = aimX;
+        this.aimY = aimY;
+    }
 
 
     public boolean isMoveLeft() {
@@ -87,5 +111,10 @@ public class CharacterInputComp implements Component {
 
     public void setAction3(boolean action3) {
         this.action3 = action3;
+    }
+
+    @Override
+    public String toString() {
+        return "[CharacterInputData: moveLeft="+moveLeft+" moveRight="+moveRight+" moveUp="+moveUp+" moveDown="+moveDown+" action1="+action1+" action2="+action2+" aimX="+aimX+" aimY="+aimY+"]";
     }
 }

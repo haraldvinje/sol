@@ -4,17 +4,27 @@ package game;
 import engine.*;
 
 import engine.character.*;
+import engine.combat.DamageResolutionSys;
+import engine.combat.DamageableComp;
+import engine.combat.DamagerComp;
+import engine.combat.abilities.Ability;
+import engine.combat.abilities.AbilityComp;
+import engine.combat.abilities.AbilitySys;
+import engine.combat.abilities.MeleeAbility;
 import engine.graphics.*;
 import engine.physics.*;
 import engine.window.Window;
+import utils.maths.M;
 
 /**
  * Created by eirik on 13.06.2017.
  */
 public class Game {
 
+
     private static final float FRAME_INTERVAL = 1.0f/60.0f;
 
+    public static final float WINDOW_WIDTH = 1600f, WINDOW_HEIGHT = 900f;
 
 
     private Window window;
@@ -32,6 +42,7 @@ public class Game {
 
     private int player;
     private int sandbag;
+    private int hole;
 
 
 
@@ -44,33 +55,15 @@ public class Game {
 
         //cds = new CollisionDetectionSys(wc);
 
-
-      
-        //assign component types
-        wc.assignComponentType(PositionComp.class);
-        wc.assignComponentType(ColoredMeshComp.class);
-        wc.assignComponentType(TexturedMeshComp.class);
-        wc.assignComponentType(CollisionComp.class);
-        wc.assignComponentType(PhysicsComp.class);
-        wc.assignComponentType(CharacterComp.class);
-        wc.assignComponentType(CharacterInputComp.class);
-        wc.assignComponentType(UserCharacterInputComp.class);
-        wc.assignComponentType(RotationComp.class);
-        wc.assignComponentType(MeshCenterComp.class);
-
-        //add systems
-        wc.addSystem(new RenderSys(window));
-        wc.addSystem(new CharacterSys());
-        wc.addSystem(new UserCharacterInputSys(userInput));
-        wc.addSystem(new CollisionDetectionSys());
-        wc.addSystem(new CollisionResolutionSys());
-        wc.addSystem(new PhysicsSys());
+        System.out.println("HEELLLLLOOOOO");
 
 
+        GameUtils.PROGRAM = GameUtils.OFFLINE;
 
-        player = createPlayer(wc);
-        sandbag = createSandbag(wc);
-        createBackground(wc);
+        GameUtils.assignComponentTypes(wc);
+        GameUtils.assignSystems(wc, window, userInput);
+
+        GameUtils.createInitialEntities(wc);
 
     }
 
@@ -85,6 +78,7 @@ public class Game {
 
         while (true) {
             timeSinceUpdate += timePassed();
+            //System.out.println("Time since update: "+timeSinceUpdate);
 
             if (timeSinceUpdate >= FRAME_INTERVAL) {
                 timeSinceUpdate -= FRAME_INTERVAL;
@@ -101,56 +95,10 @@ public class Game {
 
     }
 
-    private int createPlayer(WorldContainer wc) {
-        int player = wc.createEntity();
-        wc.addComponent(player, new CharacterComp());
-        wc.addComponent(player, new CharacterInputComp());
-        wc.addComponent(player, new UserCharacterInputComp());
 
-        wc.addComponent(player, new PositionComp(0, 0));
-        wc.addComponent(player, new RotationComp());
-
-        wc.addComponent(player, new PhysicsComp(80, 2.5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
-        wc.addComponent(player, new CollisionComp(new Circle(32)));
-
-        wc.addComponent(player, new TexturedMeshComp(TexturedMeshUtils.createRectangle("frank_original_swg.png", 128, 64)));
-        wc.addComponent(player, new MeshCenterComp(32, 32));
-
-        return player;
-    }
-    private int createSandbag(WorldContainer wc) {
-        float radius = 32f*4;
-        int sandbag = wc.createEntity();
-        wc.addComponent(sandbag, new PositionComp(500, 300) );
-        wc.addComponent(sandbag, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sandbag.png", radius*2, radius*2)));
-        wc.addComponent(sandbag, new MeshCenterComp(radius, radius));
-
-        wc.addComponent(sandbag, new PhysicsComp(500f, 10.0f));
-        wc.addComponent(sandbag, new CollisionComp(new Rectangle(radius*2, radius*2)));
-
-        return sandbag;
-    }
-    private void createBackground(WorldContainer wc) {
-        int bg = wc.createEntity();
-        wc.addComponent(bg, new PositionComp(0, 0));
-        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", 1600, 900)));
-
-    }
 
     public void update() {
-
-/*        System.out.println(wc.getPositionComps());
-        System.out.println(wc.getVelocityComps());
-        System.out.println(wc.getCollisionComps());
-        wc.updateSystems();*/
-  
-        //System.out.println( ((PositionComp)wc.getComponent(player, WorldContainer.COMPMASK_POSITION)).getX() );
-
         window.pollEvents();
-
-
-        //collision system
-        //cds.update();
 
         wc.updateSystems();
 

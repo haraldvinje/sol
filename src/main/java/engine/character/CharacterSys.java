@@ -1,13 +1,15 @@
 package engine.character;
 
 import engine.*;
+import engine.combat.DamageableComp;
+import engine.combat.DamagerComp;
+import engine.combat.abilities.Ability;
+import engine.combat.abilities.AbilityComp;
 import engine.graphics.ColoredMesh;
 import engine.graphics.ColoredMeshComp;
 import engine.graphics.ColoredMeshUtils;
-import engine.physics.Circle;
-import engine.physics.CollisionComp;
-import engine.physics.PhysicsComp;
-import engine.physics.Shape;
+import engine.physics.*;
+import game.GameUtils;
 import utils.maths.TrigUtils;
 import utils.maths.Vec2;
 
@@ -19,41 +21,83 @@ public class CharacterSys implements Sys {
 
     private WorldContainer wc;
 
-    private float reloadTime = 0.1f;
-    private float bulletSpeed = 600f;
-    private float bulletRadius = 12;
-    private float timeToShoot = reloadTime;
-    private ColoredMesh bulletMesh = ColoredMeshUtils.createCircleTwocolor(bulletRadius, 8);
+
+
+
+    public CharacterSys() {
+
+    }
 
 
     @Override
     public void setWorldContainer(WorldContainer wc) {
         this.wc = wc;
+
+        //allocate bullet entity
+
     }
 
     @Override
     public void update() {
         //float aimAngle = TrigUtils.pointDirection(posComp.getX(), posComp.getY(),   userInput.getMouseX(), userInput.getMouseY());
 
-        for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class)) {
-            PositionComp posComp = (PositionComp) wc.getComponent(entity, PositionComp.class);
-            CharacterInputComp inputComp = (CharacterInputComp) wc.getComponent(entity, CharacterInputComp.class);
-            RotationComp rotComp = (RotationComp) wc.getComponent(entity, RotationComp.class);
-            PhysicsComp phComp = (PhysicsComp) wc.getComponent(entity, PhysicsComp.class);
+        int charNumb = 0;
 
-            updateEntity(entity, posComp, inputComp, rotComp, phComp);
+        for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class)) {
+
+            updateEntity(entity, charNumb);
+
+            charNumb++;
         }
     }
 
-    private void updateEntity(int entity, PositionComp posComp, CharacterInputComp inputComp, RotationComp rotComp, PhysicsComp phComp) {
-        updateMove(inputComp, phComp);
+    @Override
+    public void terminate() {
+
+    }
+
+    private void updateEntity(int entity, int charNumb) {
+        CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
+        PositionComp posComp = (PositionComp) wc.getComponent(entity, PositionComp.class);
+        CharacterInputComp inputComp = (CharacterInputComp) wc.getComponent(entity, CharacterInputComp.class);
+        RotationComp rotComp = (RotationComp) wc.getComponent(entity, RotationComp.class);
+        PhysicsComp phComp = (PhysicsComp) wc.getComponent(entity, PhysicsComp.class);
+        AbilityComp abComp = (AbilityComp) wc.getComponent(entity, AbilityComp.class);
+        DamageableComp dmgableComp = (DamageableComp)wc.getComponent(entity, DamageableComp.class);
+        AffectedByHoleComp affholeComp = (AffectedByHoleComp)wc.getComponent(entity, AffectedByHoleComp.class);
+
+
+        checkHoleAffected(charNumb, posComp, phComp, charComp, dmgableComp, affholeComp);
+
+        //do not take input if character is executing ability or is stunned
+        if (abComp.getOccupiedBy() != null) return;
+        if (dmgableComp.isStunned()) return;
+
+        updateMove(charComp, inputComp, phComp);
         updateRotation(inputComp, posComp, rotComp);
-        updateAbilities(inputComp, posComp, rotComp);
+        updateAbilities(charComp, abComp, inputComp, posComp, rotComp);
+    }
+
+    private void checkHoleAffected(int charNumb, PositionComp posComp, PhysicsComp physComp, CharacterComp charComp, DamageableComp dmgablComp, AffectedByHoleComp affholeComp) {
+        if (affholeComp.isHoleAffectedFlag()) {
+
+            Vec2 respawnPos = (charNumb == 0)? new Vec2(GameUtils.MAP_WIDTH/4f, GameUtils.MAP_HEIGHT/2f) : new Vec2(GameUtils.MAP_WIDTH*3f/4f, GameUtils.MAP_HEIGHT/2f);
+
+            dmgablComp.reset();
+            physComp.reset();
+
+            charComp.incrementRespawnCount();
+
+            posComp.setPos(respawnPos);
+
+            System.out.println("Character numb: "+charNumb+" stocks lost: "+charComp.getRespawnCount());
+        }
     }
 
 
-    private void updateMove(CharacterInputComp inputComp, PhysicsComp phComp) {
-        float accel = 1200.0f;
+    private void updateMove(CharacterComp charComp, CharacterInputComp inputComp, PhysicsComp phComp) {
+
+        float accel = charComp.getMoveAccel();
         float stepX = ( (inputComp.isMoveRight()? 1:0) - (inputComp.isMoveLeft()? 1:0) );
         float stepY = ( (inputComp.isMoveDown()? 1:0) - (inputComp.isMoveUp()? 1:0) );
 
@@ -61,38 +105,30 @@ public class CharacterSys implements Sys {
     }
 
     private void updateRotation(CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
-        float angle = TrigUtils.pointDirection(posComp.getX(), posComp.getY(), inputComp.getAimX(), inputComp.getAimY());
-        rotComp.setAngle(angle);
+        float newAngle = TrigUtils.pointDirection(posComp.getX(), posComp.getY(), inputComp.getAimX(), inputComp.getAimY());
+        float diffAngle = TrigUtils.shortesAngleBetween(rotComp.getAngle(), newAngle);
+
+        //add a portion of diffAngle
+        rotComp.addAngle(diffAngle * 0.2f);
     }
 
-    private void updateAbilities(CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
+    private void updateAbilities(CharacterComp charComp, AbilityComp abComp, CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
         //System.out.println(inputComp.isAction1());
 
-        if (inputComp.isAction1() && timeToShoot <= 0) {
-            timeToShoot = reloadTime;
+        if (inputComp.isAction1()){
+            abComp.requestExecution(0);
+        }
 
-            createBullet(posComp.getPos(), Vec2.newLenDir(bulletSpeed, rotComp.getAngle()) );
+        if (inputComp.isAction2()) {
+            abComp.requestExecution(1);
         }
-        else {
-            timeToShoot -= 1.0f/60f;
+
+        if (inputComp.isAction3()) {
+            abComp.requestExecution(2);
         }
+
+
     }
 
 
-    private void createBullet(Vec2 position, Vec2 velocity) {
-        System.out.println("Creating bullet");
-        int b = wc.createEntity();
-
-        Vec2 offset = new Vec2(velocity);
-        offset.setLength(64);
-        position = position.add(offset);
-        wc.addComponent(b, new PositionComp(position.x, position.y));
-        PhysicsComp pc = new PhysicsComp();
-        pc.addVelocity(velocity);
-        //pc.setFrictionConstant(0.001f); not implemented in resolution
-        wc.addComponent(b, pc);
-        wc.addComponent(b, new CollisionComp(new Circle(bulletRadius)));
-        wc.addComponent(b, new ColoredMeshComp(bulletMesh));
-
-    }
 }

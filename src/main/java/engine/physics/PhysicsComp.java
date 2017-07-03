@@ -52,6 +52,10 @@ public class PhysicsComp implements Component {
     public void addVelocity(Vec2 velocity) {
         this.velocity = this.velocity.add(velocity);
     }
+    public void resetVelocity() {
+        velocity.setZero();
+    }
+
     public Vec2 getImpulse() {
         return impulse;
     }
@@ -94,7 +98,7 @@ public class PhysicsComp implements Component {
         if (m == 0)
             invMass = 0;
         else
-            invMass = 1/m;
+            invMass = 1.0f/m;
     }
     public float getElasticity() {
         return elasticity;
@@ -108,5 +112,16 @@ public class PhysicsComp implements Component {
     }
     public void setFrictionModel(int frictionModel) {
         this.frictionModel = frictionModel;
+    }
+
+
+    public void reset() {
+        resetAcceleration();
+        resetVelocity();
+        resetImpulse();
+    }
+
+    void setVelocityLen(float length) {
+        velocity.setLength(length);
     }
 }

@@ -1,6 +1,8 @@
 package engine;
 
+
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Created by eirik on 13.06.2017.
@@ -9,7 +11,7 @@ import java.util.*;
  */
 public class WorldContainer {
 
-    private static int ENTITY_COUNT = 200;
+    private static int ENTITY_COUNT = 400;
 
 
 
@@ -18,7 +20,11 @@ public class WorldContainer {
 
     //A mapping between entities and components for each component type.
     //A TreeMap is used to keep the map sorted on its keyValues.
-    private Map<Class<? extends Component>, TreeMap<Integer, Component>> components = new HashMap<>();
+    private Map< Class<? extends Component >, TreeMap<Integer, Component>> activeComponents = new HashMap<>();
+    private Map< Class<? extends Component >, TreeMap<Integer, Component>> inactiveComponents = new HashMap<>();
+
+    //a maping from entities to its components
+    private Map<Integer, ArrayList< Class<? extends Component> >> entityComponents = new HashMap<>();
 
     private List<Sys> systems = new ArrayList<>();
 
@@ -35,7 +41,9 @@ public class WorldContainer {
 
     //assign component types to be used during execution
     public void assignComponentType(Class<? extends Component> compType) {
-        components.put(compType, new TreeMap<>());
+        activeComponents.put(compType, new TreeMap<>());
+        inactiveComponents.put(compType, new TreeMap<>());
+
     }
 
     //add system instances to be updated/run on each update frame
@@ -57,15 +65,56 @@ public class WorldContainer {
     //----------ENTITY HANDLING
 
     public int createEntity() {
-        int e = allocateEntity();
+        //retrieve unique id
+        int e = retrieveEntityId();
+
+        //create entry in entity-compType map
+        entityComponents.put(e, new ArrayList<>());
 
         return e;
     }
+    /**
+     * Use with caution. Better to deactivate than to destroy if a similar entity is used again
+     * @param entity
+     */
     public void destroyEntity(int entity) {
         if (! entityExists(entity)) throw new IllegalArgumentException("Trying to destroy an entity that doesnt exist");
 
-        deallocateEntity(entity);
+        //remove components
+        ArrayList<Class<? extends Component>> compTypes = entityComponents.get(entity);
+        while( !compTypes.isEmpty() ) {
+            removeComponent(entity, compTypes.get(0));
+        }
+
+        //remove entry in entity-compType map
+        entityComponents.remove(entity);
+
+        //release entity id
+        releaseEntityId(entity);
     }
+
+    /**
+     * Deactivate all components corresponding to the given entity
+     * @param entity
+     */
+    public void deactivateEntity(int entity) {
+        //deactivation is done on component level
+        for (Class<? extends  Component> compType : entityComponents.get(entity)) {
+            deactivateComponent(entity, compType);
+        }
+    }
+
+    /**
+     * Activates all components corresponding to the given entity. Assumes all components inactive
+     * @param entity
+     */
+    public void activateEntity(int entity) {
+        //activation is done on component level
+        for (Class<? extends  Component> compType : entityComponents.get(entity)) {
+            activateComponent(entity, compType);
+        }
+    }
+
 
     /**
      * Retrieve the entities that contains a given component  in ascending order based on the entities id.
@@ -73,11 +122,15 @@ public class WorldContainer {
      * @param compType
      * @return
      */
+    @Deprecated
     public Set<Integer> getEntitiesWithComponentType(Class<? extends Component> compType) {
-        return components.get(compType).keySet();
+        return activeComponents.get(compType).keySet();
+    }
+    public Stream<Integer> entitiesOfComponentTypeStream(Class<? extends Component> compType) {
+        return activeComponents.get(compType).keySet().stream();
     }
 
-    private int allocateEntity() {
+    private int retrieveEntityId() {
         for (int i = 0; i < ENTITY_COUNT; i++) {
             if (!entities[i]) {
                 entities[i] = true;
@@ -86,8 +139,10 @@ public class WorldContainer {
         }
         throw new IllegalStateException("There is not allocated enough space for more entities");
     }
-    private void deallocateEntity(int entity) {
+    private void releaseEntityId(int entity) {
+        //release id
         entities[entity] = false;
+
     }
     private boolean entityExists(int entity) {
         return entities[entity];
@@ -97,18 +152,120 @@ public class WorldContainer {
 
     //----------COMPONENT HANDLING
 
+    /**
+     * Add a component, it will be active even though deactivate entity is previously called
+     * @param entity
+     * @param comp
+     */
     public void addComponent(int entity, Component comp) {
-        validateComponentType(comp);
+        validateComponentType(comp); //check if component type is assigned
 
-        components.get(comp.getClass()).put(entity, comp);
+        activeComponents.get(comp.getClass()).put(entity, comp);
+
+        //update entityComponent with compType
+        entityComponents.get(entity).add(comp.getClass());
     }
+    public void addInactiveComponent(int entity, Component comp) {
+        addComponent(entity, comp);
+        deactivateComponent(entity, comp.getClass());
+
+    }
+
+    /**
+     * Deactivates a component if it is active. If it is inactive, nothing is changed.
+     * @param entity
+     * @param compType
+     * @return true if a component was set active
+     */
+    public boolean deactivateComponent(int entity, Class<? extends Component> compType) {
+        //swap a comp instance from active to inactive list
+        Component c = activeComponents.get(compType).remove(entity);
+        if (c != null) {
+            inactiveComponents.get(compType).put(entity, c);
+            return true;
+        }
+        else {
+            //System.err.println("CompType "+compType+" is already inactive");
+            return false;
+        }
+    }
+
+    /**
+     * Activates a component if it is inactive. If it is active, change nothing
+     * @param entity
+     * @param compType
+     * @return
+     */
+    public boolean activateComponent(int entity, Class<? extends Component> compType) {
+        //swap a comp instance from inactive to active list
+        Component c = inactiveComponents.get(compType).remove(entity);
+
+        if (c != null) {
+            activeComponents.get(compType).put(entity, c);
+            return true;
+        }
+        else {
+            //System.err.println("CompType "+compType+" is already active");
+            return false;
+        }
+    }
+
+    /**
+     * Removes an active or inactive component corresponding to the given entity
+     * Use with caution, better to deactivate component if it is to be used again
+     * @param entity
+     * @param compType
+     */
+    public void removeComponent(int entity, Class<? extends Component> compType) {
+        //remove if in active list
+        Component c = activeComponents.get(compType).remove(entity);
+        if (c == null) {
+            //remove if in inactive list
+            c = inactiveComponents.get(compType).remove(entity);
+
+            if (c == null) {
+                //the component doesnt exist
+                throw new IllegalStateException("Trying to remove a component that doesn't exist");
+            }
+        }
+
+        //remove component from entity in entityComponent list
+        boolean removed = entityComponents.get(entity).remove(compType);
+
+        if (!removed) throw new IllegalStateException("Tried to remove compType from entitiesComponent list, but it didnt exist");
+    }
+    /**
+     * Use with caution, better to deactivate component if it is to be used again
+     * @param entity
+     * @param comp
+     */
+    public void removeComponent(int entity, Component comp) {
+        removeComponent(entity, comp.getClass());
+    }
+    public void removeComponents(int entity, Class<? extends Component>... compTypes) {
+        for (Class<? extends Component> compType : compTypes) {
+            removeComponent(entity, compType);
+        }
+    }
+
     public Map<Integer, Component> getComponentsOfType(Class<? extends Component> compType) {
         validateComponentType(compType);
 
-        return components.get(compType);
+        return activeComponents.get(compType);
     }
+    public Map<Integer, Component> getInactiveComponentsOfType(Class<? extends Component> compType) {
+        validateComponentType(compType);
+
+        return inactiveComponents.get(compType);
+    }
+
     public Component getComponent(int entity, Class<? extends Component> compType) {
         Component c = getComponentsOfType(compType).get(entity);
+        if (c == null) throw new IllegalStateException("No component of the given type is assigned to the given entity, type="+compType);
+        return c;
+    }
+    public Component getInactiveComponent(int entity, Class<? extends Component> compType) {
+        Component c = getInactiveComponentsOfType(compType).get(entity);
         if (c == null) throw new IllegalStateException("No component of the given type is assigned to the given entity, type="+compType);
         return c;
     }
@@ -120,9 +277,26 @@ public class WorldContainer {
         validateComponentType(comp.getClass());
     }
     private void validateComponentType(Class<? extends Component> compType) {
-        if (!components.containsKey(compType)) throw new IllegalStateException("Trying to use a component of a type that is not assigned, type="+compType);
+        if (!activeComponents.containsKey(compType)) throw new IllegalStateException("Trying to use a component of a type that is not assigned, type="+compType);
     }
 
+
+    //---------TERMINATION
+    public void terminate() {
+        for (Sys s : systems) {
+            s.terminate();
+        }
+    }
+
+
+    public String entityToString(int entity) {
+        String entStr = "[Entity "+entity+": components={";
+        for (Class<? extends Component> compType : entityComponents.get(entity)) {
+            entStr += compType.getSimpleName() + "=" + hasComponent(entity, compType) + ", ";
+        }
+        entStr += "}]";
+        return entStr;
+    }
 
 }
 

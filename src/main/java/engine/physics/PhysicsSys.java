@@ -18,6 +18,7 @@ import java.util.TreeMap;
 public class PhysicsSys implements Sys {
 
     private static float DELTA_TIME = 1.0f / 60.0f;
+    private static float MAX_VELOCITY = 30f*60f;
 
     private WorldContainer worldContainer;
     private Set<Integer> physicsEntities;
@@ -30,6 +31,7 @@ public class PhysicsSys implements Sys {
     @Override
     public void update() {
         this.physicsEntities = worldContainer.getEntitiesWithComponentType(PhysicsComp.class);
+
 //        applyFriction();            //adding friction acceleration vector
 //        updateVelocities();         //accelerating
 //        updatePositions();
@@ -43,21 +45,31 @@ public class PhysicsSys implements Sys {
             physicsComp.addAcceleration(calculateFriction(physicsComp));
 
             //apply acceleration
-            System.out.println(physicsComp.getImpulse());
-
             Vec2 deltaAcceleration = physicsComp.getAcceleration().scale(DELTA_TIME);
             physicsComp.addVelocity( deltaAcceleration.add( physicsComp.getImpulse()) );
 
-            //apply velocity
-            Vec2 deltaVelocity = physicsComp.getVelocity().scale(DELTA_TIME);
 
-            posComp.addPos(deltaVelocity);
+            //check if velocity is to great. If so, apply greatest velocity, but dont change the velocity
+            Vec2 correctedVelocity = new Vec2(physicsComp.getVelocity());
+            if (correctedVelocity.getLengthSquared() > MAX_VELOCITY*MAX_VELOCITY) {
+                //System.out.println("Hit max velocity");
+                correctedVelocity.setLength(MAX_VELOCITY);
+            }
+
+            //apply velocity
+            Vec2 deltaCorrectedVelocity = correctedVelocity.scale(DELTA_TIME);
+            posComp.addPos(deltaCorrectedVelocity);
 
 
             //reset frame-based values
             physicsComp.resetAcceleration();
             physicsComp.resetImpulse();
         }
+    }
+
+    @Override
+    public void terminate() {
+
     }
 
 //    private void applyFriction() {
