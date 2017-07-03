@@ -12,6 +12,10 @@ public class FileUtils {
     private FileUtils() {
     }
 
+    public static InputStream loadAsStream(String filepath) {
+        return FileUtils.class.getClassLoader().getResourceAsStream(filepath);
+    }
+
     public static String loadAsString(String file) {
         StringBuilder result = new StringBuilder();
         try {
