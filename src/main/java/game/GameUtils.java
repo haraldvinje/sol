@@ -10,15 +10,13 @@ import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
 import engine.combat.abilities.*;
 import engine.graphics.*;
-import engine.network.client.ClientNetworkSys;
-import engine.network.client.InterpolationComp;
-import engine.network.client.InterpolationSys;
+import engine.network.client.*;
 import engine.network.server.ServerClientHandler;
 import engine.network.server.ServerNetworkSys;
 import engine.physics.*;
 import engine.window.Window;
-import utils.maths.M;
 
+import java.net.Socket;
 import java.util.List;
 
 /**
@@ -33,7 +31,7 @@ public class GameUtils {
     public static final int SERVER = 0, CLIENT = 1, OFFLINE = 2;
     public static int PROGRAM = -1;
     //public static boolean SERVER_RENDER;
-    public static String HOST_NAME; //set by mainClient args
+    public static Socket socket; //set by mainClient args
 
     public static List<ServerClientHandler> CLIENT_HANDELERS;
 
@@ -134,7 +132,7 @@ public class GameUtils {
         }
 
         else if (PROGRAM == CLIENT){
-            wc.addSystem(new ClientNetworkSys(HOST_NAME, userInput) );
+            wc.addSystem(new ClientNetworkInSys(socket));
             wc.addSystem(new AbilitySys());
             wc.addSystem(new PhysicsSys());
 
@@ -142,6 +140,7 @@ public class GameUtils {
 
             wc.addSystem(new ProjectileSys());
 
+            wc.addSystem(new ClientNetworkOutSys(socket, userInput));
             wc.addSystem(new RenderSys(window));
         }
 
