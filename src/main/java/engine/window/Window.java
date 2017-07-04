@@ -115,26 +115,37 @@ public class Window {
 
         System.out.println("Created GLFW window");
 
-        // Get the resolution of the primary monitor
-        GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        // Center our window
-        glfwSetWindowPos(
-                windowId,
-                (vidmode.width() - iwidth) / 2,
-                (vidmode.height() - iheight) / 2
-        );
+        int width, height;
 
-        glfwMakeContextCurrent(windowId);
+        //center window
+        try (MemoryStack stack = stackPush() ) {
+            IntBuffer pWidth = stack.mallocInt(1);
+            IntBuffer pHeight = stack.mallocInt(1);
 
-        glfwSwapInterval(1);// Enable v-sync
+            glfwGetWindowSize(windowId, pWidth, pHeight);
 
+            width = pWidth.get(0);
+            height = pHeight.get(0);
+
+            // Center our window
+            glfwSetWindowPos(
+                    windowId,
+                    (vidmode.width() - width) / 2,
+                    (vidmode.height() - height) / 2
+            );
+        }
+        this.width = width;
+        this.height = height;
 
         glfwShowWindow(windowId);
-        glfwSwapBuffers(windowId);
     }
 
     public void initGL() {
         if (windowId == -1) throw new IllegalStateException("cannot init OpenGL before a window is created");
+
+        glfwMakeContextCurrent(windowId);
+
+        glfwSwapInterval(1);// Enable v-sync
 
         GL.createCapabilities(); //get opengl context
 
@@ -148,6 +159,8 @@ public class Window {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+        glfwSwapBuffers(windowId);
+
         GLinitialized = true;
     }
 
@@ -160,7 +173,11 @@ public class Window {
     }
 
     public void close() {
+        glfwFreeCallbacks(windowId);
         glfwDestroyWindow(windowId);
+
+        glfwTerminate();
+        glfwSetErrorCallback(null).free();
     }
 
 
