@@ -20,8 +20,6 @@ public class Server {
     private static final float FRAME_INTERVAL = 1.0f/60.0f;
 
 
-    public static final float WINDOW_WIDTH = GameUtils.MAP_WIDTH /4,
-            WINDOW_HEIGHT = GameUtils.MAP_HEIGHT /4;
 
     private ServerConnectionInput connectionInput;
     private Thread serverConnectionInputThread;
@@ -173,7 +171,7 @@ public class Server {
         wc.assignComponentType(TexturedMeshComp.class);
         wc.assignComponentType(MeshCenterComp.class);
 
-        wc.addSystem(new RenderSys(window));
+        wc.addSystem(new RenderSys(window, window.getWidth(), window.getHeight()));
     }
 
 

@@ -28,6 +28,8 @@ public class GameUtils {
     public static final float MAP_WIDTH = 1600f,
                                 MAP_HEIGHT = 900f;
 
+    public static float VIEW_WIDTH = MAP_WIDTH, VIEW_HEIGHT = MAP_HEIGHT;
+
     public static final int SERVER = 0, CLIENT = 1, OFFLINE = 2;
     public static int PROGRAM = -1;
     //public static boolean SERVER_RENDER;
@@ -128,7 +130,7 @@ public class GameUtils {
 
             wc.addSystem(new ProjectileSys());
 
-            wc.addSystem(new RenderSys(window));
+            wc.addSystem(new RenderSys(window, VIEW_WIDTH, VIEW_HEIGHT));
         }
 
         else if (PROGRAM == CLIENT){
@@ -141,7 +143,7 @@ public class GameUtils {
             wc.addSystem(new ProjectileSys());
 
             wc.addSystem(new ClientNetworkOutSys(socket, userInput));
-            wc.addSystem(new RenderSys(window));
+            wc.addSystem(new RenderSys(window, VIEW_WIDTH, VIEW_HEIGHT));
         }
 
         else if (PROGRAM == OFFLINE) {
@@ -159,7 +161,7 @@ public class GameUtils {
 
             wc.addSystem(new ProjectileSys());
 
-            wc.addSystem(new RenderSys(window));
+            wc.addSystem(new RenderSys(window, VIEW_WIDTH, VIEW_HEIGHT));
         }
     }
 

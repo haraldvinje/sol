@@ -29,7 +29,7 @@ public class ClientUtils {
         wc.assignComponentType(MeshCenterComp.class);
 
         //add systems
-        wc.addSystem(new RenderSys(window));
+        wc.addSystem(new RenderSys(window, Client.WINDOW_WIDTH, Client.WINDOW_HEIGHT));
 
         return wc;
     }

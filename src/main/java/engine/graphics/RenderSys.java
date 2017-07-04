@@ -29,12 +29,12 @@ public class RenderSys implements Sys {
     private Mat4 projectionTransform;
 
 
-    public RenderSys(Window window) {
+    public RenderSys(Window window, float viewWidth, float viewHeight) {
         this.window = window;
         colorShader = new ColorShader();
         textureShader = new TextureShader();
 
-        projectionTransform = Mat4.orthographic(0, window.getWidth(), window.getHeight(), 0, -10, 10);
+        projectionTransform = Mat4.orthographic(0, viewWidth, viewHeight, 0, -10, 10);
     }
 
     @Override

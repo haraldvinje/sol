@@ -13,7 +13,8 @@ import java.util.EnumMap;
  */
 public class Client {
 
-    public static final float WINDOW_WIDTH = 800f, WINDOW_HEIGHT = 450f;
+    public static final float WINDOW_WIDTH_SCALE = 0.7f, WINDOW_HEIGHT_SCALE = 0.7f;
+    public static float WINDOW_WIDTH, WINDOW_HEIGHT;
 
     public static final float FRAME_INTERVAL = 1f/60f;
 
@@ -44,13 +45,20 @@ public class Client {
         else throw new IllegalStateException("Trying to set socket after it is already set");
     }
 
+    public Socket getSocket() {
+        return socket;
+    }
+
     public void terminate() {
         running = false;
     }
 
     public void init() {
-        window = new Window(WINDOW_WIDTH, WINDOW_HEIGHT, "SOL client");
-        userInput = new UserInput(window);
+        window = new Window(WINDOW_WIDTH_SCALE, WINDOW_HEIGHT_SCALE, "SOL client");
+        WINDOW_WIDTH = window.getWidth();
+        WINDOW_HEIGHT = window.getHeight();
+
+        userInput = new UserInput(window, window.getWidth(), window.getHeight());
 
         //assign states
         states.put(ClientStates.IDLE, new ClientIdleState());
