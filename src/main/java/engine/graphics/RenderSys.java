@@ -24,15 +24,17 @@ public class RenderSys implements Sys {
 
     private WorldContainer wc;
 
-    private Mat4 viewTransform = Mat4.translate(new Vec3(0, 0,0));
+    private Mat4 viewTransform = Mat4.identity();// Mat4.translate(new Vec3(0, 0,0));
 
-    private Mat4 projectionTransform = Mat4.orthographic(0, 1600, 900, 0, -10, 10);
+    private Mat4 projectionTransform;
 
 
     public RenderSys(Window window) {
         this.window = window;
         colorShader = new ColorShader();
         textureShader = new TextureShader();
+
+        projectionTransform = Mat4.orthographic(0, window.getWidth(), window.getHeight(), 0, -10, 10);
     }
 
     @Override
