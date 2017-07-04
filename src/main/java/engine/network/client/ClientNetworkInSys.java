@@ -47,11 +47,11 @@ public class ClientNetworkInSys implements Sys{
 
     @Override
     public void terminate() {
-        try {
-            inputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            inputStream.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
     }
 

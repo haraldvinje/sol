@@ -84,11 +84,11 @@ public class ClientNetworkOutSys implements Sys {
 
     @Override
     public void terminate() {
-        try {
-            outputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            outputStream.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
     }
 }

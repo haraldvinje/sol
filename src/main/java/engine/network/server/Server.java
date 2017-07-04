@@ -125,6 +125,8 @@ public class Server {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        Window.terminateGLFW();
     }
 
     private void createGame(ServerClientHandler client1, ServerClientHandler client2) {

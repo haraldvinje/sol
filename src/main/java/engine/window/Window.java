@@ -176,7 +176,7 @@ public class Window {
         glfwFreeCallbacks(windowId);
         glfwDestroyWindow(windowId);
 
-        glfwTerminate();
+        //glfwTerminate();
         glfwSetErrorCallback(null).free();
     }
 
@@ -197,4 +197,7 @@ public class Window {
         glfwSetKeyCallback( windowId, call);
     }
 
+    public static void terminateGLFW() {
+        glfwTerminate();
+    }
 }
