@@ -66,6 +66,11 @@ public class NaturalResolutionSys implements Sys {
     private void resolveCollision(CollisionData data) {
         PhysicsComp phc1 = (PhysicsComp) worldContainer.getComponent(data.getEntity1(), PhysicsComp.class);
         PhysicsComp phc2 = (PhysicsComp) worldContainer.getComponent(data.getEntity2(), PhysicsComp.class);
+
+        if (phc1.getMass()==0 && phc2.getMass() ==0 ){
+            return;
+        }
+
         Vec2 collisionVector = data.getCollisionVector();
 
         Vec2 relVelocity = phc2.getVelocity().subtract(phc1.getVelocity());
