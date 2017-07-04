@@ -65,7 +65,7 @@ public class ClientIngameState extends ClientState {
 
     private void createInitialEntities(WorldContainer wc) {
         int circ = wc.createEntity();
-        wc.addComponent(circ, new PositionComp(Client.WINDOW_WIDTH/2, Client.WINDOW_HEIGHT/2));
-        wc.addComponent(circ, new ColoredMeshComp(ColoredMeshUtils.createCircleTwocolor(Client.WINDOW_HEIGHT*(3/4), 32)));
+        wc.addComponent(circ, new PositionComp(client.getWindowWidth()/2, client.getWindowHeight()/2));
+        wc.addComponent(circ, new ColoredMeshComp(ColoredMeshUtils.createCircleTwocolor(client.getWindowHeight()*(3/4), 32)));
     }
 }

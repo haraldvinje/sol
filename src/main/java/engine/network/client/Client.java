@@ -145,6 +145,12 @@ public class Client {
         currentState.onEnter();
     }
 
+    public float getWindowWidth() {
+        return window.getWidth();
+    }
+    public float getWindowHeight() {
+        return window.getHeight();
+    }
 
     private float timePassed() {
         long newTime = System.nanoTime();
