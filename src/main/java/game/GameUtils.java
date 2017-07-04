@@ -231,13 +231,12 @@ public class GameUtils {
 
 
 
-/*
-        TODO: Fix circular walls. Bug now
-        float c1WallRadius = 0f;
-        createCircleWall(wc, 1000*scale, 2*(MAP_HEIGHT/2)*scale, c1WallRadius*scale);
-        createCircleWall(wc, 1000*scale, 2*(MAP_HEIGHT/2)*scale, c1WallRadius*scale);
+        float c1WallRadius = 200f;
+        float circleWallsSeperation = 300;
+        createCircleWall(wc, 2*(MAP_WIDTH / 2 - circleWallsSeperation)*scale, 2*(MAP_HEIGHT/2)*scale, c1WallRadius*scale);
+        createCircleWall(wc, 2*(MAP_WIDTH / 2 + circleWallsSeperation)*scale, 2*(MAP_HEIGHT/2)*scale, c1WallRadius*scale);
 
-*/
+
 
         //creating walls and holes in center
         float centerSep = 180f;
