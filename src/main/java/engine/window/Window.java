@@ -25,14 +25,26 @@ public class Window {
 
     private long windowId;
 
+    private float width, height;
+
 
     public Window(float width, float height, String title) {
 
         initGLFW();
         createWindow(width, height, title);
         initGL();
+
+        this.width = width;
+        this.height = height;
     }
 
+    public float getWidth() {
+        return width;
+    }
+
+    public float getHeight() {
+        return height;
+    }
 
     public void initGLFW() {
         if (!glfwInit()) {
