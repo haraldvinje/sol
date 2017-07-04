@@ -1,54 +1,38 @@
 package engine.network.client;
 
-import engine.*;
+import engine.Sys;
+import engine.WorldContainer;
 import engine.character.CharacterComp;
 import engine.combat.abilities.AbilityComp;
 import engine.combat.abilities.HitboxComp;
 import engine.combat.abilities.ProjectileComp;
-import engine.network.CharacterInputData;
 import engine.network.CharacterStateData;
 import engine.network.GameStateData;
 import engine.network.NetworkUtils;
-import utils.maths.M;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
 /**
- * Created by eirik on 21.06.2017.
+ * Created by eirik on 04.07.2017.
  */
-public class ClientNetworkSys implements Sys{
-
+public class ClientNetworkInSys implements Sys{
 
     private WorldContainer wc;
-    private UserInput userInput;
 
-    private Socket socket;
-    private DataOutputStream outputStream;
     private DataInputStream inputStream;
 
 
-    public ClientNetworkSys(String hostname, UserInput userInput) {
+    public ClientNetworkInSys(Socket socket) {
 
         try {
-            System.out.println("Connecting to server");
-            socket = new Socket(hostname, NetworkUtils.PORT_NUMBER);
-            System.out.println("Connection established!");
-
-            outputStream = new DataOutputStream(socket.getOutputStream());
             inputStream = new DataInputStream(socket.getInputStream());
-        }
-        catch (UnknownHostException e) {
-            throw new IllegalArgumentException("Invalid hostname");
         }
         catch (IOException e) {
             throw new IllegalStateException("An io exception occured while setting up socket\n could not connect to specified host");
         }
-
-        this.userInput = userInput;
     }
 
     @Override
@@ -56,25 +40,20 @@ public class ClientNetworkSys implements Sys{
         this.wc = wc;
     }
 
-
     @Override
     public void update() {
-        updateServerByInput();
-
         updateGameStateByServer();
     }
 
     @Override
     public void terminate() {
+        try {
+            inputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
-
-    private void updateServerByInput() {
-
-        CharacterInputData input = retrieveUserInput();
-        sendInputData(input);
-    }
-
 
     private void updateGameStateByServer() {
 
@@ -84,32 +63,7 @@ public class ClientNetworkSys implements Sys{
         }
     }
 
-    /**
-     * retrieve input straight from user as of now
-     * @return
-     */
-    public CharacterInputData retrieveUserInput() {
-        CharacterInputData input = new CharacterInputData();
 
-        input.setMoveLeft(userInput.isKeyboardPressed(UserInput.KEY_A));
-        input.setMoveRight(userInput.isKeyboardPressed(UserInput.KEY_D));
-        input.setMoveUp(userInput.isKeyboardPressed(UserInput.KEY_W));
-        input.setMoveDown(userInput.isKeyboardPressed(UserInput.KEY_S));
-
-        input.setAction1(userInput.isMousePressed(UserInput.MOUSE_BUTTON_1));
-        input.setAction2(userInput.isMousePressed(UserInput.MOUSE_BUTTON_2));
-        input.setAction3(userInput.isKeyboardPressed(UserInput.KEY_SPACE));
-
-        input.setAimX(userInput.getMouseX());
-        input.setAimY(userInput.getMouseY());
-
-        return input;
-    }
-
-    public void sendInputData(CharacterInputData id) {
-
-        NetworkUtils.characterInputToStream(id, outputStream); //protocol
-    }
 
     private void applyGameState(GameStateData gameState) {
         //apply state
@@ -190,20 +144,4 @@ public class ClientNetworkSys implements Sys{
             throw new IllegalStateException("IO exception");
         }
     }
-
-
-
-    //read character position, rotation,
-
-    public void close() {
-        try {
-            outputStream.close();
-            inputStream.close();
-            socket.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 }
