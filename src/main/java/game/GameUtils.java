@@ -215,7 +215,19 @@ public class GameUtils {
     }
 
     private static int createSchmathias(WorldContainer wc, float x, float y) {
-        int hookProjEntity = allocateImageProjectileEntity(wc, "hook.png", -256/2, 512, 256, 24); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
+
+        //frogpunch
+        MeleeAbility abFrogpunch = new MeleeAbility(wc, 3, 5, 3, 20, new Circle(64f),48.0f);
+        abFrogpunch.setDamagerValues(wc, 150, 700, 0.8f, -48f, false);
+
+        //hook
+        int hookProjEntity = allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
+        ProjectileAbility abHook = new ProjectileAbility(wc, hookProjEntity, 5, 23, 50, 900, 30);
+        abHook.setDamagerValues(wc, 200f, 1500f, 0.2f, -128, true);
+
+        //meteorpunch
+        MeleeAbility abMeteorpunch = new MeleeAbility(wc, 15, 3, 4, 60, new Circle(32), 64);
+        abMeteorpunch.setDamagerValues(wc, 500, 1000, 1.5f, -128f, false);
 
         return createCharacter(wc, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
                 new MeleeAbility(wc, 3, 5, 3, 20, 150, 700, 0.8f, new Circle(64f),48.0f, 0f),
