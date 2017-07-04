@@ -59,8 +59,8 @@ public class ClientGame implements Runnable{
      */
     @Override
     public void run() {
-        window = new Window(WINDOW_WIDTH, WINDOW_HEIGHT, "Client   SIIII");
-        userInput = new UserInput(window);
+        window = new Window("Client   SIIII");
+        userInput = new UserInput(window, GameUtils.MAP_WIDTH, GameUtils.MAP_HEIGHT);
 
         GameUtils.assignComponentTypes(wc);
         GameUtils.assignSystems(wc, window, userInput);

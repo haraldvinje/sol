@@ -45,8 +45,8 @@ public class Server {
 
 
     public void init() {
-        window = new Window(WINDOW_WIDTH, WINDOW_HEIGHT, "D1n-only Server SII");
-        userInput = new UserInput(window);
+        window = new Window(0.3f, 0.3f, "D1n-only Server SII");
+        userInput = new UserInput(window, 1, 1);
 
         wc = new WorldContainer();
         initWorldContainer();

@@ -1,16 +1,19 @@
 package engine.window;
 
 
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-import org.lwjgl.glfw.GLFWCursorPosCallbackI;
-import org.lwjgl.glfw.GLFWKeyCallbackI;
-import org.lwjgl.glfw.GLFWMouseButtonCallbackI;
-import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.glfw.*;
 
 import org.lwjgl.opengl.GL;
+import org.lwjgl.system.MemoryStack;
+
+import java.nio.IntBuffer;
+
 import static org.lwjgl.opengl.GL11.*;
 
 
@@ -28,20 +31,30 @@ public class Window {
     private float width, height;
 
 
-    public Window(float width, float height, String title) {
+    public Window(float relMonitorWidthSize, float relMonitorHeightSize, String title) {
 
         initGLFW();
-        createWindow(width, height, title);
+        createWindow(relMonitorWidthSize, relMonitorHeightSize, title);
         initGL();
 
         this.width = width;
         this.height = height;
     }
+    public Window(float relMonitorSize, String title) {
+        initGLFW();
+        createWindow(relMonitorSize, title);
+        initGL();
+    }
+    public Window(String title) {
+
+        initGLFW();
+        createFullscreenWindow(title);
+        initGL();
+    }
 
     public float getWidth() {
         return width;
     }
-
     public float getHeight() {
         return height;
     }
@@ -50,17 +63,47 @@ public class Window {
         if (!glfwInit()) {
             throw new IllegalStateException("Could not initialize GLFW!");
         }
+        GLFWErrorCallback.createPrint(System.err).set();
 
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
-        //glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // the window will not be resizable
 
         GLFWinitialized = true;
     }
+    public void createFullscreenWindow(String title) {
+        long primaryMonitor = glfwGetPrimaryMonitor();
+        GLFWVidMode vidmode = glfwGetVideoMode(primaryMonitor);
 
-    public void createWindow(float width, float height, String title) {
-        int iwidth = (int)width;
-        int iheight = (int)height;
+        int iwidth = vidmode.width();
+        int iheight = vidmode.height();
+
+        if (!GLFWinitialized) throw new IllegalStateException("Cannot create window because GLFW is not initialized");
+
+        windowId =  glfwCreateWindow(iwidth, iheight, title, primaryMonitor, NULL);
+
+        if (windowId == NULL) {
+            throw new IllegalStateException("Could not create GLFW window!");
+        }
+        System.out.println("Created GLFW window");
+
+        this.width = iwidth;
+        this.height = iheight;
+
+        glfwShowWindow(windowId);
+
+    }
+
+    public void createWindow(float relMonitorSize, String title) {
+        createWindow(relMonitorSize, relMonitorSize, title);
+    }
+    public void createWindow(float relMonitorWidthSize, float relMonitorHeightSize, String title) {
+
+        long primaryMonitor = glfwGetPrimaryMonitor();
+        GLFWVidMode vidmode = glfwGetVideoMode(primaryMonitor);
+
+        int iwidth = (int)((float)vidmode.width() * relMonitorWidthSize);
+        int iheight = (int)((float)vidmode.height() * relMonitorHeightSize);
 
         if (!GLFWinitialized) throw new IllegalStateException("Cannot create window because GLFW is not initialized");
 
