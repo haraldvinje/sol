@@ -57,7 +57,7 @@ task runClient(type: JavaExec) {
 
     classpath = sourceSets.main.runtimeClasspath
 
-    args = ["localhost"]
+    args = ["localhost"]//["192.168.1.24"]
     main = 'game.MainClient'
 
     systemProperty 'java.library.path', project.nativeLibsDir
@@ -71,6 +71,7 @@ run {
 
     systemProperty 'java.library.path', project.nativeLibsDir
 }
+
 
 
 task createFatOfflineJar(type: Jar) {
