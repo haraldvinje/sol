@@ -232,7 +232,7 @@ public class GameUtils {
 
         //hook
         int hookProjEntity = allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
-        ProjectileAbility abHook = new ProjectileAbility(wc, hookProjEntity, 5, 23, 50, 900, 30);
+        ProjectileAbility abHook = new ProjectileAbility(wc, hookProjEntity, 5, 14, 50, 900, 30);
         abHook.setDamagerValues(wc, 200f, 1500f, 0.2f, -128, true);
 
         //meteorpunch
