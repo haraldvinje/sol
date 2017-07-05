@@ -24,13 +24,17 @@ public class RenderSys implements Sys {
 
     private WorldContainer wc;
 
-    Mat4 projectionTransform = Mat4.orthographic(0, 1600, 900, 0, -10, 10);
+    private Mat4 viewTransform = Mat4.identity();// Mat4.translate(new Vec3(0, 0,0));
+
+    private Mat4 projectionTransform;
 
 
-    public RenderSys(Window window) {
+    public RenderSys(Window window, float viewWidth, float viewHeight) {
         this.window = window;
         colorShader = new ColorShader();
         textureShader = new TextureShader();
+
+        projectionTransform = Mat4.orthographic(0, viewWidth, viewHeight, 0, -10, 10);
     }
 
     @Override
@@ -76,7 +80,7 @@ public class RenderSys implements Sys {
             Mat4 modelTransform = modelTranslate.multiply(modelScale.multiply(modelRotate.multiply( modelCenterTranslate )));
 
             ColoredMeshComp coloredMeshComp = (ColoredMeshComp)wc.getComponent(entity, ColoredMeshComp.class);
-            renderColoredMesh(coloredMeshComp.getMesh(), modelTransform, Mat4.identity(), projectionTransform);
+            renderColoredMesh(coloredMeshComp.getMesh(), modelTransform, viewTransform, projectionTransform);
 
 
 
@@ -106,7 +110,7 @@ public class RenderSys implements Sys {
 
 
             TexturedMeshComp texturedMeshComp = (TexturedMeshComp)wc.getComponent(entity, TexturedMeshComp.class);
-            renderTexturedMesh(texturedMeshComp.getMesh(), modelTransform, Mat4.identity(), projectionTransform);
+            renderTexturedMesh(texturedMeshComp.getMesh(), modelTransform, viewTransform, projectionTransform);
 
 
         }

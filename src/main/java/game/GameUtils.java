@@ -10,15 +10,13 @@ import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
 import engine.combat.abilities.*;
 import engine.graphics.*;
-import engine.network.client.ClientNetworkSys;
-import engine.network.client.InterpolationComp;
-import engine.network.client.InterpolationSys;
+import engine.network.client.*;
 import engine.network.server.ServerClientHandler;
 import engine.network.server.ServerNetworkSys;
 import engine.physics.*;
 import engine.window.Window;
-import utils.maths.M;
 
+import java.net.Socket;
 import java.util.List;
 
 /**
@@ -30,10 +28,12 @@ public class GameUtils {
     public static final float MAP_WIDTH = 1600f,
                                 MAP_HEIGHT = 900f;
 
+    public static float VIEW_WIDTH = MAP_WIDTH, VIEW_HEIGHT = MAP_HEIGHT;
+
     public static final int SERVER = 0, CLIENT = 1, OFFLINE = 2;
     public static int PROGRAM = -1;
     //public static boolean SERVER_RENDER;
-    public static String HOST_NAME; //set by mainClient args
+    public static Socket socket; //set by mainClient args
 
     public static List<ServerClientHandler> CLIENT_HANDELERS;
 
@@ -130,11 +130,11 @@ public class GameUtils {
 
             wc.addSystem(new ProjectileSys());
 
-            wc.addSystem(new RenderSys(window));
+            wc.addSystem(new RenderSys(window, VIEW_WIDTH, VIEW_HEIGHT));
         }
 
         else if (PROGRAM == CLIENT){
-            wc.addSystem(new ClientNetworkSys(HOST_NAME, userInput) );
+            wc.addSystem(new ClientNetworkInSys(socket));
             wc.addSystem(new AbilitySys());
             wc.addSystem(new PhysicsSys());
 
@@ -142,7 +142,8 @@ public class GameUtils {
 
             wc.addSystem(new ProjectileSys());
 
-            wc.addSystem(new RenderSys(window));
+            wc.addSystem(new ClientNetworkOutSys(socket, userInput));
+            wc.addSystem(new RenderSys(window, VIEW_WIDTH, VIEW_HEIGHT));
         }
 
         else if (PROGRAM == OFFLINE) {
@@ -160,7 +161,7 @@ public class GameUtils {
 
             wc.addSystem(new ProjectileSys());
 
-            wc.addSystem(new RenderSys(window));
+            wc.addSystem(new RenderSys(window, VIEW_WIDTH, VIEW_HEIGHT));
         }
     }
 
@@ -231,8 +232,8 @@ public class GameUtils {
 
         //hook
         int hookProjEntity = allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
-        ProjectileAbility abHook = new ProjectileAbility(wc, hookProjEntity, 5, 23, 50, 900, 30);
-        abHook.setDamagerValues(wc, 100f, 800f, 0.3f, -128, true);
+        ProjectileAbility abHook = new ProjectileAbility(wc, hookProjEntity, 5, 14, 50, 900, 30);
+        abHook.setDamagerValues(wc, 200f, 1500f, 0.2f, -128, true);
 
         //meteorpunch
         MeleeAbility abMeteorpunch = new MeleeAbility(wc, 15, 3, 4, 60, new Circle(32), 64);

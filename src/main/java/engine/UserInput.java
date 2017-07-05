@@ -28,6 +28,7 @@ public class UserInput {
 
 
     private Window window;
+    private float relViewScreenWidth=0, relViewScreenHeight=0;
 
     private float mouseX;
     private float mouseY;
@@ -36,8 +37,11 @@ public class UserInput {
     private boolean[] mouseButtonPressed = new boolean[16];
 
 
-    public UserInput(Window window) {
+    public UserInput(Window window, float viewWidth, float viewHeight) {
         this.window = window;
+
+        relViewScreenWidth = viewWidth / window.getWidth();
+        relViewScreenHeight = viewHeight / window.getHeight();
 
         //if (!initialized) throw new IllegalStateException("Have to init engine before enabling user input");
 
@@ -51,8 +55,8 @@ public class UserInput {
         });
 
         window.setCursorPosCallback( (w, xpos, ypos) -> {
-            mouseX = (float)xpos;
-            mouseY = (float)ypos;
+            mouseX = (float)xpos * relViewScreenWidth;
+            mouseY = (float)ypos * relViewScreenHeight;
         });
 
         window.setKeyCallback( (w, key, scancode, action, mods) -> {

@@ -2,7 +2,7 @@ package game;
 
 import engine.network.CharacterInputData;
 import engine.network.GameStateData;
-import engine.network.client.ClientNetworkSys;
+
 import engine.network.server.ServerNetworkSys;
 
 public class Main {
