@@ -17,26 +17,56 @@ public class Font {
     private static EnumMap<FontType, Font> loadedFonts = new EnumMap<FontType, Font>(FontType.class);
 
     public static void loadFonts(FontType... fonts) {
+        for (int i = 0; i < fonts.length; i++) {
+            FontType fontType = fonts[i];
+            Font font = FontUtils.loadFont(fontType.getFontFilePath(), fontType.getTextAtlasPath());
 
+            loadedFonts.put(fontType, font);
+        }
     }
 
+    public static Font getFont(FontType type) {
+        if (!loadedFonts.containsKey(type)) throw new IllegalStateException("Trying to access font "+type+" that is not loaded");
+        return loadedFonts.get(type);
+    }
+
+//    public static void main(String[] args) {
+//        loadFonts(FontType.BROADWAY);
+//    }
+
+
+    private final int lineHeight, fontSize;
+    private HashMap<Character, CharData> charData;
     private Texture fontAtlas;
 
 
-    public Font getFont(FontType fontType) {
-        return null;
+    Font(int lineHeight, int fontSize, HashMap<Character, CharData> charData, Texture fontAtlas) {
+        this.charData = charData;
+        this.fontAtlas = fontAtlas;
+        this.lineHeight = lineHeight;
+        this.fontSize = fontSize;
+
+        System.out.println(charData.keySet());
+        System.out.println("Line height="+lineHeight);
     }
 
-    public Font getDefaultFont() {
-        return getFont(FontType.BROADWAY);
+    public Texture getFontAtlas() {
+        return fontAtlas;
     }
 
+    public CharData getCharData(char c) {
+        return charData.get(c);
+    }
 
-    private void loadFont(FontType fontType) {
-        String atlasPath = fontType.getTextAtlasPath();
-        String ffilePath = fontType.getFontFilePath();
+    public boolean hasChar(char c) {
+        return charData.containsKey(c);
+    }
 
-        fontAtlas = TextureUtils.loadTexture(atlasPath);
+    public int getLineHeight() {
+        return lineHeight;
+    }
 
+    public int getFontSize() {
+        return fontSize;
     }
 }
