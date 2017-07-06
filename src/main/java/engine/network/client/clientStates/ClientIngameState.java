@@ -48,7 +48,7 @@ public class ClientIngameState extends ClientState {
 
     private void createGame() {
         game = new ClientGame(client.getSocket());
-        game.init();
+        game.init(null, null, null, null, 0, 0);
         gameThread = new Thread(game);
 
         gameThread.start();

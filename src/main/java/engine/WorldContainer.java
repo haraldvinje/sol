@@ -3,6 +3,7 @@ package engine;
 
 import java.util.*;
 import java.util.stream.Stream;
+import engine.graphics.view_.View;
 
 /**
  * Created by eirik on 13.06.2017.
@@ -16,7 +17,7 @@ public class WorldContainer {
 
 
     //an overview of entity id's in use
-    private boolean[] entities;
+    private boolean[] entities = new boolean[ENTITY_COUNT];
 
     //A mapping between entities and components for each component type.
     //A TreeMap is used to keep the map sorted on its keyValues.
@@ -28,14 +29,27 @@ public class WorldContainer {
 
     private List<Sys> systems = new ArrayList<>();
 
+    private View view; //a view_ into the world
 
 
 
+
+    public WorldContainer(float viewWidth, float viewHeight) {
+
+        view = new View(viewWidth, viewHeight);
+    }
+
+    /**
+     * init a Container with no view_. Render systems then uses the default view_ wich is equal to screen size
+     */
     public WorldContainer() {
-        entities = new boolean[ENTITY_COUNT];
 
     }
 
+    //---------VIEW
+    public View getView() {
+        return view;
+    }
 
     //---------SETUP
 

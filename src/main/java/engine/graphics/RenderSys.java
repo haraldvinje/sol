@@ -11,6 +11,7 @@ import utils.maths.M;
 import utils.maths.Mat4;
 import utils.maths.Vec2;
 import utils.maths.Vec3;
+import engine.graphics.view_.View;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -32,12 +33,12 @@ public class RenderSys implements Sys {
 
     private WorldContainer wc;
 
-    private Mat4 viewTransform = Mat4.identity();// Mat4.translate(new Vec3(0, 0,0));
 
-    private Mat4 projectionTransform;
+    private final float znear = -10, zfar = 10;
 
 
-    public RenderSys(Window window, float viewWidth, float viewHeight) {
+
+    public RenderSys(Window window) {
         this.window = window;
         colorShader = new ColorShader();
         textureShader = new TextureShader();
@@ -92,6 +93,27 @@ public class RenderSys implements Sys {
         textureShader.setLightPoint(new Vec3(100f, 100f, -500f));
 
 
+        //create projection transform
+
+
+        //create view_ transform
+
+        //set default values if no ViewController is present
+        View view = wc.getView();
+
+        Vec2 viewTranslate = new Vec2();
+        Vec2 viewSize = new Vec2( window.getWidth(), window.getHeight() );
+
+        if (view != null) {
+            viewTranslate = view.getPos().negative();
+            viewSize = view.getSize();
+        }
+
+        Mat4 viewTransform = Mat4.translate( new Vec3(viewTranslate, 0f) );
+        Mat4 projectionTransform = Mat4.orthographic(0, viewSize.x, viewSize.y, 0, znear, zfar);
+
+
+
         for (int entity : wc.getEntitiesWithComponentType(ColoredMeshComp.class)) {
 
             PositionComp positionComp = (PositionComp)wc.getComponent(entity, PositionComp.class);
@@ -99,7 +121,7 @@ public class RenderSys implements Sys {
 
             Mat4 modelScale = Mat4.identity();
             Mat4 modelRotate = Mat4.identity();
-            Mat4 modelTranslate = Mat4.translate( new Vec3(positionComp.getX(), positionComp.getY(), 0f) );
+            Mat4 modelTranslate = Mat4.translate( positionComp.getPos3() );
             Mat4 modelCenterTranslate = Mat4.identity();
 
             //center mesh if centerComp is present
@@ -130,7 +152,7 @@ public class RenderSys implements Sys {
 
             Mat4 modelScale = Mat4.identity();
             Mat4 modelRotate = Mat4.identity();
-            Mat4 modelTranslate = Mat4.translate( new Vec3(positionComp.getX(), positionComp.getY(), 0f) );
+            Mat4 modelTranslate = Mat4.translate( positionComp.getPos3() );
             Mat4 modelCenterTranslate = Mat4.identity();
 
             //center mesh if centerComp is present
