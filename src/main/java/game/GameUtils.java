@@ -7,10 +7,9 @@ import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
 import engine.combat.abilities.*;
 import engine.graphics.*;
-import engine.graphics.view_.ViewControlComp;
 
-import engine.graphics.view_.ViewControlSys;
 import engine.network.client.*;
+
 import engine.network.server.ServerClientHandler;
 import engine.network.server.ServerNetworkSys;
 import engine.physics.*;
@@ -42,7 +41,10 @@ public class GameUtils {
 
 
 
+
     public static void assignComponentTypes(WorldContainer wc) {
+
+        wc.assignComponentType(TextMeshComp.class);
 
         wc.assignComponentType(PositionComp.class);
         wc.assignComponentType(ColoredMeshComp.class);
@@ -129,7 +131,9 @@ public class GameUtils {
 
 
 
+
     public static void createMap(WorldContainer wc) {
+
 
 //        //create players
 //        float centerSeparation = 300f;
@@ -174,7 +178,7 @@ public class GameUtils {
 
     }
 
-
+   
     private static int createSandbag(WorldContainer wc) {
         if (PROGRAM != OFFLINE) throw new UnsupportedOperationException("Sandbag not implemented for nonoffline use");
 

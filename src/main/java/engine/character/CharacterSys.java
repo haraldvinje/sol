@@ -3,11 +3,20 @@ package engine.character;
 import engine.*;
 import engine.combat.DamageableComp;
 import engine.combat.abilities.AbilityComp;
+
 import engine.graphics.view_.ViewControlComp;
+
+import engine.graphics.ColoredMesh;
+import engine.graphics.ColoredMeshComp;
+import engine.graphics.ColoredMeshUtils;
+import engine.graphics.text.TextMeshComp;
+
 import engine.physics.*;
 import game.GameUtils;
+import utils.maths.M;
 import utils.maths.TrigUtils;
 import utils.maths.Vec2;
+import utils.maths.Vec4;
 
 /**
  * Created by eirik on 15.06.2017.
@@ -61,6 +70,8 @@ public class CharacterSys implements Sys {
         AbilityComp abComp = (AbilityComp) wc.getComponent(entity, AbilityComp.class);
         DamageableComp dmgableComp = (DamageableComp)wc.getComponent(entity, DamageableComp.class);
         AffectedByHoleComp affholeComp = (AffectedByHoleComp)wc.getComponent(entity, AffectedByHoleComp.class);
+        TextMeshComp textComp = (TextMeshComp)wc.getComponent(entity, TextMeshComp.class);
+
 
 
         checkHoleAffected(charNumb, posComp, phComp, charComp, dmgableComp, affholeComp);
@@ -72,6 +83,7 @@ public class CharacterSys implements Sys {
         updateMove(charComp, inputComp, phComp);
         updateRotation(entity, inputComp, posComp, rotComp);
         updateAbilities(charComp, abComp, inputComp, posComp, rotComp);
+        updateDisplayDamage(charNumb, dmgableComp, textComp);
     }
 
     private void checkHoleAffected(int charNumb, PositionComp posComp, PhysicsComp physComp, CharacterComp charComp, DamageableComp dmgablComp, AffectedByHoleComp affholeComp) {
@@ -132,6 +144,20 @@ public class CharacterSys implements Sys {
         }
 
 
+    }
+
+    int aaa = 0;
+    private void updateDisplayDamage(int charNumb, DamageableComp dmgablComp, TextMeshComp textComp) {
+        Vec2[] pos = {new Vec2(50, GameUtils.MAP_HEIGHT/2),
+            new Vec2(GameUtils.MAP_WIDTH-150, GameUtils.MAP_HEIGHT/2) };
+
+        textComp.setSize( (aaa++) % 60 == 0? (int)(M.random()*72*2) : textComp.getSize() );
+        float sizeNormalized = textComp.getSize()/ (72*2);
+        textComp.setColor(new Vec4(sizeNormalized, 1- sizeNormalized, sizeNormalized*sizeNormalized, 1));
+
+        textComp.setViewX(pos[charNumb].x);
+        textComp.setViewY(pos[charNumb].y);
+        textComp.getTextMesh().setString( "Ahaha\n"+Float.toString(textComp.getSize()) + "\non another line" );
     }
 
 
