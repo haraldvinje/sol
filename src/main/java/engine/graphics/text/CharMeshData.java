@@ -1,5 +1,8 @@
 package engine.graphics.text;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by eirik on 03.07.2017.
  */
@@ -18,4 +21,19 @@ public class CharMeshData {
     }
 
 
+    public float[] getVertices() {
+        return vertices;
+    }
+
+    public float[] getUvs() {
+        return uvs;
+    }
+
+    public byte[] getIndices() {
+        return indices;
+    }
+
+    public String toString() {
+        return "vertices="+Arrays.toString(vertices)+" uvs="+Arrays.toString(uvs)+" indices="+Arrays.toString(indices);
+    }
 }
