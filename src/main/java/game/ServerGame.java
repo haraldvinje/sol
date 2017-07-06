@@ -66,8 +66,8 @@ public class ServerGame implements Runnable{
     @Override
     public void run() {
 
-        this.window = new Window(WINDOW_WIDTH, WINDOW_HEIGHT, "Server ingame");
-        this.userInput = new UserInput(window);
+        this.window = new Window(0.3f, "Server ingame");
+        this.userInput = new UserInput(window, 1, 1);
 
         System.out.println("Server game initiated with clients: "+GameUtils.CLIENT_HANDELERS);
 

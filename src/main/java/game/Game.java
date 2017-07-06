@@ -48,8 +48,8 @@ public class Game {
 
 
     public void init() {
-        window = new Window(1600, 900, "SIIII");
-        userInput = new UserInput(window);
+        window = new Window("SIIII");
+        userInput = new UserInput(window, GameUtils.MAP_WIDTH, GameUtils.MAP_HEIGHT);
 
         wc = new WorldContainer();
 

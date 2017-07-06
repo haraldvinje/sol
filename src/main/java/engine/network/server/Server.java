@@ -20,8 +20,6 @@ public class Server {
     private static final float FRAME_INTERVAL = 1.0f/60.0f;
 
 
-    public static final float WINDOW_WIDTH = GameUtils.MAP_WIDTH /4,
-            WINDOW_HEIGHT = GameUtils.MAP_HEIGHT /4;
 
     private ServerConnectionInput connectionInput;
     private Thread serverConnectionInputThread;
@@ -45,8 +43,8 @@ public class Server {
 
 
     public void init() {
-        window = new Window(WINDOW_WIDTH, WINDOW_HEIGHT, "D1n-only Server SII");
-        userInput = new UserInput(window);
+        window = new Window(0.3f, 0.3f, "D1n-only Server SII");
+        userInput = new UserInput(window, 1, 1);
 
         wc = new WorldContainer();
         initWorldContainer();
@@ -127,6 +125,8 @@ public class Server {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        Window.terminateGLFW();
     }
 
     private void createGame(ServerClientHandler client1, ServerClientHandler client2) {
@@ -173,7 +173,7 @@ public class Server {
         wc.assignComponentType(TexturedMeshComp.class);
         wc.assignComponentType(MeshCenterComp.class);
 
-        wc.addSystem(new RenderSys(window));
+        wc.addSystem(new RenderSys(window, window.getWidth(), window.getHeight()));
     }
 
 

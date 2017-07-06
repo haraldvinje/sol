@@ -10,16 +10,20 @@ import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
 import engine.combat.abilities.*;
 import engine.graphics.*;
+
 import engine.graphics.text.TextMeshComp;
 import engine.network.client.ClientNetworkSys;
 import engine.network.client.InterpolationComp;
 import engine.network.client.InterpolationSys;
+
+import engine.network.client.*;
+
 import engine.network.server.ServerClientHandler;
 import engine.network.server.ServerNetworkSys;
 import engine.physics.*;
 import engine.window.Window;
-import utils.maths.M;
 
+import java.net.Socket;
 import java.util.List;
 
 /**
@@ -31,10 +35,12 @@ public class GameUtils {
     public static final float MAP_WIDTH = 1600f,
                                 MAP_HEIGHT = 900f;
 
+    public static float VIEW_WIDTH = MAP_WIDTH, VIEW_HEIGHT = MAP_HEIGHT;
+
     public static final int SERVER = 0, CLIENT = 1, OFFLINE = 2;
     public static int PROGRAM = -1;
     //public static boolean SERVER_RENDER;
-    public static String HOST_NAME; //set by mainClient args
+    public static Socket socket; //set by mainClient args
 
     public static List<ServerClientHandler> CLIENT_HANDELERS;
 
@@ -133,11 +139,11 @@ public class GameUtils {
 
             wc.addSystem(new ProjectileSys());
 
-            wc.addSystem(new RenderSys(window));
+            wc.addSystem(new RenderSys(window, VIEW_WIDTH, VIEW_HEIGHT));
         }
 
         else if (PROGRAM == CLIENT){
-            wc.addSystem(new ClientNetworkSys(HOST_NAME, userInput) );
+            wc.addSystem(new ClientNetworkInSys(socket));
             wc.addSystem(new AbilitySys());
             wc.addSystem(new PhysicsSys());
 
@@ -145,7 +151,8 @@ public class GameUtils {
 
             wc.addSystem(new ProjectileSys());
 
-            wc.addSystem(new RenderSys(window));
+            wc.addSystem(new ClientNetworkOutSys(socket, userInput));
+            wc.addSystem(new RenderSys(window, VIEW_WIDTH, VIEW_HEIGHT));
         }
 
         else if (PROGRAM == OFFLINE) {
@@ -163,7 +170,7 @@ public class GameUtils {
 
             wc.addSystem(new ProjectileSys());
 
-            wc.addSystem(new RenderSys(window));
+            wc.addSystem(new RenderSys(window, VIEW_WIDTH, VIEW_HEIGHT));
         }
     }
 
@@ -173,6 +180,7 @@ public class GameUtils {
         //create players
         float centerSeparation = 300f;
         if (PROGRAM == OFFLINE) {
+
             createShrank(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
             createSchmathias(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
 
@@ -210,25 +218,46 @@ public class GameUtils {
         int proj1Entity = allocateSinglecolorProjectileAbility(wc, 8, color1);
         int proj2Entity = allocateSinglecolorProjectileAbility(wc, 20, color2);
 
+
+        //rapidshot
+        ProjectileAbility abRapidshot = new ProjectileAbility(wc, proj1Entity, 2, 2, 30, 1200, 30 );
+        abRapidshot.setDamagerValues(wc, 100, 180, 0.5f, -128, false);
+
+        //hyperbeam3
+        ProjectileAbility abHyperbeam = new ProjectileAbility(wc, proj2Entity, 15, 10, 120, 1500, 120);
+        abHyperbeam.setDamagerValues( wc, 350,900, 1.1f, -256, false);
+
+        //puffer
+        MeleeAbility abPuffer = new MeleeAbility(wc, 8, 2, 8, 60*3, new Circle(128f), 0f);
+        abPuffer.setDamagerValues(wc, 20, 900f, 0.1f, 0f, false);
+
         return createCharacter(wc, x, y, "sol_frank.png", 160f/2f, 512f, 256f, 180, 130, 32, 1800f,
-                new ProjectileAbility(wc, proj1Entity, 2, 2, 30, 100, 180, 0.5f, 1200f, 30, 0, new Circle(8) ),
-                new ProjectileAbility(wc, proj2Entity, 15, 10, 120, 500, 900, 1.1f, 1800f, 60, 0, new Circle(18)),
-                new MeleeAbility(wc, 8, 2, 8, 60*3, 20, 900f, 0.1f, new Circle(128f), 0f, 0f)
-        );
+                abRapidshot, abHyperbeam, abPuffer);
+
     }
 
     private static int createSchmathias(WorldContainer wc, float x, float y) {
-        int hookProjEntity = allocateImageProjectileEntity(wc, "hook.png", -256/2, 512, 256, 24); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
+
+
+        //frogpunch
+        MeleeAbility abFrogpunch = new MeleeAbility(wc, 3, 5, 3, 20, new Circle(64f),48.0f);
+        abFrogpunch.setDamagerValues(wc, 150, 700, 0.8f, -48f, false);
+
+        //hook
+        int hookProjEntity = allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
+        ProjectileAbility abHook = new ProjectileAbility(wc, hookProjEntity, 5, 14, 50, 900, 30);
+        abHook.setDamagerValues(wc, 200f, 1500f, 0.2f, -128, true);
+
+        //meteorpunch
+        MeleeAbility abMeteorpunch = new MeleeAbility(wc, 15, 3, 4, 60, new Circle(32), 64);
+        abMeteorpunch.setDamagerValues(wc, 500, 1000, 1.5f, -128f, false);
 
         return createCharacter(wc, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
-                new MeleeAbility(wc, 3, 5, 3, 20, 150, 700, 0.8f, new Circle(64f),48.0f, 0f),
-                new ProjectileAbility(wc, hookProjEntity, 5, 23, 50, 100, 1500, 0.3f, 900f, 30, M.PI, new Circle(16)),
-                new MeleeAbility(wc, 15, 3, 4, 60, 500, 1000, 1.5f, new Circle(32), 64, 0)
-        );
+            abFrogpunch, abHook, abMeteorpunch);
     }
 
 
-    public static int allocateHitboxEntity(WorldContainer wc, Circle shape, float damage, float baseKnockback, float knockbackRatio){
+    public static int allocateHitboxEntity(WorldContainer wc, Circle shape){
         int e = wc.createEntity();
 
         wc.addInactiveComponent(e, new PositionComp(0, 0));
@@ -237,7 +266,7 @@ public class GameUtils {
         //wc.addInactiveComponent(e, new PhysicsComp());
         wc.addInactiveComponent(e, new HitboxComp());
 
-        wc.addInactiveComponent(e, new DamagerComp(damage, baseKnockback, knockbackRatio));
+        wc.addInactiveComponent(e, new DamagerComp());
 
         float[] redColor = {1.0f, 0f,0f};
         wc.addInactiveComponent(e, new ColoredMeshComp(ColoredMeshUtils.createCircleSinglecolor(shape.getRadius(), 16, redColor)) );
