@@ -6,6 +6,7 @@ import engine.Sys;
 import engine.WorldContainer;
 import engine.graphics.text.*;
 import engine.window.Window;
+import game.GameUtils;
 import org.lwjgl.opengl.GL11;
 import utils.maths.M;
 import utils.maths.Mat4;
@@ -34,7 +35,7 @@ public class RenderSys implements Sys {
 
     private Mat4 viewTransform = Mat4.identity();// Mat4.translate(new Vec3(0, 0,0));
 
-    private Mat4 projectionTransform;
+    private Mat4 projectionTransform = Mat4.orthographic(0, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT, 0, -10, 10);
 
 
     public RenderSys(Window window, float viewWidth, float viewHeight) {

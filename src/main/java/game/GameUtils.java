@@ -12,7 +12,6 @@ import engine.combat.abilities.*;
 import engine.graphics.*;
 
 import engine.graphics.text.TextMeshComp;
-import engine.network.client.ClientNetworkSys;
 import engine.network.client.InterpolationComp;
 import engine.network.client.InterpolationSys;
 
