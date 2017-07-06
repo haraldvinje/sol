@@ -48,10 +48,10 @@ public class Game {
 
 
     public void init() {
-        window = new Window("SIIII");
-        userInput = new UserInput(window, GameUtils.MAP_WIDTH, GameUtils.MAP_HEIGHT);
+        window = new Window(0.5f, 0.5f,"SIIII");
+        userInput = new UserInput(window, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
-        wc = new WorldContainer();
+        wc = new WorldContainer(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
         //cds = new CollisionDetectionSys(wc);
 

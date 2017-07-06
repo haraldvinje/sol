@@ -59,7 +59,7 @@ public class ServerGame implements Runnable{
 
         GameUtils.PROGRAM = GameUtils.SERVER;
 
-        wc = new WorldContainer();
+        wc = new WorldContainer(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
     }
 
