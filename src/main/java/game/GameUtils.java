@@ -10,6 +10,7 @@ import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
 import engine.combat.abilities.*;
 import engine.graphics.*;
+import engine.graphics.text.TextMeshComp;
 import engine.network.client.ClientNetworkSys;
 import engine.network.client.InterpolationComp;
 import engine.network.client.InterpolationSys;
@@ -105,6 +106,8 @@ public class GameUtils {
             wc.assignComponentType(HitboxComp.class);
             wc.assignComponentType(ProjectileComp.class);
 
+            wc.assignComponentType(TextMeshComp.class);
+
         }
 
         else {
@@ -171,7 +174,7 @@ public class GameUtils {
         float centerSeparation = 300f;
         if (PROGRAM == OFFLINE) {
             createShrank(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
-            //createSchmathias(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
+            createSchmathias(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
 
             createSandbag(wc);
         }
@@ -325,6 +328,7 @@ public class GameUtils {
         }
         if (PROGRAM == OFFLINE) {
             wc.addComponent(player, new UserCharacterInputComp());
+            wc.addComponent(player, new TextMeshComp());
         }
 
         return player;
