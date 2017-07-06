@@ -30,6 +30,13 @@ public class ServerClientHandler {
     //private LinkedList
 
 
+    public void sendInt(int i) {
+        try {
+            outputStream.writeInt(i);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public ServerClientHandler(Socket clientSocket) {
 

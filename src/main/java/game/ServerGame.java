@@ -77,7 +77,13 @@ public class ServerGame implements Runnable{
         GameUtils.assignSystems(wc, window, userInput);
 
 
-        GameUtils.createInitialEntities(wc);
+        GameUtils.createMap(wc);
+
+        ArrayList<Integer> team1Chars = new ArrayList<>();
+        ArrayList<Integer> team2Chars = new ArrayList<>();
+        team1Chars.add(0);
+        team2Chars.add(1);
+        CharacterUtils.createServerCharacters(wc, team1Chars, team2Chars);
 
 
 
