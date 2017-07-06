@@ -10,7 +10,14 @@ import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
 import engine.combat.abilities.*;
 import engine.graphics.*;
+
+import engine.graphics.text.TextMeshComp;
+import engine.network.client.ClientNetworkSys;
+import engine.network.client.InterpolationComp;
+import engine.network.client.InterpolationSys;
+
 import engine.network.client.*;
+
 import engine.network.server.ServerClientHandler;
 import engine.network.server.ServerNetworkSys;
 import engine.physics.*;
@@ -105,6 +112,8 @@ public class GameUtils {
             wc.assignComponentType(HitboxComp.class);
             wc.assignComponentType(ProjectileComp.class);
 
+            wc.assignComponentType(TextMeshComp.class);
+
         }
 
         else {
@@ -171,7 +180,8 @@ public class GameUtils {
         //create players
         float centerSeparation = 300f;
         if (PROGRAM == OFFLINE) {
-            //createShrank(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
+
+            createShrank(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
             createSchmathias(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
 
             createSandbag(wc);
@@ -208,6 +218,7 @@ public class GameUtils {
         int proj1Entity = allocateSinglecolorProjectileAbility(wc, 8, color1);
         int proj2Entity = allocateSinglecolorProjectileAbility(wc, 20, color2);
 
+
         //rapidshot
         ProjectileAbility abRapidshot = new ProjectileAbility(wc, proj1Entity, 2, 2, 30, 1200, 30 );
         abRapidshot.setDamagerValues(wc, 100, 180, 0.5f, -128, false);
@@ -222,9 +233,11 @@ public class GameUtils {
 
         return createCharacter(wc, x, y, "sol_frank.png", 160f/2f, 512f, 256f, 180, 130, 32, 1800f,
                 abRapidshot, abHyperbeam, abPuffer);
+
     }
 
     private static int createSchmathias(WorldContainer wc, float x, float y) {
+
 
         //frogpunch
         MeleeAbility abFrogpunch = new MeleeAbility(wc, 3, 5, 3, 20, new Circle(64f),48.0f);
@@ -344,6 +357,7 @@ public class GameUtils {
         }
         if (PROGRAM == OFFLINE) {
             wc.addComponent(player, new UserCharacterInputComp());
+            wc.addComponent(player, new TextMeshComp());
         }
 
         return player;
