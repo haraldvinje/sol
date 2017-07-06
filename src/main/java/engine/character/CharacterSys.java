@@ -2,13 +2,15 @@ package engine.character;
 
 import engine.*;
 import engine.combat.DamageableComp;
-import engine.combat.DamagerComp;
-import engine.combat.abilities.Ability;
 import engine.combat.abilities.AbilityComp;
+
+import engine.graphics.view_.ViewControlComp;
+
 import engine.graphics.ColoredMesh;
 import engine.graphics.ColoredMeshComp;
 import engine.graphics.ColoredMeshUtils;
 import engine.graphics.text.TextMeshComp;
+
 import engine.physics.*;
 import game.GameUtils;
 import utils.maths.M;
@@ -79,7 +81,7 @@ public class CharacterSys implements Sys {
         if (dmgableComp.isStunned()) return;
 
         updateMove(charComp, inputComp, phComp);
-        updateRotation(inputComp, posComp, rotComp);
+        updateRotation(entity, inputComp, posComp, rotComp);
         updateAbilities(charComp, abComp, inputComp, posComp, rotComp);
         updateDisplayDamage(charNumb, dmgableComp, textComp);
     }
@@ -110,12 +112,20 @@ public class CharacterSys implements Sys {
         phComp.addAcceleration(new Vec2(stepX, stepY).normalize().scale(accel));
     }
 
-    private void updateRotation(CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
-        float newAngle = TrigUtils.pointDirection(posComp.getX(), posComp.getY(), inputComp.getAimX(), inputComp.getAimY());
+    private void updateRotation(int entity, CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
+        Vec2 posInView = new Vec2(0,0);
+        if (wc.hasComponent(entity, ViewControlComp.class)) {
+            ViewControlComp viewComp = (ViewControlComp) wc.getComponent(entity, ViewControlComp.class);
+            posInView = viewComp.getViewOffset().negative();
+        }
+
+        float newAngle = TrigUtils.pointDirection( posInView, new Vec2( inputComp.getAimX(), inputComp.getAimY() )  );
+
+
         float diffAngle = TrigUtils.shortesAngleBetween(rotComp.getAngle(), newAngle);
 
         //add a portion of diffAngle
-        rotComp.addAngle(diffAngle * 0.2f);
+        rotComp.addAngle(diffAngle * 0.3f);
     }
 
     private void updateAbilities(CharacterComp charComp, AbilityComp abComp, CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {

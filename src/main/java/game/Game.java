@@ -16,6 +16,9 @@ import engine.physics.*;
 import engine.window.Window;
 import utils.maths.M;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by eirik on 13.06.2017.
  */
@@ -48,10 +51,10 @@ public class Game {
 
 
     public void init() {
-        window = new Window("SIIII");
-        userInput = new UserInput(window, GameUtils.MAP_WIDTH, GameUtils.MAP_HEIGHT);
+        window = new Window(0.5f, 0.5f,"SIIII");
+        userInput = new UserInput(window, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
-        wc = new WorldContainer();
+        wc = new WorldContainer(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
         //cds = new CollisionDetectionSys(wc);
 
@@ -63,8 +66,18 @@ public class Game {
         GameUtils.assignComponentTypes(wc);
         GameUtils.assignSystems(wc, window, userInput);
 
-        GameUtils.createInitialEntities(wc);
+        //GameUtils.createInitialEntities(wc);
+        GameUtils.createMap(wc);
 
+        List<Integer> team1Chars = new ArrayList<>();
+        List<Integer> team2Chars = new ArrayList<>();
+
+        team1Chars.add(CharacterUtils.SHRANK);
+//        team1Chars.add(CharacterUtils.SHRANK);
+
+        team2Chars.add(CharacterUtils.SCHMATHIS);
+
+        CharacterUtils.createOfflineCharacters(wc, team1Chars, team2Chars, 0, 0);
     }
 
 

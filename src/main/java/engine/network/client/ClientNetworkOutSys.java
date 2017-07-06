@@ -1,6 +1,7 @@
 package engine.network.client;
 
 import engine.Sys;
+import engine.UserCharacterInputComp;
 import engine.UserInput;
 import engine.WorldContainer;
 import engine.network.CharacterInputData;
@@ -50,7 +51,16 @@ public class ClientNetworkOutSys implements Sys {
 
     private void updateServerByInput() {
 
-        CharacterInputData input = retrieveUserInput();
+        //retrieve character input from the entity that is controlled by the user
+        CharacterInputData input = null;
+        for (int userInEntity : wc.getEntitiesWithComponentType(UserCharacterInputComp.class) ) {
+            UserCharacterInputComp userInComp = (UserCharacterInputComp) wc.getComponent(userInEntity, UserCharacterInputComp.class);
+
+            input = userInComp.getClientData();
+        }
+        if (input == null) throw new IllegalStateException("No data in UserCharacterInputComp");
+
+        //send input data
         sendInputData(input);
     }
 

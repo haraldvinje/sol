@@ -5,9 +5,9 @@ import engine.RotationComp;
 import engine.UserInput;
 import engine.WorldContainer;
 import engine.graphics.*;
+import engine.graphics.view_.ViewControlComp;
 import engine.network.NetworkUtils;
 import engine.window.Window;
-import game.GameUtils;
 import game.ServerGame;
 
 import java.util.*;
@@ -143,6 +143,15 @@ public class Server {
         gamesRunning.put(game, gameThread);
 
         gameThread.start();
+
+        client1.sendInt(0); //team number
+        client1.sendInt(0); //team 1 char
+        client1.sendInt(1); //team 2 char
+
+        client2.sendInt(1); //team number
+        client2.sendInt(0); //team 1 char
+        client2.sendInt(1); //team 2 char
+
     }
 
     private void terminateAllRunningGames() {
@@ -172,8 +181,10 @@ public class Server {
         wc.assignComponentType(ColoredMeshComp.class);
         wc.assignComponentType(TexturedMeshComp.class);
         wc.assignComponentType(MeshCenterComp.class);
+        wc.assignComponentType(ViewControlComp.class);
 
-        wc.addSystem(new RenderSys(window, window.getWidth(), window.getHeight()));
+
+        wc.addSystem(new RenderSys(window));
     }
 
 

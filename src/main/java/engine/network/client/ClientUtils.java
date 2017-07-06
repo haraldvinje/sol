@@ -7,6 +7,7 @@ import engine.graphics.ColoredMeshComp;
 import engine.graphics.MeshCenterComp;
 import engine.graphics.RenderSys;
 import engine.graphics.TexturedMeshComp;
+import engine.graphics.view_.ViewControlComp;
 import engine.window.Window;
 
 /**
@@ -29,7 +30,8 @@ public class ClientUtils {
         wc.assignComponentType(MeshCenterComp.class);
 
         //add systems
-        wc.addSystem(new RenderSys(window, Client.WINDOW_WIDTH, Client.WINDOW_HEIGHT));
+        wc.addSystem(new RenderSys(window));
+
 
         return wc;
     }

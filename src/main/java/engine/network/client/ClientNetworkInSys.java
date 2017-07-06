@@ -70,17 +70,12 @@ public class ClientNetworkInSys implements Sys{
 
         //System.out.println("Recieved frame: " + gameState.getFrameNumber());
 
+        //update each character according to state received
         int entityNumb = 0;
         for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class)) {
             if (entityNumb >= NetworkUtils.CHARACTER_NUMB) throw new IllegalStateException("applying game state to more characters than supported by network system");
 
-            //PositionComp posComp = (PositionComp)wc.getComponent(entity, PositionComp.class);
-            //RotationComp rotComp = (RotationComp)wc.getComponent(entity, RotationComp.class);
             CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
-
-//            posComp.setX(gameState.getX(entityNumb));
-//            posComp.setY(gameState.getY(entityNumb));
-//            rotComp.setAngle(gameState.getRotation(entityNumb));
 
             //Give new character state to interpolation component
             InterpolationComp interpComp = (InterpolationComp)wc.getComponent(entity, InterpolationComp.class);
