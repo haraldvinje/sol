@@ -4,9 +4,12 @@ import engine.PositionComp;
 import engine.RotationComp;
 import engine.Sys;
 import engine.WorldContainer;
+import engine.graphics.text.*;
 import engine.window.Window;
 import org.lwjgl.opengl.GL11;
+import utils.maths.M;
 import utils.maths.Mat4;
+import utils.maths.Vec2;
 import utils.maths.Vec3;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -16,10 +19,15 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class RenderSys implements Sys {
 
+    static {
+        Font.loadFonts(FontType.BROADWAY);
+    }
+
 
     private Window window;
     private ColorShader colorShader;
     private TextureShader textureShader;
+    private TextShader textShader;
 
 
     private WorldContainer wc;
@@ -31,6 +39,7 @@ public class RenderSys implements Sys {
         this.window = window;
         colorShader = new ColorShader();
         textureShader = new TextureShader();
+        textShader = new TextShader();
     }
 
     @Override
@@ -40,9 +49,39 @@ public class RenderSys implements Sys {
 
 
     public void update() {
-
         //clear screen
         glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+
+        //render text
+        textShader.bind();
+        textShader.setProjectionTransform(projectionTransform);
+
+        wc.entitiesOfComponentTypeStream(TextMeshComp.class).forEach(textEntity -> {
+            TextMeshComp textComp = (TextMeshComp)wc.getComponent(textEntity, TextMeshComp.class);
+            TextMesh textMesh = textComp.getTextMesh();
+
+            //color
+            textShader.setTextColor(textComp.getColor());
+
+            //size
+            float textScale = textComp.getSize() / textMesh.getFont().getFontSize();
+            Mat4 screenScale = Mat4.scale(new Vec3(textScale, textScale, 1f));
+
+            //position
+            Mat4 screenTranslate = Mat4.translate(new Vec3(textComp.getViewPos(), 0f));
+
+            //result
+            textShader.setScreenTransform(screenTranslate.multiply( screenScale ));
+
+            //draw
+            textMesh.bind();
+            glDrawElements(GL_TRIANGLES, textMesh.getIndicesCount(), GL_UNSIGNED_BYTE, 0);
+            textMesh.unbind();
+
+        });
+
+        textShader.unbind();
+
 
         colorShader.bind();
         colorShader.setLightPoint(new Vec3(100f, 100f, -500f));
@@ -108,9 +147,7 @@ public class RenderSys implements Sys {
             TexturedMeshComp texturedMeshComp = (TexturedMeshComp)wc.getComponent(entity, TexturedMeshComp.class);
             renderTexturedMesh(texturedMeshComp.getMesh(), modelTransform, Mat4.identity(), projectionTransform);
 
-
         }
-
 
 
         window.swapBuffers();
