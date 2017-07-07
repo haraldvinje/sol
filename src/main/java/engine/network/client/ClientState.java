@@ -46,6 +46,9 @@ public abstract class ClientState {
         gotoState = null;
         return s;
     }
+
+
+
     public void setGotoState(ClientStates state) {
         gotoState = state;
     }

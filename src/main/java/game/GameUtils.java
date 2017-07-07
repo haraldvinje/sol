@@ -11,6 +11,8 @@ import engine.combat.DamagerComp;
 import engine.combat.abilities.*;
 import engine.graphics.*;
 import engine.network.client.*;
+import engine.network.client.clientStates.ClientCharacterselectState;
+import engine.network.client.clientStates.ClientIngameState;
 import engine.network.server.ServerClientHandler;
 import engine.network.server.ServerNetworkSys;
 import engine.physics.*;
@@ -166,6 +168,48 @@ public class GameUtils {
     }
 
 
+    public static void createInitialEntities(WorldContainer wc, Integer [] characters) {
+
+        //create players
+        float centerSeparation = 300f;
+        if (PROGRAM == OFFLINE) {
+            //createShrank(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
+            createSchmathias(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
+
+            createSandbag(wc);
+        }
+        else {
+
+            createCharacter(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2, characters[0]);
+            createCharacter(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2, characters[1]);
+
+
+//            createShrank(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
+//            createSchmathias(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
+        }
+
+
+        //create walls
+        float wallThickness = 64f;
+        createWall(wc, wallThickness/2, MAP_HEIGHT/2, wallThickness, MAP_HEIGHT);
+        createWall(wc, MAP_WIDTH-wallThickness/2, MAP_HEIGHT/2, wallThickness, MAP_HEIGHT);
+
+//        createWall(wc, MAP_WIDTH/2, wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
+//        createWall(wc, MAP_WIDTH/2, MAP_HEIGHT-wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
+
+        //create holes
+        createRectangleHoleInvisible(wc, MAP_WIDTH/2, wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
+        createRectangleHoleInvisible(wc, MAP_WIDTH/2, MAP_HEIGHT-wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
+        createCircleHole(wc, MAP_WIDTH/2, MAP_HEIGHT/2, 48f);
+
+
+        //create background
+        createBackground(wc);
+
+
+    }
+
+
     public static void createInitialEntities(WorldContainer wc) {
 
         //create players
@@ -200,6 +244,16 @@ public class GameUtils {
         createBackground(wc);
 
 
+    }
+
+    private static int createCharacter(WorldContainer wc, float x, float y, int characterId){
+        if (characterId == ClientCharacterselectState.SCHMATHIAS_CHARACTER_ID){
+            return createSchmathias(wc, x, y);
+        }
+        else if (characterId == ClientCharacterselectState.SHRANK_CHARACTER_ID){
+            return createShrank(wc, x, y);
+        }
+        throw new IllegalArgumentException("No character with this id exists yet");
     }
 
     private static int createShrank(WorldContainer wc, float x, float y) {

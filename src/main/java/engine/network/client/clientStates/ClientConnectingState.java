@@ -18,6 +18,7 @@ import java.net.UnknownHostException;
 /**
  * Created by eirik on 04.07.2017.
  */
+
 public class ClientConnectingState extends ClientState {
 
 

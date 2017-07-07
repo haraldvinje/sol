@@ -4,9 +4,14 @@ import engine.*;
 import engine.network.client.clientStates.*;
 import engine.window.Window;
 
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by eirik on 21.06.2017.
@@ -27,6 +32,7 @@ public class Client {
 
     private ClientState currentState;
     private EnumMap<ClientStates, ClientState> states = new EnumMap<>(ClientStates.class);
+    private Map<Integer, ClientState> statesById = new HashMap<>();
 
 
     private long lastTime;
@@ -49,6 +55,25 @@ public class Client {
         return socket;
     }
 
+    public DataInputStream getSocketInputStream(){
+        try{
+           return new DataInputStream(socket.getInputStream());
+        }
+        catch(IOException e){
+            throw new IllegalStateException("");
+        }
+    }
+
+
+    public DataOutputStream getSocketOutputStream(){
+        try{
+            return new DataOutputStream(socket.getOutputStream());
+        }
+        catch(IOException e){
+            throw new IllegalStateException("");
+        }
+    }
+
     public void terminate() {
         running = false;
     }
@@ -60,12 +85,24 @@ public class Client {
 
         userInput = new UserInput(window, window.getWidth(), window.getHeight());
 
+        ClientIdleState clientIdleState = new ClientIdleState();
+        ClientConnectingState clientConnectingState = new ClientConnectingState(hostname);
+        ClientWaitingState clientWaitingState = new ClientWaitingState();
+        ClientCharacterselectState clientCharacterselectState = new ClientCharacterselectState();
+        ClientIngameState clientIngameState = new ClientIngameState();
+
         //assign states
-        states.put(ClientStates.IDLE, new ClientIdleState());
-        states.put(ClientStates.CONNECTING, new ClientConnectingState(hostname));
-        states.put(ClientStates.WAITING_GAME, new ClientWaitingState());
-        states.put(ClientStates.CHOOSING_CHARACTER, new ClientCharacterselectState());
-        states.put(ClientStates.INGAME, new ClientIngameState() );
+        states.put(ClientStates.IDLE, clientIdleState);
+        states.put(ClientStates.CONNECTING, clientConnectingState);
+        states.put(ClientStates.WAITING_GAME,clientWaitingState);
+        states.put(ClientStates.CHOOSING_CHARACTER, clientCharacterselectState);
+        states.put(ClientStates.INGAME, clientIngameState );
+
+        statesById.put(ClientStateUtils.IDLE, clientIdleState);
+        statesById.put(ClientStateUtils.CONNECTING, clientConnectingState);
+        statesById.put(ClientStateUtils.WAITING_GAME, clientWaitingState);
+        statesById.put(ClientStateUtils.CHOOSING_CHARACTER, clientCharacterselectState);
+        statesById.put(ClientStateUtils.INGAME, clientIngameState);
 
         gotoState(ClientStates.IDLE);
     }
@@ -133,6 +170,24 @@ public class Client {
         }
 
         ClientState newState = states.get(newStateType);
+        if (!newState.isInitialized()) {
+            newState.setClientFields(this, window, userInput);
+            newState.init();
+        }
+        currentState = newState;
+
+        //render new state
+        currentState.getWorldContainer().updateSystems();
+
+        currentState.onEnter();
+    }
+
+    private void gotoStateById(int newStateType) {
+        if (currentState != null) {
+            currentState.onExit();
+        }
+
+        ClientState newState = statesById.get(newStateType);
         if (!newState.isInitialized()) {
             newState.setClientFields(this, window, userInput);
             newState.init();

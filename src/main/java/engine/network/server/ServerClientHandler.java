@@ -59,10 +59,35 @@ public class ServerClientHandler {
      * @param stateData
      * @return false if socket is disconnected, true otherwise
      */
+
+
+
     public boolean sendStateData(GameStateData stateData) {
         //System.out.println("[server] sending state data");
         return NetworkUtils.gameStateToStream(stateData, outputStream);
     }
+
+
+    public boolean sendClientStateId(int id){
+        return NetworkUtils.sendClientStateId(id, outputStream);
+    }
+
+
+    public int getCharacterSelectedData(){
+        int characterSelected = -1;
+        try {
+            if (inputStream.available()>=1){
+                characterSelected = inputStream.readInt();
+            }
+
+        }
+        catch (IOException e){
+            System.out.println("IO Exception occured");
+        }
+        return characterSelected;
+    }
+
+
 
     public CharacterInputData getInputData() {
         try {
