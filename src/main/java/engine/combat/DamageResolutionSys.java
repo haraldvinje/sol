@@ -10,6 +10,7 @@ import engine.physics.CollisionComp;
 import engine.physics.CollisionCompIterator;
 import engine.physics.CollisionData;
 import engine.physics.PhysicsComp;
+import engine.visualEffect.VisualEffectComp;
 import utils.maths.M;
 import utils.maths.TrigUtils;
 import utils.maths.Vec2;
@@ -42,7 +43,9 @@ public class DamageResolutionSys implements Sys {
         for (int entity : wc.getEntitiesWithComponentType(DamageableComp.class)) {
             //reset flags
             DamageableComp dmgableComp = (DamageableComp) wc.getComponent(entity, DamageableComp.class);
-            dmgableComp.resetInterrupt();
+
+            //reset one-frame data
+            dmgableComp.resetFrame();
 
             //update damageable with respect to damagers
             CollisionComp collComp = (CollisionComp) wc.getComponent(entity, CollisionComp.class);
@@ -92,6 +95,8 @@ public class DamageResolutionSys implements Sys {
         DamagerComp dmgerComp = (DamagerComp)wc.getComponent(damager, DamagerComp.class);
         PositionComp dmgerPosComp = (PositionComp)wc.getComponent(damager, PositionComp.class);
         RotationComp dmgerRotComp = (RotationComp)wc.getComponent(damager, RotationComp.class);
+        VisualEffectComp dmgerViseffComp = (VisualEffectComp)wc.getComponent(damager, VisualEffectComp.class);
+
 
         DamageableComp dmgablComp = (DamageableComp)wc.getComponent(damaged, DamageableComp.class);
         PositionComp dmgablPosComp = (PositionComp)wc.getComponent(damaged, PositionComp.class);
@@ -122,9 +127,16 @@ public class DamageResolutionSys implements Sys {
         int stunDuration = (int)knockbackLen/60;
         dmgablComp.setStunTimer(stunDuration);
 
+        //apply visual effect
+//        dmgerViseffComp.startEffect(0, dmgablPosComp.getPos());
+
 
         //set deltDamage and interrupt flags
         dmgerComp.deltDamage();
         dmgablComp.interrupt();
+
+        //add a data object about the interreaction to the damaged entity. To be read by feks network
+        HitData data = new HitData(damager, damaged, damage, knockback);
+        dmgablComp.addHitData(data);
     }
 }
