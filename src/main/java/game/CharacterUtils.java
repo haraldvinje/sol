@@ -134,8 +134,9 @@ public class CharacterUtils {
         float[] redColor = {1.0f, 0f,0f};
         wc.addInactiveComponent(e, new ColoredMeshComp(ColoredMeshUtils.createCircleSinglecolor(shape.getRadius(), 16, redColor)) );
 
-            wc.addInactiveComponent(e, new CollisionComp(shape));
+        wc.addInactiveComponent(e, new CollisionComp(shape));
 
+        wc.addComponent(e, new VisualEffectComp(VisualEffectUtils.createOnHitEffect()));
 
         return e;
     }

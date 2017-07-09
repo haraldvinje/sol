@@ -51,9 +51,9 @@ public class ProjectileUtils {
 
         wc.addInactiveComponent(b, new DamagerComp()); //because of ability system
 
+        wc.addInactiveComponent(b, new CollisionComp(new Circle(radius)));
 
-            wc.addInactiveComponent(b, new CollisionComp(new Circle(radius)));
-
+        wc.addComponent(b, new VisualEffectComp(VisualEffectUtils.createOnHitEffect()));
 
         return b;
     }

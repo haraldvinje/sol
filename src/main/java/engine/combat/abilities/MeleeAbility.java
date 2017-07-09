@@ -5,6 +5,7 @@ import engine.RotationComp;
 import engine.WorldContainer;
 import engine.combat.DamagerComp;
 import engine.physics.*;
+import engine.visualEffect.VisualEffectComp;
 import game.CharacterUtils;
 import game.GameUtils;
 import utils.maths.Vec2;
@@ -91,6 +92,7 @@ public class MeleeAbility extends Ability{
     public void endEffect(WorldContainer wc, int requestingEntity) {
         //deactivate hitbox
         wc.deactivateEntity(hitboxEntity);
+        wc.activateComponent(hitboxEntity, VisualEffectComp.class);
     }
 
     private void positionHitbox(WorldContainer wc, int requestingEntity) {
