@@ -111,12 +111,31 @@ public class CharacterUtils {
 
         //hook
         int hookProjEntity = ProjectileUtils.allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
-        ProjectileAbility abHook = new ProjectileAbility(wc, hookProjEntity, 5, 14, 50, 900, 30);
-        abHook.setDamagerValues(wc, 200f, 1500f, 0.2f, -128, true);
+        ProjectileAbility abHook = new ProjectileAbility(wc, hookProjEntity, 5, 18, 50, 900, 30);
+        abHook.setDamagerValues(wc, 200f, 1400f, 0.2f, -128, true);
 
         //meteorpunch
         MeleeAbility abMeteorpunch = new MeleeAbility(wc, 15, 3, 4, 60, new Circle(32), 64);
         abMeteorpunch.setDamagerValues(wc, 500, 1000, 1.5f, -128f, false);
+
+        return createCharacter(wc, controlled, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
+                abFrogpunch, abHook, abMeteorpunch);
+    }
+
+    private static int createShitface(WorldContainer wc, boolean controlled, float x, float y) {
+
+        //frogpunch
+        MeleeAbility abFrogpunch = new MeleeAbility(wc, 3, 5, 3, 20, new Circle(64f),48.0f);
+        abFrogpunch.setDamagerValues(wc, 150, 700, 0.00001f, -48f, false);
+
+        //hook
+        int hookProjEntity = ProjectileUtils.allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 124); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
+        ProjectileAbility abHook = new ProjectileAbility(wc, hookProjEntity, 5, 18, 50, 900, 30);
+        abHook.setDamagerValues(wc, 200f, 1400f, 0.00001f, 128, true);
+
+        //meteorpunch
+        MeleeAbility abMeteorpunch = new MeleeAbility(wc, 15, 3, 4, 60, new Circle(64), 256);
+        abMeteorpunch.setDamagerValues(wc, 3000, 1000, 1.5f, -32f, true);
 
         return createCharacter(wc, controlled, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
                 abFrogpunch, abHook, abMeteorpunch);
