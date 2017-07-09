@@ -5,6 +5,7 @@ import engine.RotationComp;
 import engine.UserInput;
 import engine.WorldContainer;
 import engine.graphics.*;
+import engine.graphics.text.TextMeshComp;
 import engine.graphics.view_.ViewControlComp;
 import engine.network.NetworkUtils;
 import engine.window.Window;
@@ -96,7 +97,8 @@ public class Server {
         checkNewConnections(); //adds panding connections
 
         if (clientsWaiting.size() >= 2) {
-            createGame(clientsWaiting.pop(), clientsWaiting.pop());
+            ServerClientHandler c = clientsWaiting.pop();
+            createGame(c, clientsWaiting.pop());
         }
 
         for (ServerGame game : gamesRunning.keySet()) {
@@ -182,6 +184,7 @@ public class Server {
         wc.assignComponentType(TexturedMeshComp.class);
         wc.assignComponentType(MeshCenterComp.class);
         wc.assignComponentType(ViewControlComp.class);
+        wc.assignComponentType(TextMeshComp.class);
 
 
         wc.addSystem(new RenderSys(window));
