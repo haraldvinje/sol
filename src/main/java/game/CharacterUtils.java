@@ -161,6 +161,8 @@ public class CharacterUtils {
 
         wc.addComponent(characterEntity, new AbilityComp(ab1, ab2, ab3));
 
+        wc.addComponent(characterEntity, new TextMeshComp()); //to render damage taken
+
         //server and offline
         wc.addComponent(characterEntity, new PhysicsComp(80, 5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
         wc.addComponent(characterEntity, new CollisionComp(new Circle(radius)));

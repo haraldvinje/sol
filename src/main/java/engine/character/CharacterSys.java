@@ -76,6 +76,9 @@ public class CharacterSys implements Sys {
 
         checkHoleAffected(charNumb, posComp, phComp, charComp, dmgableComp, affholeComp);
 
+        updateDisplayDamage(charNumb, dmgableComp, textComp);
+
+
         //do not take input if character is executing ability or is stunned
         if (abComp.getOccupiedBy() != null) return;
         if (dmgableComp.isStunned()) return;
@@ -83,7 +86,6 @@ public class CharacterSys implements Sys {
         updateMove(charComp, inputComp, phComp);
         updateRotation(entity, inputComp, posComp, rotComp);
         updateAbilities(charComp, abComp, inputComp, posComp, rotComp);
-        updateDisplayDamage(charNumb, dmgableComp, textComp);
     }
 
     private void checkHoleAffected(int charNumb, PositionComp posComp, PhysicsComp physComp, CharacterComp charComp, DamageableComp dmgablComp, AffectedByHoleComp affholeComp) {
@@ -146,18 +148,16 @@ public class CharacterSys implements Sys {
 
     }
 
-    int aaa = 0;
     private void updateDisplayDamage(int charNumb, DamageableComp dmgablComp, TextMeshComp textComp) {
-        Vec2[] pos = {new Vec2(50, GameUtils.MAP_HEIGHT/2),
-            new Vec2(GameUtils.MAP_WIDTH-150, GameUtils.MAP_HEIGHT/2) };
+        Vec2[] pos = {new Vec2(50, GameUtils.MAP_HEIGHT-100),
+            new Vec2(GameUtils.MAP_WIDTH-200, GameUtils.MAP_HEIGHT-100) };
 
-        textComp.setSize( (aaa++) % 60 == 0? (int)(M.random()*72*2) : textComp.getSize() );
-        float sizeNormalized = textComp.getSize()/ (72*2);
-        textComp.setColor(new Vec4(sizeNormalized, 1- sizeNormalized, sizeNormalized*sizeNormalized, 1));
+        textComp.setSize(64);
+        textComp.setColor(new Vec4(1, 0, 0, 1)); //red
 
         textComp.setViewX(pos[charNumb].x);
         textComp.setViewY(pos[charNumb].y);
-        textComp.getTextMesh().setString( "Ahaha\n"+Float.toString(textComp.getSize()) + "\non another line" );
+        textComp.getTextMesh().setString( Integer.toString((int)dmgablComp.getDamage()) );
     }
 
 

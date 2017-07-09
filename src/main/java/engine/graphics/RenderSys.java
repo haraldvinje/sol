@@ -14,6 +14,9 @@ import utils.maths.Vec2;
 import utils.maths.Vec3;
 import engine.graphics.view_.View;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.lwjgl.opengl.GL11.*;
 
 /**
@@ -21,10 +24,12 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class RenderSys implements Sys {
 
-    static {
-        Font.loadFonts(FontType.BROADWAY);
-    }
 
+
+    private static List<TextMeshComp> texts = new ArrayList<>();
+    public static void addText(TextMeshComp text) {
+        texts.add(text);
+    }
 
     private Window window;
     private ColorShader colorShader;
@@ -87,7 +92,7 @@ public class RenderSys implements Sys {
             glDrawElements(GL_TRIANGLES, textMesh.getIndicesCount(), GL_UNSIGNED_BYTE, 0);
             textMesh.unbind();
 
-        });
+        }
 
         textShader.unbind();
 
