@@ -35,10 +35,6 @@ public class RenderSys implements Sys {
     private WorldContainer wc;
 
 
-    private final float znear = -10, zfar = 10;
-
-
-
 
     public RenderSys(Window window) {
         this.window = window;
@@ -62,24 +58,15 @@ public class RenderSys implements Sys {
         //get view propreties
         View view = wc.getView();
 
-        Vec2 viewTranslate = new Vec2();
-        Vec2 viewSize = new Vec2( window.getWidth(), window.getHeight() );
+        Mat4 viewTransform = view.getViewTransform();
+        Mat4 projectionTransform = view.getProjectionTransform();
 
-        if (view != null) {
-            viewTranslate = view.getPos().negative();
-            viewSize = view.getSize();
-        }
 
-        Mat4 viewTransform = Mat4.translate( new Vec3(viewTranslate, 0f) );
-        Mat4 projectionTransform = Mat4.orthographic(0, viewSize.x, viewSize.y, 0, znear, zfar);
-
-        
         //render text
         textShader.bind();
         textShader.setProjectionTransform(projectionTransform);
 
-        wc.entitiesOfComponentTypeStream(TextMeshComp.class).forEach(textEntity -> {
-            TextMeshComp textComp = (TextMeshComp)wc.getComponent(textEntity, TextMeshComp.class);
+        for (TextMeshComp textComp: texts){
             TextMesh textMesh = textComp.getTextMesh();
 
             //color
@@ -184,7 +171,7 @@ public class RenderSys implements Sys {
      * Render a vertex array.
      * @param mesh
      */
-    private void renderColoredMesh(ColoredMesh mesh, Mat4 modelTransform, Mat4 viewTransform, Mat4 projectionTransform) {
+    public void renderColoredMesh(ColoredMesh mesh, Mat4 modelTransform, Mat4 viewTransform, Mat4 projectionTransform) {
         colorShader.bind();
         mesh.bind();
 
@@ -199,7 +186,7 @@ public class RenderSys implements Sys {
         colorShader.unbind();
     }
 
-    private void renderTexturedMesh(TexturedMesh mesh, Mat4 modelTransform, Mat4 viewTransform, Mat4 projectionTransform) {
+    public void renderTexturedMesh(TexturedMesh mesh, Mat4 modelTransform, Mat4 viewTransform, Mat4 projectionTransform) {
         textureShader.bind();
         mesh.bind();
 

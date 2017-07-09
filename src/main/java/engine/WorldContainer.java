@@ -4,6 +4,7 @@ package engine;
 import java.util.*;
 import java.util.stream.Stream;
 import engine.graphics.view_.View;
+import game.GameUtils;
 
 /**
  * Created by eirik on 13.06.2017.
@@ -43,7 +44,7 @@ public class WorldContainer {
      * init a Container with no view_. Render systems then uses the default view_ wich is equal to screen size
      */
     public WorldContainer() {
-
+        view = new View(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
     }
 
     //---------VIEW
@@ -136,7 +137,6 @@ public class WorldContainer {
      * @param compType
      * @return
      */
-    @Deprecated
     public Set<Integer> getEntitiesWithComponentType(Class<? extends Component> compType) {
         return activeComponents.get(compType).keySet();
     }
