@@ -312,6 +312,14 @@ public class WorldContainer {
         return entStr;
     }
 
+    public String entitiesToString() {
+        String s = "";
+        for (int entity : entityComponents.keySet()) {
+            s += entityToString(entity) + "\n";
+        }
+        return s;
+    }
+
 }
 
 
