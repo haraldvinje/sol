@@ -77,7 +77,7 @@ public class Game {
 
         team2Chars.add(CharacterUtils.SCHMATHIS);
 
-        CharacterUtils.createOfflineCharacters(wc, team1Chars, team2Chars, 0, 0);
+        CharacterUtils.createOfflineCharacters(wc, team1Chars, team2Chars, 1, 0);
     }
 
 
