@@ -2,6 +2,8 @@ package game;
 
 import engine.UserInput;
 import engine.WorldContainer;
+import engine.graphics.text.Font;
+import engine.graphics.text.FontType;
 import engine.network.NetworkUtils;
 import engine.network.client.Client;
 import engine.window.Window;
@@ -21,6 +23,7 @@ public class ClientGame implements Runnable{
     private static final float FRAME_INTERVAL = 1.0f/60.0f;
 
     public static final float WINDOW_WIDTH = 1600f, WINDOW_HEIGHT = 900f;
+
 
 
     private Window window;
@@ -81,10 +84,15 @@ public class ClientGame implements Runnable{
         window = new Window("Client   SIIII");
         userInput = new UserInput(window, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
+
+        Font.loadFonts(FontType.BROADWAY);
+
+
         GameUtils.assignComponentTypes(wc);
         GameUtils.assignSystems(wc, window, userInput);
 
         GameUtils.createMap(wc);
+
         //create characters
 //        ArrayList<Integer> team1Chars = new ArrayList<>();
 //        ArrayList<Integer> team2Chars = new ArrayList<>();
@@ -92,6 +100,9 @@ public class ClientGame implements Runnable{
 //        team2Chars.add(1);
         CharacterUtils.createClientCharacters(wc, friendlyCharacters, enemyCharacters, team, clientCharacterId);
 
+        //print initial state
+        System.out.println("Initial state:");
+        System.out.println(wc.entitiesToString());
 
         lastTime = System.nanoTime();
 

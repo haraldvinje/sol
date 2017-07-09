@@ -9,6 +9,8 @@ import engine.combat.DamageResolutionSys;
 import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
 import engine.graphics.*;
+import engine.graphics.text.Font;
+import engine.graphics.text.FontType;
 import engine.network.server.ServerClientHandler;
 import engine.network.server.ServerNetworkSys;
 import engine.physics.*;
@@ -69,13 +71,15 @@ public class ServerGame implements Runnable{
         this.window = new Window(0.3f, "Server ingame");
         this.userInput = new UserInput(window, 1, 1);
 
+        Font.loadFonts(FontType.BROADWAY);
+
+
         System.out.println("Server game initiated with clients: "+GameUtils.CLIENT_HANDELERS);
 
         //create entities
         GameUtils.assignComponentTypes(wc);
 
         GameUtils.assignSystems(wc, window, userInput);
-
 
         GameUtils.createMap(wc);
 
@@ -86,6 +90,9 @@ public class ServerGame implements Runnable{
         CharacterUtils.createServerCharacters(wc, team1Chars, team2Chars);
 
 
+        //print initial state
+        System.out.println("Initial state:");
+        System.out.println(wc.entitiesToString());
 
         lastTime = System.nanoTime();
 
