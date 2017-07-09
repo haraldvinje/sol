@@ -5,6 +5,9 @@ import engine.RotationComp;
 import engine.Sys;
 import engine.WorldContainer;
 import engine.graphics.text.*;
+import engine.visualEffect.VisualEffect;
+import engine.visualEffect.VisualEffectComp;
+import engine.visualEffect.VisualEffectSys;
 import engine.window.Window;
 import game.GameUtils;
 import org.lwjgl.opengl.GL11;
@@ -162,6 +165,12 @@ public class RenderSys implements Sys {
             renderTexturedMesh(texturedMeshComp.getMesh(), modelTransform, viewTransform, projectionTransform);
 
         }
+
+        //draw effects
+        VisualEffectSys.forEachActiveParticle(p -> {
+            Mat4 translateTransform = Mat4.translate( new Vec3(p.getPos(), 1) );
+            renderColoredMesh(p.getMesh(), translateTransform, viewTransform, projectionTransform);
+        });
 
 
         window.swapBuffers();

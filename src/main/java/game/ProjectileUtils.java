@@ -10,6 +10,8 @@ import engine.graphics.*;
 import engine.physics.Circle;
 import engine.physics.CollisionComp;
 import engine.physics.PhysicsComp;
+import engine.visualEffect.VisualEffectComp;
+import engine.visualEffect.VisualEffectUtils;
 
 /**
  * Created by eirik on 05.07.2017.

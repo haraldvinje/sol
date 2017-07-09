@@ -10,10 +10,13 @@ import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
 import engine.combat.abilities.*;
 import engine.graphics.*;
+import engine.graphics.text.TextMeshComp;
 import engine.graphics.view_.ViewControlComp;
 import engine.network.client.ClientControlledComp;
 import engine.network.client.InterpolationComp;
 import engine.physics.*;
+import engine.visualEffect.VisualEffectComp;
+import engine.visualEffect.VisualEffectUtils;
 
 import java.util.List;
 

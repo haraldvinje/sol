@@ -20,6 +20,8 @@ import engine.network.client.*;
 import engine.network.server.ServerClientHandler;
 import engine.network.server.ServerNetworkSys;
 import engine.physics.*;
+import engine.visualEffect.VisualEffectComp;
+import engine.visualEffect.VisualEffectSys;
 import engine.window.Window;
 
 import java.net.Socket;
@@ -74,6 +76,7 @@ public class GameUtils {
         wc.assignComponentType(InterpolationComp.class);
         wc.assignComponentType(ViewControlComp.class);
         wc.assignComponentType(ClientControlledComp.class);
+        wc.assignComponentType(VisualEffectComp.class);
 
     }
 
@@ -111,6 +114,8 @@ public class GameUtils {
             wc.addSystem(new ViewControlSys());
 
             wc.addSystem(new ClientNetworkOutSys(socket, userInput));
+            wc.addSystem(new VisualEffectSys());
+
             wc.addSystem(new RenderSys(window));
         }
 
@@ -131,8 +136,10 @@ public class GameUtils {
             wc.addSystem(new ProjectileSys());
 
             wc.addSystem(new ViewControlSys());
+            wc.addSystem(new VisualEffectSys());
 
             wc.addSystem(new RenderSys(window));
+
         }
     }
 
