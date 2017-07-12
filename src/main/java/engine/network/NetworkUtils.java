@@ -134,6 +134,7 @@ public class NetworkUtils {
     public static boolean sendClientStateId(int id, DataOutputStream outputStream) {
 
         try{
+            System.out.println("Sending id: " + id + " to " + outputStream.toString());
             outputStream.write(id);
         }
 

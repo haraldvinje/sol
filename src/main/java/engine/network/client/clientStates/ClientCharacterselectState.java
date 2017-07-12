@@ -80,8 +80,9 @@ public class ClientCharacterselectState extends ClientState {
 
     private boolean serverStartedGame() {
         try{
+            System.out.println("In try block");
             if (client.getSocketInputStream().available()>=1){
-
+                System.out.println("Available bytes from inputstream");
                int goToIngame = client.getSocketInputStream().readInt();
                if (goToIngame!= ClientStateUtils.INGAME){
                     throw new IOException("Did not recieve ingame state from server. Wrong data recieved");
