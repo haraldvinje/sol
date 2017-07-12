@@ -92,7 +92,7 @@ public class ServerGame implements Runnable {
 
         if (characterSelection.isReady()){
             serverInGame = new ServerInGame(characterSelection);
-            serverInGame.init(GameUtils.CLIENT_HANDELERS);
+            serverInGame.init(clients);
             for (ServerClientHandler client: clients){
                 client.sendClientStateId(ClientStateUtils.INGAME);
             }
