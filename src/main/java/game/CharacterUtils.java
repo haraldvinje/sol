@@ -12,7 +12,7 @@ import engine.combat.abilities.*;
 import engine.graphics.*;
 import engine.graphics.text.TextMeshComp;
 import engine.graphics.view_.ViewControlComp;
-import engine.network.client.ClientControlledComp;
+import engine.ControlledComp;
 import engine.network.client.InterpolationComp;
 import engine.physics.*;
 import engine.visualEffect.VisualEffectComp;
@@ -72,13 +72,20 @@ public class CharacterUtils {
     }
 
 
-    private static void createCharacter(int characterId, WorldContainer wc, boolean controlled, float x, float y) {
+    private static int createCharacter(int characterId, WorldContainer wc, boolean controlled, float x, float y) {
+        int charEnt;
+
         switch(characterId) {
-            case SHRANK: createShrank(wc, controlled, x, y);
+            case SHRANK: charEnt = createShrank(wc, controlled, x, y);
                 break;
-            case SCHMATHIS: createSchmathias(wc, controlled, x, y);
+            case SCHMATHIS: charEnt = createSchmathias(wc, controlled, x, y);
+                break;
+            default:
+                throw new IllegalArgumentException("no character of id given");
                 break;
         }
+
+
     }
 
     private static int createShrank(WorldContainer wc, boolean controlled, float x, float y) {
@@ -183,8 +190,6 @@ public class CharacterUtils {
 
         wc.addComponent(characterEntity, new AbilityComp(ab1, ab2, ab3));
 
-        wc.addComponent(characterEntity, new TextMeshComp()); //to render damage taken
-
         //server and offline
         wc.addComponent(characterEntity, new PhysicsComp(80, 5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
         wc.addComponent(characterEntity, new CollisionComp(new Circle(radius)));
@@ -201,7 +206,7 @@ public class CharacterUtils {
         if (controlled) {
             wc.addComponent(characterEntity, new UserCharacterInputComp());
             wc.addComponent(characterEntity, new ViewControlComp( -GameUtils.VIEW_WIDTH/2f, -GameUtils.VIEW_HEIGHT/2f) );
-            wc.addComponent(characterEntity, new ClientControlledComp());
+            wc.addComponent(characterEntity, new ControlledComp());
         }
 
 

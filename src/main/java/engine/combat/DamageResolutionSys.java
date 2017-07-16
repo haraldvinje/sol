@@ -77,7 +77,7 @@ public class DamageResolutionSys implements Sys {
 
             if (wc.hasComponent(damagerEntity, DamagerComp.class)) {
                 //System.out.println("Taking damage, bullet: "+collIt.getOtherEntity() +" victim: " + collIt.getSelfEntity());
-                takeDamage(entity, collIt.getOtherEntity());
+                applyDamage(wc, entity, collIt.getOtherEntity());
             }
 
         }
@@ -91,7 +91,7 @@ public class DamageResolutionSys implements Sys {
         }
     }
 
-    private void takeDamage(int damaged, int damager) {
+    public static void applyDamage(WorldContainer wc, int damaged, int damager) {
         DamagerComp dmgerComp = (DamagerComp)wc.getComponent(damager, DamagerComp.class);
         PositionComp dmgerPosComp = (PositionComp)wc.getComponent(damager, PositionComp.class);
         RotationComp dmgerRotComp = (RotationComp)wc.getComponent(damager, RotationComp.class);
@@ -128,14 +128,14 @@ public class DamageResolutionSys implements Sys {
         dmgablComp.setStunTimer(stunDuration);
 
         //apply visual effect
-//        dmgerViseffComp.startEffect(0, dmgablPosComp.getPos());
+        dmgerViseffComp.startEffect(0, dmgablPosComp.getPos());
 
 
         //set deltDamage and interrupt flags
         dmgerComp.deltDamage();
         dmgablComp.interrupt();
 
-        //add a data object about the interreaction to the damaged entity. To be read by feks network
+        //add a data object about the interraction to the damaged entity. To be read by feks network
         HitData data = new HitData(damager, damaged, damage, knockback);
         dmgablComp.addHitData(data);
     }

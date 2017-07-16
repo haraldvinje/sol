@@ -70,13 +70,13 @@ public class CharacterSys implements Sys {
         AbilityComp abComp = (AbilityComp) wc.getComponent(entity, AbilityComp.class);
         DamageableComp dmgableComp = (DamageableComp)wc.getComponent(entity, DamageableComp.class);
         AffectedByHoleComp affholeComp = (AffectedByHoleComp)wc.getComponent(entity, AffectedByHoleComp.class);
-        TextMeshComp textComp = (TextMeshComp)wc.getComponent(entity, TextMeshComp.class);
+//        TextMeshComp textComp = (TextMeshComp)wc.getComponent(entity, TextMeshComp.class);
 
 
 
         checkHoleAffected(charNumb, posComp, phComp, charComp, dmgableComp, affholeComp);
 
-        updateDisplayDamage(charNumb, dmgableComp, textComp);
+//        updateDisplayDamage(charNumb, dmgableComp, textComp);
 
 
         //do not take input if character is executing ability or is stunned
@@ -148,17 +148,17 @@ public class CharacterSys implements Sys {
 
     }
 
-    private void updateDisplayDamage(int charNumb, DamageableComp dmgablComp, TextMeshComp textComp) {
-        Vec2[] pos = {new Vec2(50, GameUtils.MAP_HEIGHT-100),
-            new Vec2(GameUtils.MAP_WIDTH-200, GameUtils.MAP_HEIGHT-100) };
-
-        textComp.setSize(64);
-        textComp.setColor(new Vec4(1, 0, 0, 1)); //red
-
-        textComp.setViewX(pos[charNumb].x);
-        textComp.setViewY(pos[charNumb].y);
-        textComp.getTextMesh().setString( Integer.toString((int)dmgablComp.getDamage()) );
-    }
+//    private void updateDisplayDamage(int charNumb, DamageableComp dmgablComp, TextMeshComp textComp) {
+//        Vec2[] pos = {new Vec2(50, GameUtils.MAP_HEIGHT-100),
+//            new Vec2(GameUtils.MAP_WIDTH-200, GameUtils.MAP_HEIGHT-100) };
+//
+//        textComp.setSize(64);
+//        textComp.setColor(new Vec4(1, 0, 0, 1)); //red
+//
+//        textComp.setViewX(pos[charNumb].x);
+//        textComp.setViewY(pos[charNumb].y);
+//        textComp.getTextMesh().setString( Integer.toString((int)dmgablComp.getDamage()) );
+//    }
 
 
 }

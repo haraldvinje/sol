@@ -40,8 +40,6 @@ public class ClientNetworkInSys implements Sys{
     private int nextPacketType = -1;
 
 
-    private List<TextMeshComp> texts = new ArrayList<>();
-
 
     public ClientNetworkInSys(Socket socket) {
         //init packet sizes
@@ -55,15 +53,6 @@ public class ClientNetworkInSys implements Sys{
             throw new IllegalStateException("An io exception occured while setting up socket\n could not connect to specified host");
         }
 
-        //create texts
-        TextMeshComp damageText1 = new TextMeshComp(new TextMesh(Font.getFont(FontType.BROADWAY), "hei"), 72, 100, GameUtils.VIEW_HEIGHT-100, new Vec4(1, 0, 0, 1));
-        TextMeshComp damageText2 = new TextMeshComp(new TextMesh(Font.getFont(FontType.BROADWAY), "hei"), 72, GameUtils.VIEW_WIDTH-300, GameUtils.VIEW_HEIGHT-100, new Vec4(1, 0, 0, 1));
-
-        RenderSys.addText(damageText1);
-        RenderSys.addText(damageText2);
-
-        texts.add(damageText1);
-        texts.add(damageText2);
     }
 
     @Override
@@ -208,13 +197,13 @@ public class ClientNetworkInSys implements Sys{
         int entityDamaged = data.getEntityDamageable();
         float totalDamageTaken = data.getTotalDamageTaken();
 
-        if (entityDamaged < 10) {
-            texts.get(0).getTextMesh().setString(Integer.toString((int)totalDamageTaken));
-        }
-        else {
-            texts.get(1).getTextMesh().setString(Integer.toString((int)totalDamageTaken));
-
-        }
+//        if (entityDamaged < 10) {
+//            texts.get(0).getTextMesh().setString(Integer.toString((int)totalDamageTaken));
+//        }
+//        else {
+//            texts.get(1).getTextMesh().setString(Integer.toString((int)totalDamageTaken));
+//
+//        }
 
         //if hitbox comp isnt already deactivated, start visual effect
 //        if (!wc.hasComponent(entityDamager, VisualEffectComp.class)) {

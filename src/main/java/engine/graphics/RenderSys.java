@@ -1,21 +1,19 @@
 package engine.graphics;
 
+import com.sun.prism.TextureMap;
 import engine.PositionComp;
 import engine.RotationComp;
 import engine.Sys;
 import engine.WorldContainer;
 import engine.graphics.text.*;
-import engine.visualEffect.VisualEffect;
-import engine.visualEffect.VisualEffectComp;
 import engine.visualEffect.VisualEffectSys;
 import engine.window.Window;
-import game.GameUtils;
 import org.lwjgl.opengl.GL11;
-import utils.maths.M;
 import utils.maths.Mat4;
 import utils.maths.Vec2;
 import utils.maths.Vec3;
 import engine.graphics.view_.View;
+import utils.maths.Vec4;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +27,10 @@ public class RenderSys implements Sys {
 
 
 
-    private static List<TextMeshComp> texts = new ArrayList<>();
-    public static void addText(TextMeshComp text) {
-        texts.add(text);
-    }
+//    private static List<TextMeshComp> texts = new ArrayList<>();
+//    public static void addText(TextMeshComp text) {
+//        texts.add(text);
+//    }
 
     private Window window;
     private ColorShader colorShader;
@@ -70,107 +68,59 @@ public class RenderSys implements Sys {
         Mat4 projectionTransform = view.getProjectionTransform();
 
 
-        //render text
-        textShader.bind();
-        textShader.setProjectionTransform(projectionTransform);
-
-        for (TextMeshComp textComp: texts){
-            TextMesh textMesh = textComp.getTextMesh();
-
-            //color
-            textShader.setTextColor(textComp.getColor());
-
-            //size
-            float textScale = textComp.getSize() / textMesh.getFont().getFontSize();
-            Mat4 screenScale = Mat4.scale(new Vec3(textScale, textScale, 1f));
-
-            //position
-            Mat4 screenTranslate = Mat4.translate(new Vec3(textComp.getViewPos(), 0f));
-
-            //result
-            textShader.setScreenTransform(screenTranslate.multiply( screenScale ));
-
-            //draw
-            textMesh.bind();
-            glDrawElements(GL_TRIANGLES, textMesh.getIndicesCount(), GL_UNSIGNED_BYTE, 0);
-            textMesh.unbind();
-
-        }
-
-        textShader.unbind();
-
 
         colorShader.bind();
-        colorShader.setLightPoint(new Vec3(100f, 100f, -500f));
+        colorShader.setLightPoint(new Vec3(500, 500, -5000f));
         textureShader.bind();
-        textureShader.setLightPoint(new Vec3(100f, 100f, -500f));
+        textureShader.setLightPoint(new Vec3(500, 500, -5000f));
 
 
-        for (int entity : wc.getEntitiesWithComponentType(ColoredMeshComp.class)) {
-
-            PositionComp positionComp = (PositionComp)wc.getComponent(entity, PositionComp.class);
-
-
-            Mat4 modelScale = Mat4.identity();
-            Mat4 modelRotate = Mat4.identity();
-            Mat4 modelTranslate = Mat4.translate( positionComp.getPos3() );
-            Mat4 modelCenterTranslate = Mat4.identity();
-
-            //center mesh if centerComp is present
-            if (wc.hasComponent(entity, MeshCenterComp.class)) {
-                MeshCenterComp centerComp = (MeshCenterComp) wc.getComponent(entity, MeshCenterComp.class);
-                modelCenterTranslate = Mat4.translate(new Vec3(-centerComp.getCx(), -centerComp.getCy(), 0));
-            }
-
-            if (wc.hasComponent(entity, RotationComp.class)) {
-                RotationComp rotComp = (RotationComp) wc.getComponent(entity, RotationComp.class);
-
-                modelRotate = Mat4.rotate(rotComp.getAngle());
-            }
-
-
-            Mat4 modelTransform = modelTranslate.multiply(modelScale.multiply(modelRotate.multiply( modelCenterTranslate )));
-
+        //draw colored meshes in the world
+        wc.entitiesOfComponentTypeStream(ColoredMeshComp.class).forEach(entity -> {
             ColoredMeshComp coloredMeshComp = (ColoredMeshComp)wc.getComponent(entity, ColoredMeshComp.class);
-            renderColoredMesh(coloredMeshComp.getMesh(), modelTransform, viewTransform, projectionTransform);
+            renderColoredMesh(entity, coloredMeshComp.getMesh(), viewTransform, projectionTransform);
 
+        });
 
-
-        }
-
-        for (int entity : wc.getEntitiesWithComponentType(TexturedMeshComp.class)) {
-
-            PositionComp positionComp = (PositionComp)wc.getComponent(entity, PositionComp.class);
-
-            Mat4 modelScale = Mat4.identity();
-            Mat4 modelRotate = Mat4.identity();
-            Mat4 modelTranslate = Mat4.translate( positionComp.getPos3() );
-            Mat4 modelCenterTranslate = Mat4.identity();
-
-            //center mesh if centerComp is present
-            if (wc.hasComponent(entity, MeshCenterComp.class)) {
-                MeshCenterComp centerComp = (MeshCenterComp) wc.getComponent(entity, MeshCenterComp.class);
-                modelCenterTranslate = Mat4.translate(new Vec3(-centerComp.getCx(), -centerComp.getCy(), 0));
-            }
-
-            if (wc.hasComponent(entity, RotationComp.class)) {
-                RotationComp rotComp = (RotationComp) wc.getComponent(entity, RotationComp.class);
-
-                modelRotate = Mat4.rotate(rotComp.getAngle());
-            }
-            Mat4 modelTransform = modelTranslate.multiply(modelScale.multiply(modelRotate.multiply( modelCenterTranslate )));
-
-
+        //draw textured meshes in the world
+        wc.entitiesOfComponentTypeStream(TexturedMeshComp.class).forEach( entity -> {
             TexturedMeshComp texturedMeshComp = (TexturedMeshComp)wc.getComponent(entity, TexturedMeshComp.class);
-            renderTexturedMesh(texturedMeshComp.getMesh(), modelTransform, viewTransform, projectionTransform);
+            renderTexturedMesh(entity, texturedMeshComp.getMesh(), viewTransform, projectionTransform);
+        });
 
-        }
 
-        //draw effects
+        //draw effects in the world
         VisualEffectSys.forEachActiveParticle(p -> {
             Mat4 translateTransform = Mat4.translate( new Vec3(p.getPos(), 1) );
             renderColoredMesh(p.getMesh(), translateTransform, viewTransform, projectionTransform);
         });
+
+
+        //render stuff on view
+        Mat4 toScreenTranslate = Mat4.translate(new Vec3(0, 0, 9.99f) );
+        for (int entity : wc.getEntitiesWithComponentType(ViewRenderComp.class) ) {
+            ViewRenderComp viewrendComp = (ViewRenderComp)wc.getComponent(entity, ViewRenderComp.class);
+
+            Mat4 modelTransform = toScreenTranslate.multiply( retrieveModelTransform(entity) );
+
+            viewrendComp.textureMeshesStream().forEach(textureMesh -> {
+                renderTexturedMesh(textureMesh, modelTransform, Mat4.identity(), projectionTransform);
+            });
+
+            viewrendComp.colorMeshesStream().forEach(colorMesh -> {
+                renderColoredMesh(colorMesh, modelTransform, Mat4.identity(), projectionTransform);
+            });
+
+            viewrendComp.textMeshesStream().forEach(textMesh -> {
+                //get text size
+                float textScale = textMesh.getSize() / textMesh.getFont().getFontSize();
+
+                Mat4 modelScale = Mat4.scale(new Vec3(textScale, textScale, 1f));
+                Mat4 textModelTransform = modelTransform.multiply( modelScale );
+
+                renderTextMesh(textMesh, textMesh.getColor(), textModelTransform, Mat4.identity(), projectionTransform);
+            });
+        }
 
 
         window.swapBuffers();
@@ -181,11 +131,35 @@ public class RenderSys implements Sys {
 
     }
 
+    private void renderColoredMesh(int entity, ColoredMesh mesh, Mat4 viewTransform, Mat4 projectionTransform) {
+        Mat4 modelTransform = retrieveModelTransform(entity);
+
+        renderColoredMesh(mesh, modelTransform, viewTransform, projectionTransform);
+    }
+    private void renderColoredMesh(ColoredMesh mesh, Vec3 imageCenterTranslation, Vec3 translation, Vec3 scale, float rotation, Mat4 viewTransform, Mat4 projectionTransform) {
+        Mat4 modelTransform = composeModelTransform(imageCenterTranslation, translation, scale, rotation);
+
+        renderColoredMesh(mesh, modelTransform, viewTransform, projectionTransform);
+    }
+
+    private void renderTexturedMesh(int entity, TexturedMesh mesh, Mat4 viewTransform, Mat4 projectionTransform) {
+        Mat4 modelTransform = retrieveModelTransform(entity);
+
+        renderTexturedMesh(mesh, modelTransform, viewTransform, projectionTransform);
+    }
+
+    private void renderTexturedMesh(TexturedMesh mesh, Vec3 imageCenterTranslation, Vec3 translation, Vec3 scale, float rotation, Mat4 viewTransform, Mat4 projectionTransform) {
+        Mat4 modelTransform = composeModelTransform(imageCenterTranslation, translation, scale, rotation);
+
+        renderTexturedMesh(mesh, modelTransform, viewTransform, projectionTransform);
+    }
+
+
     /**
      * Render a vertex array.
      * @param mesh
      */
-    public void renderColoredMesh(ColoredMesh mesh, Mat4 modelTransform, Mat4 viewTransform, Mat4 projectionTransform) {
+    private void renderColoredMesh(ColoredMesh mesh, Mat4 modelTransform, Mat4 viewTransform, Mat4 projectionTransform) {
         colorShader.bind();
         mesh.bind();
 
@@ -200,7 +174,7 @@ public class RenderSys implements Sys {
         colorShader.unbind();
     }
 
-    public void renderTexturedMesh(TexturedMesh mesh, Mat4 modelTransform, Mat4 viewTransform, Mat4 projectionTransform) {
+    private void renderTexturedMesh(TexturedMesh mesh, Mat4 modelTransform, Mat4 viewTransform, Mat4 projectionTransform) {
         textureShader.bind();
         mesh.bind();
 
@@ -214,4 +188,68 @@ public class RenderSys implements Sys {
         mesh.unbind();
         textureShader.unbind();
     }
+    private void renderTextMesh(TextMesh mesh, Vec4 color, Mat4 modelTransform, Mat4 viewTransform, Mat4 projectionTransform) {
+        textShader.bind();
+        mesh.bind();
+
+        textShader.setModelTransform(modelTransform);
+        textShader.setViewTransform(viewTransform);
+        textShader.setProjectionTransform(projectionTransform);
+
+        textShader.setTextColor(color);
+
+
+        glDrawElements(GL_TRIANGLES, mesh.getIndicesCount(), GL_UNSIGNED_BYTE, 0);
+
+        mesh.unbind();
+        textShader.unbind();
+    }
+
+
+    private Mat4 retrieveModelTransform( int entity ) {
+        PositionComp positionComp = (PositionComp)wc.getComponent(entity, PositionComp.class);
+
+        Vec3 translate = positionComp.getPos3();
+        Vec3 centerTranslate = getMeshCentering(entity);
+        Vec3 scale = new Vec3(1, 1, 1);
+        float rotate = getRotation(entity);
+
+        return composeModelTransform(centerTranslate, translate, scale, rotate);
+    }
+    private Mat4 composeModelTransform( Vec3 imageCenterTranslation, Vec3 translation, Vec3 scale, float rotation ) {
+        Mat4 modelScale = Mat4.scale( scale );
+        Mat4 modelRotate = Mat4.rotate( rotation );
+        Mat4 modelTranslate = Mat4.translate( translation );
+        Mat4 modelCenterTranslate = Mat4.translate( imageCenterTranslation );
+
+        Mat4 modelTransform = modelTranslate.multiply( modelScale.multiply( modelRotate.multiply( modelCenterTranslate ) ) );
+
+        return modelTransform;
+    }
+
+    /**
+     * Get rotation if rotation comp is present, else return 0
+     * @param meshEntity
+     * @return
+     */
+    private float getRotation(int meshEntity) {
+        if (wc.hasComponent(meshEntity, RotationComp.class)) {
+            RotationComp rotComp = (RotationComp) wc.getComponent(meshEntity, RotationComp.class);
+
+            return rotComp.getAngle();
+        }
+        return 0;
+    }
+
+    /**
+     * Returns mesh centering vector if meshCenterComp is present, [0,0] else
+     */
+    private Vec3 getMeshCentering(int meshEntity) {
+        if (wc.hasComponent(meshEntity, MeshCenterComp.class)) {
+            MeshCenterComp centerComp = (MeshCenterComp) wc.getComponent(meshEntity, MeshCenterComp.class);
+            return new Vec3(-centerComp.getCx(), -centerComp.getCy(), 0);
+        }
+        return new Vec3();
+    }
+
 }

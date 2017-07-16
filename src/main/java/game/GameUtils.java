@@ -75,8 +75,9 @@ public class GameUtils {
         wc.assignComponentType(ProjectileComp.class);
         wc.assignComponentType(InterpolationComp.class);
         wc.assignComponentType(ViewControlComp.class);
-        wc.assignComponentType(ClientControlledComp.class);
+        wc.assignComponentType(ControlledComp.class);
         wc.assignComponentType(VisualEffectComp.class);
+        wc.assignComponentType(ViewRenderComp.class);
 
     }
 
@@ -138,6 +139,8 @@ public class GameUtils {
             wc.addSystem(new ViewControlSys());
             wc.addSystem(new VisualEffectSys());
 
+            wc.addSystem(new OnScreenSys(wc, 2));
+
             wc.addSystem(new RenderSys(window));
 
         }
@@ -171,6 +174,8 @@ public class GameUtils {
         GameUtils.startPositionsTeam1 = startPositionsTeam1;
         GameUtils.startPositionsTeam2 = startPositionsTeam2;
 
+        //create background
+        createBackground(wc);
 
         //create walls
         float wallThickness = 64f;
@@ -184,11 +189,6 @@ public class GameUtils {
         createRectangleHoleInvisible(wc, MAP_WIDTH/2, wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
         createRectangleHoleInvisible(wc, MAP_WIDTH/2, MAP_HEIGHT-wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
         createCircleHole(wc, MAP_WIDTH/2, MAP_HEIGHT/2, 48f);
-
-
-        //create background
-        createBackground(wc);
-
 
     }
 

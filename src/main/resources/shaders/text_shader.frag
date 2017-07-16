@@ -13,7 +13,7 @@ out vec4 Color;
 void main() {
     vec4 texColor = texture(tex, Uv);
 
-    if (texColor.w == 0) discard;
-    Color = textColor * textColor;
+    //if (texColor.w == 0) discard;
+    Color = vec4(texColor * textColor);
     //Color = vec4(Uv.x, 0, Uv.y, 1);
 }

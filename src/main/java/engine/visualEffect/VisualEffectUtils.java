@@ -11,12 +11,12 @@ public class VisualEffectUtils {
 
     public static VisualEffect createOnHitEffect() {
 
-        int particleCount = 300;//16;
+        int particleCount = 16;
         int lifetime = 15;
 
         float speedMax = 8;
         float speedMin = -4;
-        float angleCenter = M.PI;
+        float angleCenter = 0;
         float angleSpread = 2*M.PI;
 
         return new VisualEffect(particleCount, lifetime, speedMin, speedMax, angleCenter, angleSpread);
