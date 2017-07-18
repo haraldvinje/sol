@@ -27,6 +27,8 @@ public class CharacterUtils {
 
     public static final int SHRANK = 0, SCHMATHIS = 1;
 
+    private static int characterCount;
+
 
     public static void createOfflineCharacters(WorldContainer wc, List<Integer> team1Characters, List<Integer> team2Characters, int team, int clientCharacterId) {
         createClientCharacters(wc, team1Characters, team2Characters, team, clientCharacterId);
@@ -181,7 +183,7 @@ public class CharacterUtils {
         float offsetY = offsetYOnImage*scale;
 
         wc.addComponent(characterEntity, new CharacterComp(moveAccel));//1500f));
-        wc.addComponent(characterEntity, new PositionComp(x, y));
+        wc.addComponent(characterEntity, new PositionComp(x, y, (float)(characterCount++)/100f ) ); //z value is a way to make draw ordering and depth positioning correspond. Else alpha images will appear incorrect.
         wc.addComponent(characterEntity, new RotationComp());
 
         wc.addComponent(characterEntity, new TexturedMeshComp(TexturedMeshUtils.createRectangle(imagePath, width, height)));
