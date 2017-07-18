@@ -31,7 +31,7 @@ public class OnScreenSys implements Sys{
     public OnScreenSys(WorldContainer wc, int characterCount) {
 
         //create bottom bar
-        botBarEnt = createBotBarEnt(wc);
+        //botBarEnt = createBotBarEnt(wc);
 
         //create character damage displays
         int halfCharCount = characterCount /2;

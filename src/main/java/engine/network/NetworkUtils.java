@@ -160,7 +160,7 @@ public class NetworkUtils {
         try {
             stream.writeInt(data.getEntityDamager());
             stream.writeInt(data.getEntityDamageable());
-            stream.writeFloat(data.getTotalDamageTaken());
+            stream.writeFloat(data.getDamageTaken());
         }
         catch (SocketException e) {
             return false;
@@ -175,7 +175,7 @@ public class NetworkUtils {
         try {
             data.setEntityDamager( stream.readInt() );
             data.setEntityDamageable( stream.readInt() );
-            data.setTotalDamageTaken( stream.readFloat() );
+            data.setDamageTaken( stream.readFloat() );
         }
         catch(IOException e) {e.printStackTrace(); throw new IllegalStateException("");}
 

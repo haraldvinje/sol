@@ -147,11 +147,11 @@ public class Server {
         gameThread.start();
 
         client1.sendInt(0); //team number
-        client1.sendInt(0); //team 1 char
+        client1.sendInt(1); //team 1 char
         client1.sendInt(1); //team 2 char
 
         client2.sendInt(1); //team number
-        client2.sendInt(0); //team 1 char
+        client2.sendInt(1); //team 1 char
         client2.sendInt(1); //team 2 char
 
     }
@@ -185,6 +185,7 @@ public class Server {
         wc.assignComponentType(MeshCenterComp.class);
         wc.assignComponentType(ViewControlComp.class);
         wc.assignComponentType(TextMeshComp.class);
+        wc.assignComponentType(ViewRenderComp.class);
 
 
         wc.addSystem(new RenderSys(window));

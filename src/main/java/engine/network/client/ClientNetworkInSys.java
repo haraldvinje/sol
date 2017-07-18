@@ -4,6 +4,8 @@ import engine.PositionComp;
 import engine.Sys;
 import engine.WorldContainer;
 import engine.character.CharacterComp;
+import engine.combat.DamageableComp;
+import engine.combat.DamagerComp;
 import engine.combat.abilities.AbilityComp;
 import engine.combat.abilities.HitboxComp;
 import engine.combat.abilities.ProjectileComp;
@@ -35,16 +37,12 @@ public class ClientNetworkInSys implements Sys{
 
     private DataInputStream inputStream;
 
-//    private List<Integer> inPacketSizes;
 
     private int nextPacketType = -1;
 
 
 
     public ClientNetworkInSys(Socket socket) {
-        //init packet sizes
-//        Integer[] inPacketSizes = {AllCharacterStateData.BYTES, AbilityStartedData.BYTES, HitDetectedData.BYTES, ProjectileDeadData.BYTES, EntityDeadData.BYTES};
-//        this.inPacketSizes = Arrays.asList(inPacketSizes);
 
         try {
             inputStream = new DataInputStream(socket.getInputStream());
@@ -195,7 +193,7 @@ public class ClientNetworkInSys implements Sys{
 
         int entityDamager = data.getEntityDamager();
         int entityDamaged = data.getEntityDamageable();
-        float totalDamageTaken = data.getTotalDamageTaken();
+        float damageTaken = data.getDamageTaken();
 
 //        if (entityDamaged < 10) {
 //            texts.get(0).getTextMesh().setString(Integer.toString((int)totalDamageTaken));
@@ -210,9 +208,11 @@ public class ClientNetworkInSys implements Sys{
 //            wc.activateComponent(entityDamager, VisualEffectComp.class);
 //        }
 
+        DamageableComp dmgableComp = (DamageableComp) wc.getComponent(entityDamaged, DamageableComp.class);
         VisualEffectComp visefComp = (VisualEffectComp) wc.getComponent(entityDamager, VisualEffectComp.class);
         PositionComp posComp = (PositionComp) wc.getComponent(entityDamaged, PositionComp.class);
 
+        dmgableComp.applyDamage(damageTaken);
         visefComp.startEffect(0, posComp.getPos());
     }
 

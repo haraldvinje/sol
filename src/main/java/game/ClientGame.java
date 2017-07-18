@@ -84,12 +84,7 @@ public class ClientGame implements Runnable{
         window = new Window("Client   SIIII");
         userInput = new UserInput(window, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
-
-        Font.loadFonts(FontType.BROADWAY);
-
-
         GameUtils.assignComponentTypes(wc);
-        GameUtils.assignSystems(wc, window, userInput);
 
         GameUtils.createMap(wc);
 
@@ -99,6 +94,13 @@ public class ClientGame implements Runnable{
 //        team1Chars.add(0);
 //        team2Chars.add(1);
         CharacterUtils.createClientCharacters(wc, friendlyCharacters, enemyCharacters, team, clientCharacterId);
+
+
+
+        Font.loadFonts(FontType.BROADWAY);
+
+        GameUtils.assignSystems(wc, window, userInput);
+
 
         //print initial state
         System.out.println("Initial state:");

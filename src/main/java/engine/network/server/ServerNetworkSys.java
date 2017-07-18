@@ -137,7 +137,7 @@ public class ServerNetworkSys implements Sys {
             DamageableComp dmgablComp = (DamageableComp)wc.getComponent(dmgablEntity, DamageableComp.class);
 
             dmgablComp.hitDataStream().forEach( hitData -> {
-                data.add( new HitDetectedData(hitData.getEntityDamager(), hitData.getEntityDamaged(), dmgablComp.getDamage()) );
+                data.add( new HitDetectedData(hitData.getEntityDamager(), hitData.getEntityDamaged(), hitData.getDamageDelt() ) );
 
             });
         });

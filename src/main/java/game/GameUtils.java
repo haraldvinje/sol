@@ -79,6 +79,7 @@ public class GameUtils {
         wc.assignComponentType(VisualEffectComp.class);
         wc.assignComponentType(ViewRenderComp.class);
 
+
     }
 
     public static void assignSystems(WorldContainer wc, Window window, UserInput userInput) {
@@ -116,6 +117,8 @@ public class GameUtils {
 
             wc.addSystem(new ClientNetworkOutSys(socket, userInput));
             wc.addSystem(new VisualEffectSys());
+
+            wc.addSystem(new OnScreenSys(wc, 2));
 
             wc.addSystem(new RenderSys(window));
         }

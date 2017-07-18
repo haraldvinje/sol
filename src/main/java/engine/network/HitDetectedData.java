@@ -10,13 +10,13 @@ public class HitDetectedData {
 
     private int entityDamager;
     private int entityDamageable;
-    private float totalDamageTaken;
+    private float damageTaken;
 
 
-    public HitDetectedData(int entityDamager, int entityDamageable, float totalDamageTaken) {
+    public HitDetectedData(int entityDamager, int entityDamageable, float damageTaken) {
         this.entityDamager = entityDamager;
         this.entityDamageable = entityDamageable;
-        this.totalDamageTaken = totalDamageTaken;
+        this.damageTaken = damageTaken;
     }
     public HitDetectedData() {
         this(0, 0, 0);
@@ -39,15 +39,15 @@ public class HitDetectedData {
         this.entityDamageable = entityDamageable;
     }
 
-    public float getTotalDamageTaken() {
-        return totalDamageTaken;
+    public float getDamageTaken() {
+        return damageTaken;
     }
-    public void setTotalDamageTaken(float totalDamageTaken) {
-        this.totalDamageTaken = totalDamageTaken;
+    public void setDamageTaken(float damageTaken) {
+        this.damageTaken = damageTaken;
     }
 
 
     public String toString() {
-        return "["+getClass().getSimpleName()+": entityDamager="+entityDamager+" entityDamageable="+entityDamageable+" totalDamageTaken="+totalDamageTaken+"]";
+        return "["+getClass().getSimpleName()+": entityDamager="+entityDamager+" entityDamageable="+entityDamageable+" totalDamageTaken="+damageTaken+"]";
     }
 }

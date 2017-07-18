@@ -85,7 +85,7 @@ public class ServerGame implements Runnable{
 
         ArrayList<Integer> team1Chars = new ArrayList<>();
         ArrayList<Integer> team2Chars = new ArrayList<>();
-        team1Chars.add(0);
+        team1Chars.add(1);
         team2Chars.add(1);
         CharacterUtils.createServerCharacters(wc, team1Chars, team2Chars);
 
