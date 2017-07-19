@@ -27,7 +27,10 @@ public class CharacterUtils {
 
     public static final int SHRANK = 0, SCHMATHIS = 1;
 
+    private static float hitboxDepth = 1;
+
     private static int characterCount;
+
 
 
     public static void createOfflineCharacters(WorldContainer wc, List<Integer> team1Characters, List<Integer> team2Characters, int team, int clientCharacterId) {
@@ -153,7 +156,7 @@ public class CharacterUtils {
     public static int allocateHitboxEntity(WorldContainer wc, Circle shape){
         int e = wc.createEntity();
 
-        wc.addInactiveComponent(e, new PositionComp(0, 0));
+        wc.addInactiveComponent(e, new PositionComp(0, 0, hitboxDepth));
         wc.addInactiveComponent(e, new RotationComp());
 
         //wc.addInactiveComponent(e, new PhysicsComp());

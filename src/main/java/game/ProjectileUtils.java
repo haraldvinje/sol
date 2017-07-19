@@ -18,6 +18,9 @@ import engine.visualEffect.VisualEffectUtils;
  */
 public class ProjectileUtils {
 
+    private static float projectileDepth = 1.5f;
+
+
     public static int allocateSinglecolorProjectileAbility(WorldContainer wc, float radius, float[] color) {
         int p = allocateNonRenderableProjectileEntity(wc, radius);
         wc.addInactiveComponent(p, new ColoredMeshComp( ColoredMeshUtils.createCircleSinglecolor(radius, 12, color) ));
@@ -44,7 +47,7 @@ public class ProjectileUtils {
     public static int allocateNonRenderableProjectileEntity(WorldContainer wc, float radius) {
         int b = wc.createEntity();
 
-        wc.addInactiveComponent(b, new PositionComp(0,0));
+        wc.addInactiveComponent(b, new PositionComp(0,0, projectileDepth));
         wc.addInactiveComponent(b, new RotationComp());
 
         wc.addInactiveComponent(b, new PhysicsComp(20, 0.05f, 0.3f));
