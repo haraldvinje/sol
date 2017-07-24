@@ -44,6 +44,9 @@ public class ServerInGame {
     private WorldContainer wc;
 
 
+    private List<ServerClientHandler> clientHandlers;
+
+
     private boolean running = true;
 
     private long lastTime;
@@ -59,7 +62,7 @@ public class ServerInGame {
 
         //window = new Window(WINDOW_WIDTH, WINDOW_HEIGHT, "Server   SIIII");
         //userInput = new UserInput(window);
-
+        this.clientHandlers = clientHandlers;
         //add an stockLoss entry for every client
         stockLossCount = new int[clientHandlers.size()];
 
@@ -75,6 +78,8 @@ public class ServerInGame {
         this.userInput = new UserInput(window, 1, 1);
 
         System.out.println("Server game initiated with clients: "+GameUtils.CLIENT_HANDELERS);
+
+
 
         //create entities
         GameUtils.assignComponentTypes(wc);
