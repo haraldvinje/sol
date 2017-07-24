@@ -12,9 +12,14 @@ import engine.combat.abilities.AbilityComp;
 import engine.combat.abilities.AbilitySys;
 import engine.combat.abilities.MeleeAbility;
 import engine.graphics.*;
+import engine.graphics.text.Font;
+import engine.graphics.text.FontType;
 import engine.physics.*;
 import engine.window.Window;
 import utils.maths.M;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by eirik on 13.06.2017.
@@ -30,30 +35,22 @@ public class Game {
     private Window window;
     private UserInput userInput;
 
-
     private ColoredMesh vao;
 
     private long lastTime;
 
     private WorldContainer wc;
 
-    //private CollisionDetectionSys cds;
-
-
-    private int player;
-    private int sandbag;
-    private int hole;
-
-
-
 
     public void init() {
-        window = new Window("SIIII");
-        userInput = new UserInput(window, GameUtils.MAP_WIDTH, GameUtils.MAP_HEIGHT);
+        window = new Window(0.8f, 0.8f,"SIIII");
+        userInput = new UserInput(window, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
-        wc = new WorldContainer();
+        Font.loadFonts(FontType.BROADWAY);
 
-        //cds = new CollisionDetectionSys(wc);
+
+        wc = new WorldContainer(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
+
 
         System.out.println("HEELLLLLOOOOO");
 
@@ -63,8 +60,18 @@ public class Game {
         GameUtils.assignComponentTypes(wc);
         GameUtils.assignSystems(wc, window, userInput);
 
-        GameUtils.createInitialEntities(wc);
+        //GameUtils.createInitialEntities(wc);
+        GameUtils.createMap(wc);
 
+        List<Integer> team1Chars = new ArrayList<>();
+        List<Integer> team2Chars = new ArrayList<>();
+
+        team1Chars.add(CharacterUtils.SHRANK);
+//        team1Chars.add(CharacterUtils.SHRANK);
+
+        team2Chars.add(CharacterUtils.SCHMATHIS);
+
+        CharacterUtils.createOfflineCharacters(wc, team1Chars, team2Chars, 0, 0);
     }
 
 

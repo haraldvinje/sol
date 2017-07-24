@@ -16,6 +16,9 @@ public class TrigUtils {
 		currRotation = M.atan2(deltaY, deltaX);
 		return currRotation;
 	}
+	public static float pointDirection(Vec2 v1, Vec2 v2) {
+		return pointDirection(v1.x, v1.y, v2.x, v2.y);
+	}
 	/**
 	 * returns a normalized vector in the direction specified by points
 	 */
