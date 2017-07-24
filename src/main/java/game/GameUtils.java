@@ -1,21 +1,29 @@
 package game;
 
-import engine.PositionComp;
-import engine.RotationComp;
-import engine.UserInput;
-import engine.WorldContainer;
+import engine.*;
 import engine.character.*;
 import engine.combat.DamageResolutionSys;
 import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
 import engine.combat.abilities.*;
 import engine.graphics.*;
+
+
+import engine.graphics.text.TextMeshComp;
+import engine.graphics.view_.ViewControlComp;
+import engine.graphics.view_.ViewControlSys;
+import engine.network.client.InterpolationComp;
+import engine.network.client.InterpolationSys;
+
 import engine.network.client.*;
+
 import engine.network.client.clientStates.ClientCharacterselectState;
 import engine.network.client.clientStates.ClientIngameState;
 import engine.network.server.ServerClientHandler;
 import engine.network.server.ServerNetworkSys;
 import engine.physics.*;
+import engine.visualEffect.VisualEffectComp;
+import engine.visualEffect.VisualEffectSys;
 import engine.window.Window;
 
 import java.net.Socket;
@@ -39,79 +47,40 @@ public class GameUtils {
 
     public static List<ServerClientHandler> CLIENT_HANDELERS;
 
+    public static int[][] startPositionsTeam1, startPositionsTeam2;
+
+
+
+
 
     public static void assignComponentTypes(WorldContainer wc) {
 
-        if (PROGRAM == SERVER) {
-            wc.assignComponentType(PositionComp.class);
-            wc.assignComponentType(ColoredMeshComp.class);
-            wc.assignComponentType(TexturedMeshComp.class);
-            wc.assignComponentType(CollisionComp.class);
-            wc.assignComponentType(NaturalResolutionComp.class);
-            wc.assignComponentType(PhysicsComp.class);
-            wc.assignComponentType(CharacterComp.class);
-            wc.assignComponentType(CharacterInputComp.class);
-            wc.assignComponentType(RotationComp.class);
-            wc.assignComponentType(MeshCenterComp.class);
-            wc.assignComponentType(HoleComp.class);
-            wc.assignComponentType(DamageableComp.class);
-            wc.assignComponentType(DamagerComp.class);
-            wc.assignComponentType(AffectedByHoleComp.class);
-            wc.assignComponentType(AbilityComp.class);
-            wc.assignComponentType(HitboxComp.class);
-//        wc.assignComponentType(UserCharacterInputComp.class);
-            wc.assignComponentType(ProjectileComp.class);
+        wc.assignComponentType(TextMeshComp.class);
 
-        }
-        else if (PROGRAM == CLIENT){
-            wc.assignComponentType(PositionComp.class);
-            wc.assignComponentType(ColoredMeshComp.class);
-            wc.assignComponentType(TexturedMeshComp.class);
-            wc.assignComponentType(CharacterComp.class);
-            wc.assignComponentType(RotationComp.class);
-            wc.assignComponentType(MeshCenterComp.class);
-//            wc.assignComponentType(CollisionComp.class);
-            wc.assignComponentType(PhysicsComp.class);
-//            wc.assignComponentType(CharacterInputComp.class);
-//            wc.assignComponentType(UserCharacterInputComp.class);
-//            wc.assignComponentType(HoleComp.class);
-            wc.assignComponentType(DamageableComp.class);
-            wc.assignComponentType(DamagerComp.class);
-//            wc.assignComponentType(AffectedByHoleComp.class);
-            wc.assignComponentType(AbilityComp.class);
-            wc.assignComponentType(HitboxComp.class);
-            wc.assignComponentType(InterpolationComp.class);
-            wc.assignComponentType(ProjectileComp.class);
+        wc.assignComponentType(PositionComp.class);
+        wc.assignComponentType(ColoredMeshComp.class);
+        wc.assignComponentType(TexturedMeshComp.class);
+        wc.assignComponentType(CollisionComp.class);
+        wc.assignComponentType(NaturalResolutionComp.class);
+        wc.assignComponentType(PhysicsComp.class);
+        wc.assignComponentType(CharacterComp.class);
+        wc.assignComponentType(CharacterInputComp.class);
+        wc.assignComponentType(RotationComp.class);
+        wc.assignComponentType(MeshCenterComp.class);
+        wc.assignComponentType(HoleComp.class);
+        wc.assignComponentType(DamageableComp.class);
+        wc.assignComponentType(DamagerComp.class);
+        wc.assignComponentType(AffectedByHoleComp.class);
+        wc.assignComponentType(AbilityComp.class);
+        wc.assignComponentType(HitboxComp.class);
+        wc.assignComponentType(UserCharacterInputComp.class);
+        wc.assignComponentType(ProjectileComp.class);
+        wc.assignComponentType(InterpolationComp.class);
+        wc.assignComponentType(ViewControlComp.class);
+        wc.assignComponentType(ControlledComp.class);
+        wc.assignComponentType(VisualEffectComp.class);
+        wc.assignComponentType(ViewRenderComp.class);
 
-        }
-
-        else if (PROGRAM == OFFLINE) {
-            //assign component types
-            wc.assignComponentType(PositionComp.class);
-            wc.assignComponentType(ColoredMeshComp.class);
-            wc.assignComponentType(TexturedMeshComp.class);
-            wc.assignComponentType(CollisionComp.class);
-            wc.assignComponentType(NaturalResolutionComp.class);
-
-            wc.assignComponentType(PhysicsComp.class);
-            wc.assignComponentType(CharacterComp.class);
-            wc.assignComponentType(CharacterInputComp.class);
-            wc.assignComponentType(RotationComp.class);
-            wc.assignComponentType(MeshCenterComp.class);
-            wc.assignComponentType(HoleComp.class);
-            wc.assignComponentType(DamageableComp.class);
-            wc.assignComponentType(DamagerComp.class);
-            wc.assignComponentType(AffectedByHoleComp.class);
-            wc.assignComponentType(AbilityComp.class);
-            wc.assignComponentType(UserCharacterInputComp.class);
-            wc.assignComponentType(HitboxComp.class);
-            wc.assignComponentType(ProjectileComp.class);
-
-        }
-
-        else {
-            throw new IllegalStateException("Specify programtype in GameUtils");
-        }
 
     }
 
@@ -132,10 +101,12 @@ public class GameUtils {
 
             wc.addSystem(new ProjectileSys());
 
-            wc.addSystem(new RenderSys(window, VIEW_WIDTH, VIEW_HEIGHT));
+            wc.addSystem(new RenderSys(window));
         }
 
         else if (PROGRAM == CLIENT){
+            wc.addSystem(new UserCharacterInputSys(userInput));
+
             wc.addSystem(new ClientNetworkInSys(socket));
             wc.addSystem(new AbilitySys());
             wc.addSystem(new PhysicsSys());
@@ -144,12 +115,19 @@ public class GameUtils {
 
             wc.addSystem(new ProjectileSys());
 
+            wc.addSystem(new ViewControlSys());
+
             wc.addSystem(new ClientNetworkOutSys(socket, userInput));
-            wc.addSystem(new RenderSys(window, VIEW_WIDTH, VIEW_HEIGHT));
+            wc.addSystem(new VisualEffectSys());
+
+            wc.addSystem(new OnScreenSys(wc, 2));
+
+            wc.addSystem(new RenderSys(window));
         }
 
         else if (PROGRAM == OFFLINE) {
             wc.addSystem(new UserCharacterInputSys(userInput));
+            wc.addSystem(new UserInputToCharacterSys());
             wc.addSystem(new CharacterSys());
             wc.addSystem(new AbilitySys());
 
@@ -163,7 +141,13 @@ public class GameUtils {
 
             wc.addSystem(new ProjectileSys());
 
-            wc.addSystem(new RenderSys(window, VIEW_WIDTH, VIEW_HEIGHT));
+            wc.addSystem(new ViewControlSys());
+            wc.addSystem(new VisualEffectSys());
+
+            wc.addSystem(new OnScreenSys(wc, 2));
+
+            wc.addSystem(new RenderSys(window));
+
         }
     }
 
@@ -210,21 +194,35 @@ public class GameUtils {
     }
 
 
-    public static void createInitialEntities(WorldContainer wc) {
 
-        //create players
-        float centerSeparation = 300f;
-        if (PROGRAM == OFFLINE) {
-            //createShrank(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
-            createSchmathias(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
 
-            createSandbag(wc);
-        }
-        else {
-            createShrank(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
-            createSchmathias(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
-        }
+    public static void createMap(WorldContainer wc) {
 
+
+//        //create players
+//        float centerSeparation = 300f;
+//        if (PROGRAM == OFFLINE) {
+//            //createShrank(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
+//            createSchmathias(wc, true, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
+//
+//            createSandbag(wc);
+//        }
+//        else if (PROGRAM == SERVER){
+//            createShrank(wc, true, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
+//            createSchmathias(wc, true, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
+//        }
+//        else if (PROGRAM == CLIENT) {
+//            createShrank(wc, true, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
+//            createSchmathias(wc, false, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
+//        }
+
+        int[][] startPositionsTeam1 = { {100, 200}, {100, 400}};
+        int[][] startPositionsTeam2 = { {1000, 200}, {1000, 400}};
+        GameUtils.startPositionsTeam1 = startPositionsTeam1;
+        GameUtils.startPositionsTeam2 = startPositionsTeam2;
+
+        //create background
+        createBackground(wc);
 
         //create walls
         float wallThickness = 64f;
@@ -239,9 +237,6 @@ public class GameUtils {
         createRectangleHoleInvisible(wc, MAP_WIDTH/2, MAP_HEIGHT-wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
         createCircleHole(wc, MAP_WIDTH/2, MAP_HEIGHT/2, 48f);
 
-
-        //create background
-        createBackground(wc);
 
 
     }
@@ -297,111 +292,7 @@ public class GameUtils {
             abFrogpunch, abHook, abMeteorpunch);
     }
 
-
-    public static int allocateHitboxEntity(WorldContainer wc, Circle shape){
-        int e = wc.createEntity();
-
-        wc.addInactiveComponent(e, new PositionComp(0, 0));
-        wc.addInactiveComponent(e, new RotationComp());
-
-        //wc.addInactiveComponent(e, new PhysicsComp());
-        wc.addInactiveComponent(e, new HitboxComp());
-
-        wc.addInactiveComponent(e, new DamagerComp());
-
-        float[] redColor = {1.0f, 0f,0f};
-        wc.addInactiveComponent(e, new ColoredMeshComp(ColoredMeshUtils.createCircleSinglecolor(shape.getRadius(), 16, redColor)) );
-
-        if (PROGRAM == SERVER  || PROGRAM == OFFLINE) {
-            wc.addInactiveComponent(e, new CollisionComp(shape));
-        }
-
-        return e;
-    }
-
-    public static int allocateSinglecolorProjectileAbility(WorldContainer wc, float radius, float[] color) {
-        int p = allocateNonRenderableProjectileEntity(wc, radius);
-        wc.addInactiveComponent(p, new ColoredMeshComp( ColoredMeshUtils.createCircleSinglecolor(radius, 12, color) ));
-        return p;
-    }
-
-    public static int allocateTwocolorProjectileAbility(WorldContainer wc, float radius) {
-        int p = allocateNonRenderableProjectileEntity(wc, radius);
-        wc.addInactiveComponent(p, new ColoredMeshComp( ColoredMeshUtils.createCircleTwocolor(radius, 12) ));
-        return p;
-    }
-    public static int allocateImageProjectileEntity(WorldContainer wc, String imagePath, float radiusOnImage, float imageWidth, float imageHeight, float radius) {
-        float scale = radius/radiusOnImage;
-        float width = imageWidth*scale;
-        float height = imageHeight*scale;
-
-        int p = allocateNonRenderableProjectileEntity(wc, radius);
-        wc.addInactiveComponent(p, new TexturedMeshComp(TexturedMeshUtils.createRectangle(imagePath, width, height)) );
-        wc.addInactiveComponent(p, new MeshCenterComp(width/2, height/2));
-
-        return p;
-    }
-    public static int allocateNonRenderableProjectileEntity(WorldContainer wc, float radius) {
-        int b = wc.createEntity();
-
-        wc.addInactiveComponent(b, new PositionComp(0,0));
-        wc.addInactiveComponent(b, new RotationComp());
-
-        wc.addInactiveComponent(b, new PhysicsComp(20, 0.05f, 0.3f));
-        wc.addInactiveComponent(b, new HitboxComp());
-        wc.addInactiveComponent(b, new ProjectileComp());
-
-        wc.addInactiveComponent(b, new DamagerComp()); //because of ability system
-
-        if (PROGRAM == SERVER || PROGRAM == OFFLINE) {
-            wc.addInactiveComponent(b, new CollisionComp(new Circle(radius)));
-
-        }
-
-        return b;
-    }
-
-
-    private static int createCharacter(WorldContainer wc, float x, float y, String imagePath, float radiusOnImage, float imageWidth, float imageHeight, float offsetXOnImage, float offsetYOnImage, float radius, float moveAccel, Ability ab1, Ability ab2, Ability ab3) {
-        int player = wc.createEntity();
-
-        float scale = radius/radiusOnImage;
-        float width = imageWidth*scale;
-        float height = imageHeight*scale;
-        float offsetX = offsetXOnImage*scale;
-        float offsetY = offsetYOnImage*scale;
-
-        wc.addComponent(player, new CharacterComp(moveAccel));//1500f));
-        wc.addComponent(player, new PositionComp(x, y));
-        wc.addComponent(player, new RotationComp());
-
-        wc.addComponent(player, new TexturedMeshComp(TexturedMeshUtils.createRectangle(imagePath, width, height)));
-        wc.addComponent(player, new MeshCenterComp(offsetX, offsetY));
-
-
-        wc.addComponent(player, new AbilityComp(ab1, ab2, ab3));
-
-        if (PROGRAM == CLIENT) {
-            wc.addComponent(player, new InterpolationComp());
-        }
-
-        if (PROGRAM == SERVER || PROGRAM == OFFLINE) {
-            wc.addComponent(player, new CharacterInputComp());
-
-            wc.addComponent(player, new PhysicsComp(80, 5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
-            wc.addComponent(player, new CollisionComp(new Circle(radius)));
-            wc.addComponent(player, new NaturalResolutionComp());
-
-            wc.addComponent(player, new AffectedByHoleComp());
-
-            wc.addComponent(player, new DamageableComp());
-        }
-        if (PROGRAM == OFFLINE) {
-            wc.addComponent(player, new UserCharacterInputComp());
-        }
-
-        return player;
-    }
+   
     private static int createSandbag(WorldContainer wc) {
         if (PROGRAM != OFFLINE) throw new UnsupportedOperationException("Sandbag not implemented for nonoffline use");
 
@@ -462,7 +353,7 @@ public class GameUtils {
 
     private static int createBackground(WorldContainer wc) {
         int bg = wc.createEntity();
-        wc.addComponent(bg, new PositionComp(0, 0));
+        wc.addComponent(bg, new PositionComp(0, 0, -0.5f));
         wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", 1600, 900)));
 
         return bg;
@@ -484,4 +375,41 @@ public class GameUtils {
 
         return w;
     }
+
+    //    private static void addClientCharacter(WorldContainer wc, int characterEntity, boolean controlled) {
+//        wc.addComponent(characterEntity, new InterpolationComp());
+//
+//        if (controlled) {
+//            wc.addComponent(characterEntity, new UserCharacterInputComp());
+//            wc.addComponent(characterEntity, new ViewControlComp(VIEW_WIDTH, VIEW_HEIGHT,  -VIEW_WIDTH/2f, -VIEW_HEIGHT/2f) );
+//        }
+//    }
+//    private static void addServerCharacter(WorldContainer wc, int characterEntity, float radius) {
+//        wc.addComponent(characterEntity, new ViewControlComp(VIEW_WIDTH, VIEW_HEIGHT,  -VIEW_WIDTH/2f, -VIEW_HEIGHT/2f) );
+//
+//        wc.addComponent(characterEntity, new CharacterInputComp());
+//
+//        wc.addComponent(characterEntity, new PhysicsComp(80, 5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
+//        wc.addComponent(characterEntity, new CollisionComp(new Circle(radius)));
+//        wc.addComponent(characterEntity, new NaturalResolutionComp());
+//
+//        wc.addComponent(characterEntity, new AffectedByHoleComp());
+//
+//        wc.addComponent(characterEntity, new DamageableComp());
+//    }
+//
+//    private static void addOfflineCharacter(WorldContainer wc, int characterEntity, float radius) {
+//        wc.addComponent(characterEntity, new CharacterInputComp());
+//
+//        wc.addComponent(characterEntity, new PhysicsComp(80, 5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
+//        wc.addComponent(characterEntity, new CollisionComp(new Circle(radius)));
+//        wc.addComponent(characterEntity, new NaturalResolutionComp());
+//
+//        wc.addComponent(characterEntity, new AffectedByHoleComp());
+//
+//        wc.addComponent(characterEntity, new DamageableComp());
+//
+//        wc.addComponent(characterEntity, new UserCharacterInputComp());
+//
+//    }
 }

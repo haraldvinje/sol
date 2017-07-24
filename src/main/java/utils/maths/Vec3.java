@@ -15,6 +15,11 @@ public class Vec3 {
 		this.y = y;
 		this.z = z;
 	}
+
+	public Vec3(Vec2 v, float z) {
+		this(v.x, v.y, z);
+
+	}
 	
 
 	public Vec3 subtract(Vec3 vec) {

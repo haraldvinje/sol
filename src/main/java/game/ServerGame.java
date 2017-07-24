@@ -2,6 +2,14 @@ package game;
 
 import engine.UserInput;
 import engine.WorldContainer;
+import engine.character.*;
+import engine.combat.DamageResolutionSys;
+import engine.combat.DamageableComp;
+import engine.combat.DamagerComp;
+import engine.graphics.*;
+import engine.graphics.text.Font;
+import engine.graphics.text.FontType;
+
 import engine.character.CharacterComp;
 import engine.network.client.ClientStateUtils;
 import engine.network.server.ServerClientHandler;
@@ -53,12 +61,42 @@ public class ServerGame implements Runnable {
 
         GameUtils.PROGRAM = GameUtils.SERVER;
 
+        wc = new WorldContainer(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
+
 
     }
 
 
     @Override
     public void run() {
+
+        this.window = new Window(0.3f, "Server ingame");
+        this.userInput = new UserInput(window, 1, 1);
+
+        Font.loadFonts(FontType.BROADWAY);
+
+
+        System.out.println("Server game initiated with clients: "+GameUtils.CLIENT_HANDELERS);
+
+        //create entities
+        GameUtils.assignComponentTypes(wc);
+
+        GameUtils.assignSystems(wc, window, userInput);
+
+        GameUtils.createMap(wc);
+
+        ArrayList<Integer> team1Chars = new ArrayList<>();
+        ArrayList<Integer> team2Chars = new ArrayList<>();
+        team1Chars.add(0);
+        team2Chars.add(1);
+        CharacterUtils.createServerCharacters(wc, team1Chars, team2Chars);
+
+
+        //print initial state
+        System.out.println("Initial state:");
+        System.out.println(wc.entitiesToString());
+
+        lastTime = System.nanoTime();
 
 
         float timeSinceUpdate = 0;

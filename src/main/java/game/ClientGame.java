@@ -2,10 +2,18 @@ package game;
 
 import engine.UserInput;
 import engine.WorldContainer;
+import engine.graphics.text.Font;
+import engine.graphics.text.FontType;
+import engine.network.NetworkUtils;
 import engine.network.client.Client;
 import engine.window.Window;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by eirik on 22.06.2017.
@@ -15,6 +23,7 @@ public class ClientGame implements Runnable{
     private static final float FRAME_INTERVAL = 1.0f/60.0f;
 
     public static final float WINDOW_WIDTH = 1600f, WINDOW_HEIGHT = 900f;
+
 
 
     private Window window;
@@ -27,23 +36,34 @@ public class ClientGame implements Runnable{
 
     private WorldContainer wc;
 
-
-
-    private int[] players;
-    private int sandbag;
-    private int hole;
-
     private boolean running = true;
 
+
+
+    private List<Integer> friendlyCharacters, enemyCharacters;
+    private int clientCharacterId;
+    private int team;
+
+
+
+    public ClientGame() {
+    }
     public ClientGame(Socket socket) {
         this.socket = socket;
     }
 
-    public void init() {
 
-        wc = new WorldContainer();
+    public void init(DataInputStream inputStream, DataOutputStream outputStream, List<Integer> team1Characters, List<Integer> team2Characters, int team, int clientCharacterId) {
+
+        this.friendlyCharacters = team1Characters;
+        this.enemyCharacters = team2Characters;
+        this.clientCharacterId = clientCharacterId;
+        this.team = team;
+
+        wc = new WorldContainer(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
         System.out.println("HEELLLLLOOOOO");
+
         //set program state
         GameUtils.PROGRAM = GameUtils.CLIENT;
         GameUtils.socket = socket;
@@ -59,15 +79,32 @@ public class ClientGame implements Runnable{
      */
     @Override
     public void run() {
+
+        System.out.println("Running client");
         window = new Window("Client   SIIII");
-        userInput = new UserInput(window, GameUtils.MAP_WIDTH, GameUtils.MAP_HEIGHT);
+        userInput = new UserInput(window, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
         GameUtils.assignComponentTypes(wc);
+
+        GameUtils.createMap(wc);
+
+        //create characters
+//        ArrayList<Integer> team1Chars = new ArrayList<>();
+//        ArrayList<Integer> team2Chars = new ArrayList<>();
+//        team1Chars.add(0);
+//        team2Chars.add(1);
+        CharacterUtils.createClientCharacters(wc, friendlyCharacters, enemyCharacters, team, clientCharacterId);
+
+
+
+        Font.loadFonts(FontType.BROADWAY);
+
         GameUtils.assignSystems(wc, window, userInput);
 
-        GameUtils.createInitialEntities(wc);
 
-
+        //print initial state
+        System.out.println("Initial state:");
+        System.out.println(wc.entitiesToString());
 
         lastTime = System.nanoTime();
 
