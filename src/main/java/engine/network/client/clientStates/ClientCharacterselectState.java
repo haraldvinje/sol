@@ -3,13 +3,14 @@ package engine.network.client.clientStates;
 import engine.PositionComp;
 import engine.UserInput;
 import engine.WorldContainer;
-import engine.graphics.TexturedMeshComp;
-import engine.graphics.TexturedMeshUtils;
+import engine.graphics.*;
 import engine.network.client.Client;
 import engine.network.client.ClientState;
 import engine.network.client.ClientStateUtils;
 import engine.network.client.ClientStates;
+import utils.maths.Vec2;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 
 /**
@@ -26,7 +27,10 @@ public class ClientCharacterselectState extends ClientState {
     private boolean commited = false;
 
     private int characterSelected = 0;
-    private boolean shrankSelected = false;
+    private int cursor;
+    private float characterSpace;
+    private float iconCenterX;
+    private float iconCenterY;
 
     @Override
     public void init() {
@@ -52,10 +56,11 @@ public class ClientCharacterselectState extends ClientState {
 
             if (userInput.isMousePressed(UserInput.MOUSE_BUTTON_1)) {
                 characterSelected = SHRANK_CHARACTER_ID;
+                setCursorOnShrank();
                 //send "Selected shrank" data to server
             } else if (userInput.isMousePressed(UserInput.MOUSE_BUTTON_2)) {
                 characterSelected = SCHMATHIAS_CHARACTER_ID;
-
+                setCursorOnSchmathias();
                 //send "selected Schmathias" data to server socket
             }
 
