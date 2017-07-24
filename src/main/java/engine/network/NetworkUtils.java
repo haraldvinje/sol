@@ -208,4 +208,36 @@ public class NetworkUtils {
     }
 
 
+
+
+    public static boolean sendClientStateId(int id, DataOutputStream outputStream) {
+
+        try{
+            System.out.println("Sending id: " + id + " to " + outputStream.toString());
+            outputStream.write(id);
+        }
+
+
+        catch (SocketException e) {
+            return false;
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return true;
+
+    }
+
+    public static int streamToCharacterSelected(DataInputStream inputStream) {
+        int characterId = -1;
+        try{
+            characterId = inputStream.readInt();
+        }
+        catch (IOException e){
+            System.out.println("Could not read");
+        }
+        return characterId;
+    }
+
 }

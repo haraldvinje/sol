@@ -69,6 +69,7 @@ public class ServerClientHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return NetworkUtils.gameStateToStream(stateData, outputStream);
     }
     boolean sendAbilityStarted(AbilityStartedData abData) {
@@ -94,6 +95,42 @@ public class ServerClientHandler {
             e.printStackTrace();
         }
         return NetworkUtils.projectileDeadToStream(outputStream, projDeadData);
+    }
+
+
+
+
+    public boolean sendClientStateId(int id){
+        try{
+            System.out.println("Sending id: " + id + " to " + outputStream.toString());
+            outputStream.writeInt(id);
+        }
+
+
+        catch (SocketException e) {
+            return false;
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return true;
+
+    }
+
+
+    public int getCharacterSelectedData(){
+        int characterSelected = -1;
+        try {
+            if (inputStream.available()>=1){
+                characterSelected = inputStream.readInt();
+            }
+
+        }
+        catch (IOException e){
+            System.out.println("IO Exception occured");
+        }
+        return characterSelected;
     }
 
 

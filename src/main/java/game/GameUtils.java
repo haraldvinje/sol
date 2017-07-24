@@ -17,6 +17,8 @@ import engine.network.client.InterpolationSys;
 
 import engine.network.client.*;
 
+import engine.network.client.clientStates.ClientCharacterselectState;
+import engine.network.client.clientStates.ClientIngameState;
 import engine.network.server.ServerClientHandler;
 import engine.network.server.ServerNetworkSys;
 import engine.physics.*;
@@ -150,6 +152,48 @@ public class GameUtils {
     }
 
 
+    public static void createInitialEntities(WorldContainer wc, Integer [] characters) {
+
+        //create players
+        float centerSeparation = 300f;
+        if (PROGRAM == OFFLINE) {
+            //createShrank(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
+            createSchmathias(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
+
+            createSandbag(wc);
+        }
+        else {
+
+            createCharacter(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2, characters[0]);
+            createCharacter(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2, characters[1]);
+
+
+//            createShrank(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
+//            createSchmathias(wc, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
+        }
+
+
+        //create walls
+        float wallThickness = 64f;
+        createWall(wc, wallThickness/2, MAP_HEIGHT/2, wallThickness, MAP_HEIGHT);
+        createWall(wc, MAP_WIDTH-wallThickness/2, MAP_HEIGHT/2, wallThickness, MAP_HEIGHT);
+
+//        createWall(wc, MAP_WIDTH/2, wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
+//        createWall(wc, MAP_WIDTH/2, MAP_HEIGHT-wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
+
+        //create holes
+        createRectangleHoleInvisible(wc, MAP_WIDTH/2, wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
+        createRectangleHoleInvisible(wc, MAP_WIDTH/2, MAP_HEIGHT-wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
+        createCircleHole(wc, MAP_WIDTH/2, MAP_HEIGHT/2, 48f);
+
+
+        //create background
+        createBackground(wc);
+
+
+    }
+
+
 
 
     public static void createMap(WorldContainer wc) {
@@ -193,6 +237,59 @@ public class GameUtils {
         createRectangleHoleInvisible(wc, MAP_WIDTH/2, MAP_HEIGHT-wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
         createCircleHole(wc, MAP_WIDTH/2, MAP_HEIGHT/2, 48f);
 
+
+
+    }
+
+    private static int createCharacter(WorldContainer wc, float x, float y, int characterId){
+        if (characterId == ClientCharacterselectState.SCHMATHIAS_CHARACTER_ID){
+            return createSchmathias(wc, x, y);
+        }
+        else if (characterId == ClientCharacterselectState.SHRANK_CHARACTER_ID){
+            return createShrank(wc, x, y);
+        }
+        throw new IllegalArgumentException("No character with this id exists yet");
+    }
+
+    private static int createShrank(WorldContainer wc, float x, float y) {
+        float[] color1 = {1, 1, 0};
+        float[] color2 = {1, 0, 1};
+        int proj1Entity = allocateSinglecolorProjectileAbility(wc, 8, color1);
+        int proj2Entity = allocateSinglecolorProjectileAbility(wc, 20, color2);
+
+        //rapidshot
+        ProjectileAbility abRapidshot = new ProjectileAbility(wc, proj1Entity, 2, 2, 30, 1200, 30 );
+        abRapidshot.setDamagerValues(wc, 100, 180, 0.5f, -128, false);
+
+        //hyperbeam3
+        ProjectileAbility abHyperbeam = new ProjectileAbility(wc, proj2Entity, 15, 10, 120, 1500, 120);
+        abHyperbeam.setDamagerValues( wc, 350,900, 1.1f, -256, false);
+
+        //puffer
+        MeleeAbility abPuffer = new MeleeAbility(wc, 8, 2, 8, 60*3, new Circle(128f), 0f);
+        abPuffer.setDamagerValues(wc, 20, 900f, 0.1f, 0f, false);
+
+        return createCharacter(wc, x, y, "sol_frank.png", 160f/2f, 512f, 256f, 180, 130, 32, 1800f,
+                abRapidshot, abHyperbeam, abPuffer);
+    }
+
+    private static int createSchmathias(WorldContainer wc, float x, float y) {
+
+        //frogpunch
+        MeleeAbility abFrogpunch = new MeleeAbility(wc, 3, 5, 3, 20, new Circle(64f),48.0f);
+        abFrogpunch.setDamagerValues(wc, 150, 700, 0.8f, -48f, false);
+
+        //hook
+        int hookProjEntity = allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
+        ProjectileAbility abHook = new ProjectileAbility(wc, hookProjEntity, 5, 14, 50, 900, 30);
+        abHook.setDamagerValues(wc, 200f, 1500f, 0.2f, -128, true);
+
+        //meteorpunch
+        MeleeAbility abMeteorpunch = new MeleeAbility(wc, 15, 3, 4, 60, new Circle(32), 64);
+        abMeteorpunch.setDamagerValues(wc, 500, 1000, 1.5f, -128f, false);
+
+        return createCharacter(wc, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
+            abFrogpunch, abHook, abMeteorpunch);
     }
 
    

@@ -8,8 +8,11 @@ import engine.graphics.*;
 import engine.graphics.text.TextMeshComp;
 import engine.graphics.view_.ViewControlComp;
 import engine.network.NetworkUtils;
+import engine.network.client.ClientStateUtils;
+import engine.network.client.ClientStates;
 import engine.window.Window;
 import game.ServerGame;
+import game.ServerInGame;
 
 import java.util.*;
 
@@ -97,8 +100,9 @@ public class Server {
         checkNewConnections(); //adds panding connections
 
         if (clientsWaiting.size() >= 2) {
-            ServerClientHandler c = clientsWaiting.pop();
-            createGame(c, clientsWaiting.pop());
+
+            System.out.println("Two Clients Waiting");
+            createGame(clientsWaiting.pop(), clientsWaiting.pop());
         }
 
         for (ServerGame game : gamesRunning.keySet()) {
@@ -135,10 +139,17 @@ public class Server {
 
         ServerGame game = new ServerGame();
 
+
         ServerClientHandler[] clients = {client1, client2};
         ArrayList<ServerClientHandler> clientList = new ArrayList<>( Arrays.asList(clients) );
 
+
+        client1.sendClientStateId(ClientStateUtils.CHOOSING_CHARACTER);
+        client2.sendClientStateId(ClientStateUtils.CHOOSING_CHARACTER);
+
         game.init(clientList);
+
+
 
         Thread gameThread = new Thread(game);
 

@@ -1,7 +1,5 @@
 package game;
 
-import engine.PositionComp;
-import engine.RotationComp;
 import engine.UserInput;
 import engine.WorldContainer;
 import engine.character.*;
@@ -11,51 +9,53 @@ import engine.combat.DamagerComp;
 import engine.graphics.*;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
+
+import engine.character.CharacterComp;
+import engine.network.client.ClientStateUtils;
 import engine.network.server.ServerClientHandler;
-import engine.network.server.ServerNetworkSys;
-import engine.physics.*;
+import engine.physics.AffectedByHoleComp;
 import engine.window.Window;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
- * Created by eirik on 13.06.2017.
+ * Created by haraldvinje on 06-Jul-17.
  */
-public class ServerGame implements Runnable{
+public class ServerGame implements Runnable {
 
 
-    private static final float FRAME_INTERVAL = 1.0f/60.0f;
+
+    private ServerCharacterSelection characterSelection;
+    private ServerInGame serverInGame;
+
+    private List<ServerClientHandler> clients;
 
 
-    public static final float WINDOW_WIDTH = GameUtils.MAP_WIDTH /4,
-                                WINDOW_HEIGHT = GameUtils.MAP_HEIGHT /4;
+
+    private static final float FRAME_INTERVAL = 30.0f/60.0f;
+
+
 
 
     private boolean shouldTerminate = false;
 
 
-    private Window window;
     private UserInput userInput;
-
-    private WorldContainer wc;
 
 
     private boolean running = true;
 
     private long lastTime;
 
-    private int[] stockLossCount;
+
 
 
     public void init( List<ServerClientHandler> clientHandlers) {
 
-        //window = new Window(WINDOW_WIDTH, WINDOW_HEIGHT, "Server   SIIII");
-        //userInput = new UserInput(window);
+        clients = clientHandlers;
 
-        //add an stockLoss entry for every client
-        stockLossCount = new int[clientHandlers.size()];
+        characterSelection = new ServerCharacterSelection();
 
         GameUtils.CLIENT_HANDELERS = clientHandlers;
 
@@ -63,7 +63,9 @@ public class ServerGame implements Runnable{
 
         wc = new WorldContainer(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
+
     }
+
 
     @Override
     public void run() {
@@ -96,6 +98,7 @@ public class ServerGame implements Runnable{
 
         lastTime = System.nanoTime();
 
+
         float timeSinceUpdate = 0;
 
         while (running) {
@@ -104,16 +107,12 @@ public class ServerGame implements Runnable{
 
             if (timeSinceUpdate >= FRAME_INTERVAL) {
                 timeSinceUpdate -= FRAME_INTERVAL;
-
                 update();
             }
 
-
-            if (window.shouldClosed() || userInput.isKeyboardPressed(UserInput.KEY_ESCAPE))
-                break;
         }
 
-        onTerminate();
+
     }
 
 
@@ -121,24 +120,26 @@ public class ServerGame implements Runnable{
 
     public void update() {
 
-        window.pollEvents();
-
-        wc.updateSystems();
-
-        //check stocks left
-        Integer charNumb = 0;
-        for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class) ) {
-            AffectedByHoleComp affholeComp = (AffectedByHoleComp) wc.getComponent(entity, AffectedByHoleComp.class);
-            if (affholeComp.isHoleAffectedFlag()) {
-                stockLossCount[charNumb]++;
+        for (ServerClientHandler client: clients){
+            int characterSelectedId = client.getCharacterSelectedData();
+            if (characterSelectedId!= -1){
+                characterSelection.addCharacter(client, characterSelectedId);
             }
-
-            if (stockLossCount[charNumb] >= 3) {
-                gameOver(1-charNumb);
-            }
-
-            charNumb++;
         }
+
+
+        if (characterSelection.isReady()){
+            serverInGame = new ServerInGame(characterSelection);
+            serverInGame.init(clients);
+            for (ServerClientHandler client: clients){
+                client.sendClientStateId(ClientStateUtils.INGAME);
+            }
+            serverInGame.start(); //blocking until game ends
+            characterSelection.getCharacterIds().clear();
+        }
+
+
+
 
     }
     private void gameOver(int winner) {
@@ -148,9 +149,6 @@ public class ServerGame implements Runnable{
     }
 
     private void onTerminate() {
-        wc.terminate();
-
-        window.close();
     }
 
     private void setShouldTerminate() {
@@ -183,5 +181,5 @@ public class ServerGame implements Runnable{
         return deltaTimeF/1000000000;
     }
 
-}
 
+}
