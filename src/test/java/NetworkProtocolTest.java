@@ -148,8 +148,8 @@ public class NetworkProtocolTest {
         try {
 
             HitDetectedData data = new HitDetectedData();
-            data.setEntityHit(largeRandomInt());
-            data.setTotalDamageTaken(largeRandom());
+            data.setEntityDamageable(largeRandomInt());
+            data.setDamageTaken(largeRandom());
 
             NetworkUtils.hitDetectedToStream(serverOut, data);
 
