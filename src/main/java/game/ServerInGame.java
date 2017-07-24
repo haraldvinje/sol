@@ -10,6 +10,7 @@ import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
 import engine.graphics.*;
 import engine.network.client.Client;
+import engine.network.client.ClientStateUtils;
 import engine.network.server.ServerClientHandler;
 import engine.network.server.ServerNetworkSys;
 import engine.physics.*;

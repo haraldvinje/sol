@@ -69,31 +69,48 @@ public class ClientCharacterselectState extends ClientState {
 
                 sendCharacterSelected(characterSelected);
                 commited = true;
+                commitCursor();
             }
 
 
 
         }
 
-//        if (serverStartedGame()){
-//            setGotoState(ClientStates.INGAME);
-//        }
+        if (serverStartedGame()){
+            setGotoState(ClientStates.INGAME);
+        }
 
 
 
     }
 
+    private void commitCursor() {
+        ColoredMeshComp colMeshComp = (ColoredMeshComp)wc.getComponent(cursor, ColoredMeshComp.class);
+        float[]green = {0f, 1f, 0f};
+        colMeshComp.setMesh(ColoredMeshUtils.createCircleSinglecolor(20, 16, green));
+    }
+
+    private void setCursorOnShrank() {
+        PositionComp posComp = (PositionComp)wc.getComponent(cursor, PositionComp.class);
+        posComp.setPos(new Vec2(iconCenterX - characterSpace/2 + 30, iconCenterY + 150));
+    }
+
+    private void setCursorOnSchmathias(){
+        PositionComp posComp = (PositionComp)wc.getComponent(cursor, PositionComp.class);
+        posComp.setPos(new Vec2(iconCenterX + characterSpace/2 + 30, iconCenterY + 150));
+    }
+
     private boolean serverStartedGame() {
         try{
-            System.out.println("In try block");
             if (client.getSocketInputStream().available()>=1){
-                System.out.println("Available bytes from inputstream");
                int goToIngame = client.getSocketInputStream().readInt();
-               if (goToIngame!= ClientStateUtils.INGAME){
-                    throw new IOException("Did not recieve ingame state from server. Wrong data recieved");
+               if (goToIngame == ClientStateUtils.INGAME){
+                   return true;
                 }
+                else{
+                   throw new IOException("Did not recieve ingame state from server. Wrong data recieved");
 
-                return true;
+               }
             }
         }
         catch (IOException e){
@@ -109,7 +126,7 @@ public class ClientCharacterselectState extends ClientState {
 
         }
         catch (IOException e){
-            System.out.println("Failed to write select shrank to server");
+            System.out.println("Failed to send characterSelectedData to server");
         }
 
     }
@@ -122,9 +139,9 @@ public class ClientCharacterselectState extends ClientState {
     }
 
     private void createInitialEntities(WorldContainer wc) {
-        float characterSpace = 128;
-        float iconCenterX = Client.WINDOW_WIDTH/2;
-        float iconCenterY = Client.WINDOW_HEIGHT/2;
+        this.characterSpace = 128;
+        this.iconCenterX = Client.WINDOW_WIDTH/2;
+        this.iconCenterY = Client.WINDOW_HEIGHT/2;
 
         int shrankIcon = wc.createEntity();
         wc.addComponent(shrankIcon, new PositionComp(iconCenterX - characterSpace/2, iconCenterY));
@@ -133,5 +150,10 @@ public class ClientCharacterselectState extends ClientState {
         int schmathiasIcon = wc.createEntity();
         wc.addComponent(schmathiasIcon, new PositionComp(iconCenterX + characterSpace/2, iconCenterY));
         wc.addComponent(schmathiasIcon, new TexturedMeshComp(TexturedMeshUtils.createRectangle("Schmathias.png", 100, 100)));
+
+        this.cursor  = wc.createEntity();
+        wc.addComponent(cursor, new PositionComp(iconCenterX - characterSpace/2 + 30, iconCenterY + 150));
+        float[] red = {1f,0f,0f};
+        wc.addComponent(cursor, new ColoredMeshComp(ColoredMeshUtils.createCircleSinglecolor(20, 16, red)));
     }
 }

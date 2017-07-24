@@ -69,7 +69,21 @@ public class ServerClientHandler {
 
 
     public boolean sendClientStateId(int id){
-        return NetworkUtils.sendClientStateId(id, outputStream);
+        try{
+            System.out.println("Sending id: " + id + " to " + outputStream.toString());
+            outputStream.writeInt(id);
+        }
+
+
+        catch (SocketException e) {
+            return false;
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return true;
+
     }
 
 

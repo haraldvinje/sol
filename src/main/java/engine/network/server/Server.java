@@ -98,6 +98,7 @@ public class Server {
         checkNewConnections(); //adds panding connections
 
         if (clientsWaiting.size() >= 2) {
+            System.out.println("Two Clients Waiting");
             createGame(clientsWaiting.pop(), clientsWaiting.pop());
         }
 
