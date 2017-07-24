@@ -5,18 +5,21 @@ import java.util.Arrays;
 /**
  * Created by eirik on 21.06.2017.
  */
-public class GameStateData {
+public class AllCharacterStateData {
 
 
-    public static final int BYTES = Integer.BYTES + Float.BYTES*6 + Integer.BYTES*2 *2;
+    public static final int BYTES = Integer.BYTES + Float.BYTES*3 * NetworkUtils.CHARACTER_NUMB;
 
     private int frameNumber;
 
     private float[] x = new float[NetworkUtils.CHARACTER_NUMB],
                     y = new float[NetworkUtils.CHARACTER_NUMB],
                     rotation = new float[NetworkUtils.CHARACTER_NUMB];
-    private int[] abilityExecuted = new int[NetworkUtils.CHARACTER_NUMB];
-    private int[] abilityTerminated = new int[NetworkUtils.CHARACTER_NUMB];
+
+
+    public AllCharacterStateData() {
+
+    }
 
 
     public int getFrameNumber() {
@@ -50,22 +53,8 @@ public class GameStateData {
         this.rotation[charNumb] = rotation;
     }
 
-    public int getAbilityExecuted(int charNumb) {
-        return abilityExecuted[charNumb];
-    }
-    public void setAbilityExecuted(int charNumb, int ability) {
-        abilityExecuted[charNumb] = ability;
-    }
-
-    public int getAbilityTerminated(int charNumb) {
-        return abilityTerminated[charNumb];
-    }
-    public void setAbilityTerminated(int charNumb, int ability) {
-        this.abilityTerminated[charNumb] = ability;
-    }
-
     @Override
     public String toString() {
-        return "[GameStateData: x="+ Arrays.toString(x)+" y="+Arrays.toString(y)+" rotation="+Arrays.toString(rotation)+"]";
+        return "[AllCharacterStateData: x="+ Arrays.toString(x)+" y="+Arrays.toString(y)+" rotation="+Arrays.toString(rotation)+"]";
     }
 }

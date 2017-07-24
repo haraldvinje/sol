@@ -13,7 +13,6 @@ import java.util.List;
  */
 public class Font {
 
-
     private static EnumMap<FontType, Font> loadedFonts = new EnumMap<FontType, Font>(FontType.class);
 
     public static void loadFonts(FontType... fonts) {

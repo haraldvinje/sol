@@ -27,7 +27,7 @@ public class TextMeshComp implements Component {
         this(textMesh, textMesh.getFont().getFontSize(), 0, 0, new Vec4(1, 1, 1, 1));
     }
     public TextMeshComp() {
-        this(new TextMesh(Font.getFont(FontType.BROADWAY), ""));
+        this(new TextMesh("", Font.getFont(FontType.BROADWAY)) );
     }
 
 

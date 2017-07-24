@@ -152,11 +152,12 @@ public class Window {
         //print version
         System.out.println("OpenGL: " + glGetString(GL_VERSION));
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glEnable(GL_DEPTH_TEST);
         glActiveTexture(GL_TEXTURE0);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);

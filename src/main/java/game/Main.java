@@ -1,10 +1,5 @@
 package game;
 
-import engine.network.CharacterInputData;
-import engine.network.GameStateData;
-
-import engine.network.server.ServerNetworkSys;
-
 public class Main {
 
     public static void main(String[] args) {
@@ -57,7 +52,7 @@ public class Main {
 //
 //            //server send gameState
 //            System.out.println("[main] let server send game state");
-//            GameStateData gs = new GameStateData();
+//            AllCharacterStateData gs = new AllCharacterStateData();
 //            gs.setX1(34);
 //            gs.setY1(456);
 //            gs.setRotation1(0.43f);

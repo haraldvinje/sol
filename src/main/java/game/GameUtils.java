@@ -8,11 +8,20 @@ import engine.combat.DamagerComp;
 import engine.combat.abilities.*;
 import engine.graphics.*;
 
+
+import engine.graphics.text.TextMeshComp;
+import engine.graphics.view_.ViewControlComp;
+import engine.graphics.view_.ViewControlSys;
+import engine.network.client.InterpolationComp;
+import engine.network.client.InterpolationSys;
+
 import engine.network.client.*;
 
 import engine.network.server.ServerClientHandler;
 import engine.network.server.ServerNetworkSys;
 import engine.physics.*;
+import engine.visualEffect.VisualEffectComp;
+import engine.visualEffect.VisualEffectSys;
 import engine.window.Window;
 
 import java.net.Socket;
@@ -66,7 +75,10 @@ public class GameUtils {
         wc.assignComponentType(ProjectileComp.class);
         wc.assignComponentType(InterpolationComp.class);
         wc.assignComponentType(ViewControlComp.class);
-        wc.assignComponentType(ClientControlledComp.class);
+        wc.assignComponentType(ControlledComp.class);
+        wc.assignComponentType(VisualEffectComp.class);
+        wc.assignComponentType(ViewRenderComp.class);
+
 
     }
 
@@ -104,6 +116,10 @@ public class GameUtils {
             wc.addSystem(new ViewControlSys());
 
             wc.addSystem(new ClientNetworkOutSys(socket, userInput));
+            wc.addSystem(new VisualEffectSys());
+
+            wc.addSystem(new OnScreenSys(wc, 2));
+
             wc.addSystem(new RenderSys(window));
         }
 
@@ -124,8 +140,12 @@ public class GameUtils {
             wc.addSystem(new ProjectileSys());
 
             wc.addSystem(new ViewControlSys());
+            wc.addSystem(new VisualEffectSys());
+
+            wc.addSystem(new OnScreenSys(wc, 2));
 
             wc.addSystem(new RenderSys(window));
+
         }
     }
 
@@ -157,6 +177,8 @@ public class GameUtils {
         GameUtils.startPositionsTeam1 = startPositionsTeam1;
         GameUtils.startPositionsTeam2 = startPositionsTeam2;
 
+        //create background
+        createBackground(wc);
 
         //create walls
         float wallThickness = 64f;
@@ -170,11 +192,6 @@ public class GameUtils {
         createRectangleHoleInvisible(wc, MAP_WIDTH/2, wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
         createRectangleHoleInvisible(wc, MAP_WIDTH/2, MAP_HEIGHT-wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
         createCircleHole(wc, MAP_WIDTH/2, MAP_HEIGHT/2, 48f);
-
-
-        //create background
-        createBackground(wc);
-
 
     }
 

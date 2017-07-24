@@ -1,6 +1,8 @@
 package engine.graphics.view_;
 
+import utils.maths.Mat4;
 import utils.maths.Vec2;
+import utils.maths.Vec3;
 
 /**
  * Created by eirik on 06.07.2017.
@@ -9,6 +11,9 @@ public class View {
 
     private float width, height;
     private float x, y;
+
+    private final float znear = -10, zfar = 10;
+
 
 
     public View(float width, float height, float x, float y) {
@@ -19,6 +24,13 @@ public class View {
     }
     public View(float width, float height) {
         this(width, height, 0, 0);
+    }
+
+    public Mat4 getViewTransform() {
+        return Mat4.translate( new Vec3( new Vec2(x, y).negative(), 0f) );
+    }
+    public Mat4 getProjectionTransform( ) {
+        return Mat4.orthographic(0, width, height, 0, znear, zfar);
     }
 
     public float getWidth() {

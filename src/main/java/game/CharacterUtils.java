@@ -10,10 +10,13 @@ import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
 import engine.combat.abilities.*;
 import engine.graphics.*;
+import engine.graphics.text.TextMeshComp;
 import engine.graphics.view_.ViewControlComp;
-import engine.network.client.ClientControlledComp;
+import engine.ControlledComp;
 import engine.network.client.InterpolationComp;
 import engine.physics.*;
+import engine.visualEffect.VisualEffectComp;
+import engine.visualEffect.VisualEffectUtils;
 
 import java.util.List;
 
@@ -23,6 +26,11 @@ import java.util.List;
 public class CharacterUtils {
 
     public static final int SHRANK = 0, SCHMATHIS = 1;
+
+    private static float hitboxDepth = 1;
+
+    private static int characterCount;
+
 
 
     public static void createOfflineCharacters(WorldContainer wc, List<Integer> team1Characters, List<Integer> team2Characters, int team, int clientCharacterId) {
@@ -69,13 +77,19 @@ public class CharacterUtils {
     }
 
 
-    private static void createCharacter(int characterId, WorldContainer wc, boolean controlled, float x, float y) {
+    private static int createCharacter(int characterId, WorldContainer wc, boolean controlled, float x, float y) {
+        int charEnt;
+
         switch(characterId) {
-            case SHRANK: createShrank(wc, controlled, x, y);
+            case SHRANK: charEnt = createShrank(wc, controlled, x, y);
                 break;
-            case SCHMATHIS: createSchmathias(wc, controlled, x, y);
+            case SCHMATHIS: charEnt = createSchmathias(wc, controlled, x, y);
                 break;
+            default:
+                throw new IllegalArgumentException("no character of id given");
         }
+
+        return charEnt;
     }
 
     private static int createShrank(WorldContainer wc, boolean controlled, float x, float y) {
@@ -108,8 +122,8 @@ public class CharacterUtils {
 
         //hook
         int hookProjEntity = ProjectileUtils.allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
-        ProjectileAbility abHook = new ProjectileAbility(wc, hookProjEntity, 5, 14, 50, 900, 30);
-        abHook.setDamagerValues(wc, 200f, 1500f, 0.2f, -128, true);
+        ProjectileAbility abHook = new ProjectileAbility(wc, hookProjEntity, 5, 18, 50, 900, 30);
+        abHook.setDamagerValues(wc, 200f, 1400f, 0.2f, -128, true);
 
         //meteorpunch
         MeleeAbility abMeteorpunch = new MeleeAbility(wc, 15, 3, 4, 60, new Circle(32), 64);
@@ -119,11 +133,30 @@ public class CharacterUtils {
                 abFrogpunch, abHook, abMeteorpunch);
     }
 
+    private static int createShitface(WorldContainer wc, boolean controlled, float x, float y) {
+
+        //frogpunch
+        MeleeAbility abFrogpunch = new MeleeAbility(wc, 3, 5, 3, 20, new Circle(64f),48.0f);
+        abFrogpunch.setDamagerValues(wc, 15, 70, 0.8f, -48f, false);
+
+        //hook
+        int hookProjEntity = ProjectileUtils.allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
+        ProjectileAbility abHook = new ProjectileAbility(wc, hookProjEntity, 5, 18, 50, 900, 30);
+        abHook.setDamagerValues(wc, 20f, 140f, 0.2f, -128, true);
+
+        //meteorpunch
+        MeleeAbility abMeteorpunch = new MeleeAbility(wc, 15, 3, 4, 60, new Circle(32), 64);
+        abMeteorpunch.setDamagerValues(wc, 50, 100, 1.5f, -128f, false);
+
+        return createCharacter(wc, controlled, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
+                abFrogpunch, abHook, abMeteorpunch);
+    }
+
 
     public static int allocateHitboxEntity(WorldContainer wc, Circle shape){
         int e = wc.createEntity();
 
-        wc.addInactiveComponent(e, new PositionComp(0, 0));
+        wc.addInactiveComponent(e, new PositionComp(0, 0, hitboxDepth));
         wc.addInactiveComponent(e, new RotationComp());
 
         //wc.addInactiveComponent(e, new PhysicsComp());
@@ -134,8 +167,9 @@ public class CharacterUtils {
         float[] redColor = {1.0f, 0f,0f};
         wc.addInactiveComponent(e, new ColoredMeshComp(ColoredMeshUtils.createCircleSinglecolor(shape.getRadius(), 16, redColor)) );
 
-            wc.addInactiveComponent(e, new CollisionComp(shape));
+        wc.addInactiveComponent(e, new CollisionComp(shape));
 
+        wc.addComponent(e, new VisualEffectComp(VisualEffectUtils.createOnHitEffect()));
 
         return e;
     }
@@ -152,7 +186,7 @@ public class CharacterUtils {
         float offsetY = offsetYOnImage*scale;
 
         wc.addComponent(characterEntity, new CharacterComp(moveAccel));//1500f));
-        wc.addComponent(characterEntity, new PositionComp(x, y));
+        wc.addComponent(characterEntity, new PositionComp(x, y, (float)(characterCount++)/100f ) ); //z value is a way to make draw ordering and depth positioning correspond. Else alpha images will appear incorrect.
         wc.addComponent(characterEntity, new RotationComp());
 
         wc.addComponent(characterEntity, new TexturedMeshComp(TexturedMeshUtils.createRectangle(imagePath, width, height)));
@@ -176,7 +210,7 @@ public class CharacterUtils {
         if (controlled) {
             wc.addComponent(characterEntity, new UserCharacterInputComp());
             wc.addComponent(characterEntity, new ViewControlComp( -GameUtils.VIEW_WIDTH/2f, -GameUtils.VIEW_HEIGHT/2f) );
-            wc.addComponent(characterEntity, new ClientControlledComp());
+            wc.addComponent(characterEntity, new ControlledComp());
         }
 
 

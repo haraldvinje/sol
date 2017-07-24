@@ -1,14 +1,11 @@
 package engine.network.server;
 
-import engine.network.CharacterInputData;
-import engine.network.GameStateData;
-import engine.network.NetworkUtils;
+import engine.network.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.LinkedList;
 
 /**
@@ -66,10 +63,40 @@ public class ServerClientHandler {
      * @param stateData
      * @return false if socket is disconnected, true otherwise
      */
-    public boolean sendStateData(GameStateData stateData) {
-        //System.out.println("[server] sending state data");
+    public boolean sendCharacterData(AllCharacterStateData stateData) {
+        try {
+            outputStream.writeInt(NetworkUtils.SERVER_CHARACTER_STATE_ID);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return NetworkUtils.gameStateToStream(stateData, outputStream);
     }
+    boolean sendAbilityStarted(AbilityStartedData abData) {
+        try {
+            outputStream.writeInt(NetworkUtils.SERVER_ABILITY_STARTED_ID);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return NetworkUtils.abilityStartedDataToStream(outputStream, abData);
+    }
+    boolean sendHitDetected(HitDetectedData hitData) {
+        try {
+            outputStream.writeInt(NetworkUtils.SERVER_HIT_DETECTED_ID);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return NetworkUtils.hitDetectedToStream(outputStream, hitData);
+    }
+    boolean sendProjectileDead(ProjectileDeadData projDeadData) {
+        try {
+            outputStream.writeInt(NetworkUtils.SERVER_PROJECTILE_DEAD_ID);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return NetworkUtils.projectileDeadToStream(outputStream, projDeadData);
+    }
+
+
 
     public CharacterInputData getInputData() {
         try {

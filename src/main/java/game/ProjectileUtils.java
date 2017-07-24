@@ -10,11 +10,16 @@ import engine.graphics.*;
 import engine.physics.Circle;
 import engine.physics.CollisionComp;
 import engine.physics.PhysicsComp;
+import engine.visualEffect.VisualEffectComp;
+import engine.visualEffect.VisualEffectUtils;
 
 /**
  * Created by eirik on 05.07.2017.
  */
 public class ProjectileUtils {
+
+    private static float projectileDepth = 1.5f;
+
 
     public static int allocateSinglecolorProjectileAbility(WorldContainer wc, float radius, float[] color) {
         int p = allocateNonRenderableProjectileEntity(wc, radius);
@@ -42,7 +47,7 @@ public class ProjectileUtils {
     public static int allocateNonRenderableProjectileEntity(WorldContainer wc, float radius) {
         int b = wc.createEntity();
 
-        wc.addInactiveComponent(b, new PositionComp(0,0));
+        wc.addInactiveComponent(b, new PositionComp(0,0, projectileDepth));
         wc.addInactiveComponent(b, new RotationComp());
 
         wc.addInactiveComponent(b, new PhysicsComp(20, 0.05f, 0.3f));
@@ -51,9 +56,9 @@ public class ProjectileUtils {
 
         wc.addInactiveComponent(b, new DamagerComp()); //because of ability system
 
+        wc.addInactiveComponent(b, new CollisionComp(new Circle(radius)));
 
-            wc.addInactiveComponent(b, new CollisionComp(new Circle(radius)));
-
+        wc.addComponent(b, new VisualEffectComp(VisualEffectUtils.createOnHitEffect()));
 
         return b;
     }

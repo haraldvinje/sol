@@ -12,6 +12,8 @@ import engine.combat.abilities.AbilityComp;
 import engine.combat.abilities.AbilitySys;
 import engine.combat.abilities.MeleeAbility;
 import engine.graphics.*;
+import engine.graphics.text.Font;
+import engine.graphics.text.FontType;
 import engine.physics.*;
 import engine.window.Window;
 import utils.maths.M;
@@ -33,30 +35,22 @@ public class Game {
     private Window window;
     private UserInput userInput;
 
-
     private ColoredMesh vao;
 
     private long lastTime;
 
     private WorldContainer wc;
 
-    //private CollisionDetectionSys cds;
-
-
-    private int player;
-    private int sandbag;
-    private int hole;
-
-
-
 
     public void init() {
-        window = new Window(0.5f, 0.5f,"SIIII");
+        window = new Window(0.8f, 0.8f,"SIIII");
         userInput = new UserInput(window, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
+
+        Font.loadFonts(FontType.BROADWAY);
+
 
         wc = new WorldContainer(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
-        //cds = new CollisionDetectionSys(wc);
 
         System.out.println("HEELLLLLOOOOO");
 

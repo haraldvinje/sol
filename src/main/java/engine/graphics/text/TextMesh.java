@@ -2,6 +2,8 @@ package engine.graphics.text;
 
 import engine.graphics.Texture;
 import engine.graphics.VertexArrayUtils;
+import utils.maths.Vec2;
+import utils.maths.Vec4;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -11,6 +13,10 @@ import java.util.Arrays;
  * Created by eirik on 03.07.2017.
  */
 public class TextMesh {
+
+    private float offsetX, offsetY;
+    private float size;
+    private Vec4 color;
 
     private Font font;
     private String string;
@@ -23,11 +29,24 @@ public class TextMesh {
     private int indicesCount;
 
 
-    public TextMesh(Font font, String string) {
+    public TextMesh(String string, Font font, float size, Vec4 color, float offsetX, float offsetY) {
         this.font = font;
+        this.size = size;
         this.string = string;
+        this.color = color;
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
 
         createVertexData(font, string);
+    }
+    public TextMesh(String string, Font font, float size, Vec4 color) {
+        this(string, font, size, color, 0, 0);
+    }
+    public TextMesh(String string, Font font, float size) {
+        this(string, font, size, new Vec4(0, 0, 0, 1) );
+    }
+    public TextMesh(String string, Font font) {
+        this(string, font, font.getFontSize() );
     }
 
     private void setVertexData(float[] vertices, float[] uvs, byte[] indices) {
@@ -68,6 +87,36 @@ public class TextMesh {
 
     public int getIndicesCount() {
         return indicesCount;
+    }
+
+    public float getOffsetX() {
+        return offsetX;
+    }
+    public void setOffsetX(float offsetX) {
+        this.offsetX = offsetX;
+    }
+    public float getOffsetY() {
+        return offsetY;
+    }
+    public void setOffsetY(float offsetY) {
+        this.offsetY = offsetY;
+    }
+    public Vec2 getOffset() {
+        return new Vec2(getOffsetX(), getOffsetY());
+    }
+
+    public float getSize() {
+        return size;
+    }
+    public void setSize(float size) {
+        this.size = size;
+    }
+
+    public Vec4 getColor() {
+        return color;
+    }
+    public void setColor(Vec4 color) {
+        this.color = color;
     }
 
 

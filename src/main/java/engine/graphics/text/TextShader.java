@@ -15,7 +15,8 @@ public class TextShader extends Shader{
     public static final int UVS_LOCATION = 2;
 
 
-    private final int screenTransformLocation;
+    private final int modelTransformLocation;
+    private final int viewTransformLocation;
     private final int projectionTransformLocation;
 
     private final int textColorLocation;
@@ -28,15 +29,20 @@ public class TextShader extends Shader{
     public TextShader() {
         super(vertexPath, fragPath);
 
-        screenTransformLocation = super.getUniformLocation("screenTransform");
+        modelTransformLocation = super.getUniformLocation("modelTransform");
+        viewTransformLocation = super.getUniformLocation("viewTransform");
         projectionTransformLocation = super.getUniformLocation("projectionTransform");
 
         textColorLocation = super.getUniformLocation("textColor");
     }
 
 
-    public void setScreenTransform(Mat4 transform) {
-        super.setUniformMat4f(screenTransformLocation, transform);
+    public void setModelTransform(Mat4 transform) {
+        super.setUniformMat4f(modelTransformLocation, transform);
+    }
+
+    public void setViewTransform(Mat4 transform) {
+        super.setUniformMat4f(viewTransformLocation, transform);
     }
 
     public void setProjectionTransform(Mat4 transform) {

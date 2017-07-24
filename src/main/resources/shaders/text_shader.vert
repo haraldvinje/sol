@@ -3,7 +3,8 @@
 layout(location=0) in vec3 position;
 layout(location=1) in vec2 uv;
 
-uniform mat4 screenTransform;
+uniform mat4 modelTransform;
+uniform mat4 viewTransform;
 uniform mat4 projectionTransform;
 
 out vec2 Uv;
@@ -11,7 +12,7 @@ out vec2 Uv;
 void main() {
     Uv = uv;
 
-	vec4 screenPosition = vec4(position, 1.0);
+	vec4 pos = vec4(position, 1.0);
 
-    gl_Position = projectionTransform * screenTransform * screenPosition;
+    gl_Position = projectionTransform * viewTransform * modelTransform * pos;
 }
