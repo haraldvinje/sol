@@ -9,6 +9,8 @@ import engine.combat.DamageResolutionSys;
 import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
 import engine.graphics.*;
+import engine.graphics.text.Font;
+import engine.graphics.text.FontType;
 import engine.network.client.Client;
 import engine.network.client.ClientStateUtils;
 import engine.network.server.ServerClientHandler;
@@ -66,8 +68,11 @@ public class ServerInGame {
         //add an stockLoss entry for every client
         stockLossCount = new int[clientHandlers.size()];
 
+        GameUtils.CLIENT_HANDELERS = clientHandlers;
 
-        wc = new WorldContainer();
+        GameUtils.PROGRAM = GameUtils.SERVER;
+
+        wc = new WorldContainer(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
     }
 
@@ -77,23 +82,49 @@ public class ServerInGame {
         this.window = new Window(0.3f, "Server ingame");
         this.userInput = new UserInput(window, 1, 1);
 
+        Font.loadFonts(FontType.BROADWAY);
+
+
         System.out.println("Server game initiated with clients: "+GameUtils.CLIENT_HANDELERS);
-
-
 
         //create entities
         GameUtils.assignComponentTypes(wc);
 
         GameUtils.assignSystems(wc, window, userInput);
 
-        Collection<Integer> chars = charactersSelected.getCharacterIds().values();
+        GameUtils.createMap(wc);
 
-        Integer [] charactersSelected = (Integer[]) chars.toArray(new Integer[0]);
-        GameUtils.createInitialEntities(wc, charactersSelected);
+        ArrayList<Integer> team1Chars = new ArrayList<>();
+        ArrayList<Integer> team2Chars = new ArrayList<>();
 
+
+
+        //TODO: Make generalized method of choosing characters with team mates. ServerCharacterSelection take teams into account
+        int team1Character1 = charactersSelected.getCharacterIds().get(clientHandlers.get(0));
+        int team2Character1 = charactersSelected.getCharacterIds().get(clientHandlers.get(1));
+
+        team1Chars.add(team1Character1);
+        team2Chars.add(team2Character1);
+
+        CharacterUtils.createServerCharacters(wc, team1Chars, team2Chars);
+
+
+        ServerClientHandler client1 = clientHandlers.get(0);
+        ServerClientHandler client2 = clientHandlers.get(1);
+
+        client1.sendInt(0); //team number
+        client1.sendInt(team1Character1); //team 1 char
+        client1.sendInt(team2Character1); //team 2 char
+
+        client2.sendInt(1); //team number
+        client2.sendInt(team1Character1); //team 1 char
+        client2.sendInt(team2Character1); //team 2 char
+
+        //print initial state
 
 
         lastTime = System.nanoTime();
+
 
         float timeSinceUpdate = 0;
 
