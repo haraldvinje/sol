@@ -66,10 +66,10 @@ public class ClientCharacterselectState extends ClientState {
 
             if (userInput.isKeyboardPressed(UserInput.KEY_ENTER)) {
 
-
-                sendCharacterSelected(characterSelected);
                 commited = true;
                 commitCursor();
+                sendCharacterSelected(characterSelected);
+
             }
 
 
