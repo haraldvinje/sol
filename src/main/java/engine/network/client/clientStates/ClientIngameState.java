@@ -8,6 +8,11 @@ import engine.network.client.Client;
 import engine.network.client.ClientState;
 import game.ClientGame;
 
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by eirik on 04.07.2017.
  */
@@ -47,8 +52,25 @@ public class ClientIngameState extends ClientState {
     }
 
     private void createGame() {
+
+        List<Integer> friendlyCharacters = new ArrayList<>();
+        List<Integer> enemyCharacters = new ArrayList<>();
+        int team = 0;
+
+        try {
+             DataInputStream in = new DataInputStream(client.getSocketInputStream());
+
+             team = in.readInt();
+             friendlyCharacters.add( in.readInt() );
+             enemyCharacters.add( in.readInt() );
+        }
+
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
         game = new ClientGame(client.getSocket());
-        game.init(null, null, null, null, 0, 0);
+        game.init(null, null, friendlyCharacters, enemyCharacters, team, 0);
         gameThread = new Thread(game);
 
         gameThread.start();
