@@ -35,7 +35,7 @@ public class ServerInGame {
                                 WINDOW_HEIGHT = GameUtils.MAP_HEIGHT /4;
 
 
-    private boolean shouldTerminate = false;
+    private ServerGame serverGame;
 
     private ServerCharacterSelection charactersSelected;
 
@@ -55,7 +55,8 @@ public class ServerInGame {
 
     private int[] stockLossCount;
 
-    public ServerInGame(ServerCharacterSelection characterSelection) {
+    public ServerInGame(ServerGame serverGame, ServerCharacterSelection characterSelection) {
+        this.serverGame = serverGame;
         this.charactersSelected = characterSelection;
     }
 
@@ -173,8 +174,7 @@ public class ServerInGame {
     }
     private void gameOver(int winner) {
         System.out.println("Player "+ winner + " won!");
-        setShouldTerminate();
-
+        serverGame.setShouldTerminate();
     }
 
     private void onTerminate() {
@@ -183,16 +183,7 @@ public class ServerInGame {
         window.close();
     }
 
-    private void setShouldTerminate() {
-        synchronized (this) {
-            shouldTerminate = true;
-        }
-    }
-    public boolean isShouldTerminate(){
-        synchronized (this) {
-            return shouldTerminate;
-        }
-    }
+
 
     public void terminate() {
         running = false;

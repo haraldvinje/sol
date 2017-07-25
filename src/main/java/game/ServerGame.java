@@ -74,6 +74,7 @@ public class ServerGame implements Runnable {
 
         }
 
+        onTerminate();
 
     }
 
@@ -91,7 +92,7 @@ public class ServerGame implements Runnable {
 
 
         if (characterSelection.isReady()){
-            serverInGame = new ServerInGame(characterSelection);
+            serverInGame = new ServerInGame(this, characterSelection);
             serverInGame.init(clients);
             for (ServerClientHandler client: clients){
                 client.sendClientStateId(ClientStateUtils.INGAME);
@@ -113,7 +114,7 @@ public class ServerGame implements Runnable {
     private void onTerminate() {
     }
 
-    private void setShouldTerminate() {
+    void setShouldTerminate() {
         synchronized (this) {
             shouldTerminate = true;
         }
@@ -125,6 +126,7 @@ public class ServerGame implements Runnable {
     }
 
     public void terminate() {
+        serverInGame.terminate();
         running = false;
     }
 
