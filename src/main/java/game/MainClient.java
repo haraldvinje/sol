@@ -21,35 +21,35 @@ public class MainClient {
             return;
         }
 
-        Socket socket = null;
-        try {
-            socket = new Socket(args[0], NetworkUtils.PORT_NUMBER);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new IllegalStateException("Could not connect to server");
-        }
+//        Socket socket = null;
+//        try {
+//            socket = new Socket(args[0], NetworkUtils.PORT_NUMBER);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            throw new IllegalStateException("Could not connect to server");
+//        }
+//
+//        List<Integer> friendlyCharacters = new ArrayList<>();
+//        List<Integer> enemyCharacters = new ArrayList<>();
+//        int team = 0;
+//
+//        try {
+//            DataInputStream in = new DataInputStream(socket.getInputStream());
+//
+//            team = in.readInt();
+//            friendlyCharacters.add( in.readInt() );
+//            enemyCharacters.add( in.readInt() );
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        ClientGame cg = new ClientGame(socket);
+//        cg.init(null, null, friendlyCharacters, enemyCharacters, team, 0);
+//        cg.run();
 
-        List<Integer> friendlyCharacters = new ArrayList<>();
-        List<Integer> enemyCharacters = new ArrayList<>();
-        int team = 0;
-
-        try {
-            DataInputStream in = new DataInputStream(socket.getInputStream());
-
-            team = in.readInt();
-            friendlyCharacters.add( in.readInt() );
-            enemyCharacters.add( in.readInt() );
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        ClientGame cg = new ClientGame(socket);
-        cg.init(null, null, friendlyCharacters, enemyCharacters, team, 0);
-        cg.run();
-
-//        Client client = new Client(args[0]);
-//        client.init();
-//        client.start();
+        Client client = new Client(args[0]);
+        client.init();
+        client.start();
     }
 }
