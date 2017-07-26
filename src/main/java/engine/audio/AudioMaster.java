@@ -23,6 +23,31 @@ import static org.lwjgl.system.MemoryUtil.*;
 //Initialization
 public class AudioMaster{
 
+//    public AudioMaster(){
+//        init();
+//    }
+
+    private void init() {
+        String defaultDeviceName = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER);
+
+        long device = alcOpenDevice(defaultDeviceName);
+
+        int[] attributes = {0};
+        long alContext = alcCreateContext(device, attributes);
+        alcMakeContextCurrent(alContext);
+
+        checkALCError(device);
+
+        ALCCapabilities deviceCaps = ALC.createCapabilities(device);
+
+//        alcSetThreadContext(alContext);
+        ALCapabilities contextCaps = AL.createCapabilities(deviceCaps);
+
+        printALCInfo(device, deviceCaps);
+        printALInfo();
+
+    }
+
 
     public static void main(String[]arg) {
         String defaultDeviceName = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER);
@@ -97,7 +122,7 @@ public class AudioMaster{
 
 
         try (STBVorbisInfo info = STBVorbisInfo.malloc()) {
-            ShortBuffer pcm = AudioUtils.readVorbis("audio/si.ogg", 32 * 1024, info);
+            ShortBuffer pcm = AudioUtils.readVorbis(filename, 32 * 1024, info);
 
             //Find the correct OpenAL format
             int format = -1;
@@ -118,15 +143,20 @@ public class AudioMaster{
 
 
 
+        alSourcef(sourcePointer, AL_ROLLOFF_FACTOR, 10);
+        alSourcef(sourcePointer, AL_REFERENCE_DISTANCE, 100);
+        alSourcef(sourcePointer, AL_MAX_DISTANCE, 200);
+
 
         //Assign the sound we just loaded to the source
         alSourcei(sourcePointer, AL_BUFFER, bufferPointer);
         checkALError();
 
         alSourcei(sourcePointer, AL_LOOPING, AL_TRUE);
-        alSource3f(sourcePointer, AL_POSITION, 100000, 0f, 0f);
 
-        alListener3f(AL_POSITION, 50, 0f, 0f);
+        alSource3f(sourcePointer, AL_POSITION, 0, 0f, 0f);
+
+        alListener3f(AL_POSITION, 0, 0, 0);
 
         //Play the sound
         alSourcePlay(sourcePointer);
@@ -134,11 +164,27 @@ public class AudioMaster{
 
 
         int i = 0;
-        while(i < 10*5) {
-
-            alListener3f(AL_POSITION, i*1000000, 0, 0);
+        int pos = 0;
+        while(i < 10*30) {
+            alSource3f(sourcePointer, AL_POSITION, pos++, 0, 0);
 
             System.out.println("iteration: "+i);
+            System.out.println("position: " + pos);
+            try {
+                //Wait for a second
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+            ++i;
+        }
+        i=0;
+        while(i < 10*60) {
+
+            alSource3f(sourcePointer, AL_POSITION, pos--, 0, 0);
+
+            System.out.println("iteration: "+i);
+            System.out.println("position: " + pos);
 
             try {
                 //Wait for a second
@@ -149,6 +195,14 @@ public class AudioMaster{
             ++i;
         }
 
+
+
+//        try {
+//            Thread.sleep(2000);
+//        }
+//        catch (InterruptedException e){
+//            e.printStackTrace();
+//        }
         //terminate audio data
         alDeleteSources(sourcePointer);
         alDeleteBuffers(bufferPointer);

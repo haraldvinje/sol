@@ -8,6 +8,10 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
+import static engine.audio.AudioMaster.checkALError;
+import static org.lwjgl.openal.AL10.AL_FORMAT_MONO16;
+import static org.lwjgl.openal.AL10.AL_FORMAT_STEREO16;
+import static org.lwjgl.openal.AL10.alBufferData;
 import static org.lwjgl.stb.STBVorbis.*;
 import static org.lwjgl.stb.STBVorbis.stb_vorbis_close;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -48,6 +52,26 @@ public class AudioUtils {
         stb_vorbis_close(decoder);
 
         return pcm;
+    }
+
+
+
+    public static void initSound(String filename, int bufferPointer){
+        try (STBVorbisInfo info = STBVorbisInfo.malloc()) {
+            ShortBuffer pcm = AudioUtils.readVorbis(filename, 32 * 1024, info);
+
+            //Find the correct OpenAL format
+            int format = -1;
+            if (info.channels() == 1) {
+                format = AL_FORMAT_MONO16;
+            } else if (info.channels() == 2) {
+                format = AL_FORMAT_STEREO16;
+            }
+
+            //copy to buffer
+            alBufferData(bufferPointer, format, pcm, info.sample_rate());
+            checkALError();
+        }
     }
 
 }
