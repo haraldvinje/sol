@@ -18,7 +18,7 @@ public class ClientUtils {
      * @return
      */
     public static WorldContainer createDefaultWorldContainer(Window window) {
-        WorldContainer wc = new WorldContainer();
+        WorldContainer wc = new WorldContainer(Client.CLIENT_WIDTH, Client.CLIENT_HEIGHT);
 
         //assign components
         wc.assignComponentType(PositionComp.class);

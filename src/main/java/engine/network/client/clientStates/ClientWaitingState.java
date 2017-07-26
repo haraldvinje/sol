@@ -77,11 +77,11 @@ public class ClientWaitingState extends ClientState {
 
 
     private void createInitialEntities(WorldContainer wc) {
-        float width = Client.WINDOW_WIDTH/2;
-        float height = Client.WINDOW_HEIGHT/6;
+        float width = Client.CLIENT_WIDTH/2;
+        float height = Client.CLIENT_HEIGHT/6;
 
         int rect = wc.createEntity();
-        wc.addComponent(rect, new PositionComp(Client.WINDOW_WIDTH/2f, Client.WINDOW_HEIGHT/2f));
+        wc.addComponent(rect, new PositionComp(Client.CLIENT_WIDTH/2f, Client.CLIENT_HEIGHT/2f));
         wc.addComponent(rect, new ColoredMeshComp(ColoredMeshUtils.createRectangle(width, height) ));
         wc.addComponent(rect, new MeshCenterComp(width/2f, height/2f));
     }

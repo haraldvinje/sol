@@ -140,8 +140,8 @@ public class ClientCharacterselectState extends ClientState {
 
     private void createInitialEntities(WorldContainer wc) {
         this.characterSpace = 128;
-        this.iconCenterX = Client.WINDOW_WIDTH/2;
-        this.iconCenterY = Client.WINDOW_HEIGHT/2;
+        this.iconCenterX = Client.CLIENT_WIDTH/2;
+        this.iconCenterY = Client.CLIENT_HEIGHT/2;
 
         int shrankIcon = wc.createEntity();
         wc.addComponent(shrankIcon, new PositionComp(iconCenterX - characterSpace/2, iconCenterY));

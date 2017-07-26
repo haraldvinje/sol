@@ -43,6 +43,7 @@ public class WorldContainer {
     /**
      * init a Container with no view_. Render systems then uses the default view_ wich is equal to screen size
      */
+    @Deprecated
     public WorldContainer() {
         view = new View(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
     }

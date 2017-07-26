@@ -1,6 +1,8 @@
 package engine.network.client;
 
 import engine.*;
+import engine.graphics.text.Font;
+import engine.graphics.text.FontType;
 import engine.network.client.clientStates.*;
 import engine.window.Window;
 
@@ -19,7 +21,7 @@ import java.util.Map;
 public class Client {
 
     public static final float WINDOW_WIDTH_SCALE = 0.7f, WINDOW_HEIGHT_SCALE = 0.7f;
-    public static float WINDOW_WIDTH, WINDOW_HEIGHT;
+    public static final float CLIENT_WIDTH = 1600f, CLIENT_HEIGHT = 900f;
 
     public static final float FRAME_INTERVAL = 1f/60f;
 
@@ -80,20 +82,23 @@ public class Client {
 
     public void init() {
         window = new Window(WINDOW_WIDTH_SCALE, WINDOW_HEIGHT_SCALE, "SOL client");
-        WINDOW_WIDTH = window.getWidth();
-        WINDOW_HEIGHT = window.getHeight();
 
-        userInput = new UserInput(window, window.getWidth(), window.getHeight());
+        userInput = new UserInput(window, CLIENT_WIDTH, CLIENT_HEIGHT);
 
-        ClientIdleState clientIdleState = new ClientIdleState();
+        Font.loadFonts(FontType.BROADWAY);
+
+
+        ClientIntroState clientIntroState = new ClientIntroState();
         ClientConnectingState clientConnectingState = new ClientConnectingState(hostname);
+        ClientIdleState clientIdleState = new ClientIdleState();
         ClientWaitingState clientWaitingState = new ClientWaitingState();
         ClientCharacterselectState clientCharacterselectState = new ClientCharacterselectState();
         ClientIngameState clientIngameState = new ClientIngameState();
 
         //assign states
-        states.put(ClientStates.IDLE, clientIdleState);
+        states.put(ClientStates.INTRO, clientIntroState);
         states.put(ClientStates.CONNECTING, clientConnectingState);
+        states.put(ClientStates.IDLE, clientIdleState);
         states.put(ClientStates.WAITING_GAME,clientWaitingState);
         states.put(ClientStates.CHOOSING_CHARACTER, clientCharacterselectState);
         states.put(ClientStates.INGAME, clientIngameState );
@@ -104,7 +109,7 @@ public class Client {
         statesById.put(ClientStateUtils.CHOOSING_CHARACTER, clientCharacterselectState);
         statesById.put(ClientStateUtils.INGAME, clientIngameState);
 
-        gotoState(ClientStates.IDLE);
+        gotoState(ClientStates.INTRO);
     }
 
     public void start() {
