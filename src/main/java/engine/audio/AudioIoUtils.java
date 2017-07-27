@@ -24,6 +24,7 @@ public class AudioIoUtils {
 
     public static ByteBuffer ioResourceToByteBuffer(String resource, int bufferSize) throws IOException {
         ByteBuffer buffer;
+        System.out.println(resource);
 
 
         try (

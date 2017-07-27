@@ -21,7 +21,12 @@ public class AudioComp implements Component {
     public int requestSound = -1;
 
     public AudioComp(Sound s){
+        this(s, 20,0,300);
+    }
+
+    public AudioComp(Sound s, int rollOffFactor, int referenceDistance, int maxDistance){
         soundList.add(s);
+        this.sourcePointer = alGenSources();
     }
 
 
@@ -32,6 +37,7 @@ public class AudioComp implements Component {
     }
 
     public void playSound(int i){
+        System.out.println("Playing sound with index: " + i);
         soundList.get(i).playSource(sourcePointer);
     }
 

@@ -3,6 +3,7 @@ package engine.audio;
 
 import java.nio.ShortBuffer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -27,13 +28,21 @@ public class AudioMaster{
 //        init();
 //    }
 
-    private void init() {
+    public static List<Integer> bufferPointers = new ArrayList<Integer>();
+    public static List<Integer> sourcePointers = new ArrayList<Integer>();
+
+
+    public static long device;
+    public static long alContext;
+
+
+    public static void init() {
         String defaultDeviceName = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER);
 
-        long device = alcOpenDevice(defaultDeviceName);
+        device = alcOpenDevice(defaultDeviceName);
 
         int[] attributes = {0};
-        long alContext = alcCreateContext(device, attributes);
+        alContext = alcCreateContext(device, attributes);
         alcMakeContextCurrent(alContext);
 
         checkALCError(device);
@@ -42,6 +51,7 @@ public class AudioMaster{
 
 //        alcSetThreadContext(alContext);
         ALCapabilities contextCaps = AL.createCapabilities(deviceCaps);
+
 
         printALCInfo(device, deviceCaps);
         printALInfo();
@@ -337,4 +347,19 @@ public class AudioMaster{
             throw new RuntimeException(alGetString(err));
         }
     }
+
+    public static void terminate() {
+        for (Integer sp : sourcePointers) {
+            alDeleteSources(sp);
+        }
+
+        for (Integer bp : bufferPointers) {
+            alDeleteBuffers(bp);
+        }
+
+        alcDestroyContext(alContext);
+        alcCloseDevice(device);
+
+    }
+
 }
