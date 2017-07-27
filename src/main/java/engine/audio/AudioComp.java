@@ -21,12 +21,15 @@ public class AudioComp implements Component {
     public int requestSound = -1;
 
     public AudioComp(Sound s){
-        this(s, 20,0,300);
+        this(s, 20,50,300);
     }
 
     public AudioComp(Sound s, int rollOffFactor, int referenceDistance, int maxDistance){
         soundList.add(s);
         this.sourcePointer = alGenSources();
+        setRollOffFactor(rollOffFactor);
+        setReferenceDistance(referenceDistance);
+        setMaxDistance(maxDistance);
     }
 
 
