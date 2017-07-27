@@ -72,7 +72,7 @@ task runServerClient(dependsOn: ['runClient', 'runServer'])
 runClient.mustRunAfter runServer
 
 run {
-    mainClassName = 'engine.audio.AudioMaster'
+    mainClassName = 'engine.audio.AudioTest'
 
     systemProperty 'java.library.path', project.nativeLibsDir
 }
