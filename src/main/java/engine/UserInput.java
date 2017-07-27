@@ -46,6 +46,9 @@ public class UserInput {
         //if (!initialized) throw new IllegalStateException("Have to init engine before enabling user input");
 
         window.setMouseButtonCallback( (w, button, action, mods) -> {
+            if (button < 0 || button >= mouseButtonPressed.length) return;
+
+
             if (action == GLFW_RELEASE) {
                 mouseButtonPressed[button] = false;
             }
@@ -60,6 +63,7 @@ public class UserInput {
         });
 
         window.setKeyCallback( (w, key, scancode, action, mods) -> {
+            if (key < 0 || key >= keyPressed.length) return;
 
             if (action == GLFW_RELEASE){
                 keyPressed[key] = false;
