@@ -56,7 +56,7 @@ public class AudioUtils {
 
 
 
-    public static void initSound(String filename, int bufferPointer){
+    public static void initSoundBuffer(String filename, int bufferPointer){
         try (STBVorbisInfo info = STBVorbisInfo.malloc()) {
             ShortBuffer pcm = AudioUtils.readVorbis(filename, 32 * 1024, info);
 
@@ -74,4 +74,6 @@ public class AudioUtils {
         }
     }
 
+    public static void terminate() {
+    }
 }

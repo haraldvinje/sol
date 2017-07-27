@@ -4,6 +4,7 @@ import engine.PositionComp;
 import engine.RotationComp;
 import engine.Sys;
 import engine.WorldContainer;
+import engine.audio.AudioComp;
 import engine.combat.DamageableComp;
 import engine.physics.PhysicsComp;
 import javafx.geometry.Pos;
@@ -89,6 +90,8 @@ public class AbilitySys implements Sys {
                 if (ability.isRequestingExecution()) {
 
                     startExecution(abComp, ability);
+                    AudioComp ac = (AudioComp)wc.getComponent(entity, AudioComp.class);
+                    ac.requestSound = 0;
                 }
             }
 
