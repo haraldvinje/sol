@@ -28,8 +28,10 @@ public class AudioSys implements Sys {
             AudioComp ac = (AudioComp) wc.getComponent(entity, AudioComp.class);
             PositionComp posComp = (PositionComp) wc.getComponent(entity, PositionComp.class);
 
+            ac.setPosition(posComp.getPos3());
+
+
             if (ac.requestSound!=-1){
-                ac.setPosition(posComp.getPos3());
                 ac.playSound(ac.requestSound);
             }
 
