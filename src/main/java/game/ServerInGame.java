@@ -4,6 +4,7 @@ import engine.PositionComp;
 import engine.RotationComp;
 import engine.UserInput;
 import engine.WorldContainer;
+import engine.audio.AudioMaster;
 import engine.character.*;
 import engine.combat.DamageResolutionSys;
 import engine.combat.DamageableComp;
@@ -93,6 +94,8 @@ public class ServerInGame {
         GameUtils.assignSystems(wc, window, userInput);
 
         GameUtils.createMap(wc);
+
+        AudioMaster.init();
 
         ArrayList<Integer> team1Chars = new ArrayList<>();
         ArrayList<Integer> team2Chars = new ArrayList<>();

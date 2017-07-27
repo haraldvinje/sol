@@ -2,6 +2,7 @@ package game;
 
 import engine.UserInput;
 import engine.WorldContainer;
+import engine.audio.AudioMaster;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
 import engine.network.NetworkUtils;
@@ -83,6 +84,8 @@ public class ClientGame implements Runnable{
         System.out.println("Running client");
         window = new Window("Client   SIIII");
         userInput = new UserInput(window, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
+
+        AudioMaster.init();
 
         GameUtils.assignComponentTypes(wc);
 

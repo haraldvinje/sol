@@ -1,6 +1,9 @@
 package game;
 
 import engine.*;
+import engine.audio.AudioComp;
+import engine.audio.AudioSys;
+import engine.audio.SoundListenerComp;
 import engine.character.*;
 import engine.combat.DamageResolutionSys;
 import engine.combat.DamageableComp;
@@ -78,6 +81,9 @@ public class GameUtils {
         wc.assignComponentType(ControlledComp.class);
         wc.assignComponentType(VisualEffectComp.class);
         wc.assignComponentType(ViewRenderComp.class);
+        wc.assignComponentType(AudioComp.class);
+        wc.assignComponentType(SoundListenerComp.class);
+
 
 
     }
@@ -117,6 +123,8 @@ public class GameUtils {
 
             wc.addSystem(new ClientNetworkOutSys(socket, userInput));
             wc.addSystem(new VisualEffectSys());
+            wc.addSystem(new AudioSys());
+
 
             wc.addSystem(new OnScreenSys(wc, 2));
 
@@ -141,10 +149,13 @@ public class GameUtils {
 
             wc.addSystem(new ViewControlSys());
             wc.addSystem(new VisualEffectSys());
+            wc.addSystem(new AudioSys());
+
 
             wc.addSystem(new OnScreenSys(wc, 2));
 
             wc.addSystem(new RenderSys(window));
+
 
         }
     }

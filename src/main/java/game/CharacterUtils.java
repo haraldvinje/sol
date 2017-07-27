@@ -113,8 +113,11 @@ public class CharacterUtils {
         MeleeAbility abPuffer = new MeleeAbility(wc, 8, 2, 8, 60*3, new Circle(128f), 0f);
         abPuffer.setDamagerValues(wc, 20, 900f, 0.1f, 0f, false);
 
+        Sound ronaldoSuh = new Sound("audio/si.ogg");
+
+
         return createCharacter(wc, controlled, x, y, "sol_frank.png", 160f/2f, 512, 256, 180, 130, 32, 1800f,
-                abRapidshot, abHyperbeam, abPuffer);
+                abRapidshot, abHyperbeam, abPuffer, ronaldoSuh);
     }
 
     private static int createSchmathias(WorldContainer wc, boolean controlled, float x, float y) {
@@ -132,8 +135,11 @@ public class CharacterUtils {
         MeleeAbility abMeteorpunch = new MeleeAbility(wc, 15, 3, 4, 60, new Circle(32), 64);
         abMeteorpunch.setDamagerValues(wc, 500, 1000, 1.5f, -128f, false);
 
+        Sound ronaldoSuh = new Sound("audio/si.ogg");
+
+
         return createCharacter(wc, controlled, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
-                abFrogpunch, abHook, abMeteorpunch);
+                abFrogpunch, abHook, abMeteorpunch, ronaldoSuh);
     }
 
     private static int createShitface(WorldContainer wc, boolean controlled, float x, float y) {
@@ -151,8 +157,11 @@ public class CharacterUtils {
         MeleeAbility abMeteorpunch = new MeleeAbility(wc, 15, 3, 4, 60, new Circle(32), 64);
         abMeteorpunch.setDamagerValues(wc, 50, 100, 1.5f, -128f, false);
 
+        Sound ronaldoSuh = new Sound("audio/si.ogg");
+
+
         return createCharacter(wc, controlled, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
-                abFrogpunch, abHook, abMeteorpunch);
+                abFrogpunch, abHook, abMeteorpunch, ronaldoSuh);
     }
 
 
@@ -179,7 +188,7 @@ public class CharacterUtils {
 
 
 
-    private static int createCharacter(WorldContainer wc, boolean controlled, float x, float y, String imagePath, float radiusOnImage, float imageWidth, float imageHeight, float offsetXOnImage, float offsetYOnImage, float radius, float moveAccel, Ability ab1, Ability ab2, Ability ab3) {
+    private static int createCharacter(WorldContainer wc, boolean controlled, float x, float y, String imagePath, float radiusOnImage, float imageWidth, float imageHeight, float offsetXOnImage, float offsetYOnImage, float radius, float moveAccel, Ability ab1, Ability ab2, Ability ab3, Sound sound1) {
         int characterEntity = wc.createEntity();
 
         float scale = radius/radiusOnImage;
@@ -210,10 +219,14 @@ public class CharacterUtils {
         //client
         wc.addComponent(characterEntity, new InterpolationComp());
 
+        wc.addComponent(characterEntity, new AudioComp(sound1, 10, 100, 200));
+
         if (controlled) {
             wc.addComponent(characterEntity, new UserCharacterInputComp());
             wc.addComponent(characterEntity, new ViewControlComp( -GameUtils.VIEW_WIDTH/2f, -GameUtils.VIEW_HEIGHT/2f) );
             wc.addComponent(characterEntity, new ControlledComp());
+            wc.addComponent(characterEntity, new SoundListenerComp());
+
         }
 
 
