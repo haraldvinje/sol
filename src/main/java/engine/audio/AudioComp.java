@@ -20,6 +20,7 @@ public class AudioComp implements Component {
 
     public int requestSound = -1;
 
+
     public AudioComp(Sound s){
         this(s, 20,50,300);
     }
@@ -40,8 +41,13 @@ public class AudioComp implements Component {
     }
 
     public void playSound(int i){
-        System.out.println("Playing sound with index: " + i);
-        soundList.get(i).playSource(sourcePointer);
+        playSource(soundList.get(i));
+    }
+
+    private void playSource(Sound sound){
+        alSourcei(sourcePointer, AL_BUFFER, sound.getBufferPointer());
+//        alSourcei(sourcePointer, AL_LOOPING, AL_TRUE);
+        alSourcePlay(sourcePointer);
     }
 
 
@@ -50,27 +56,9 @@ public class AudioComp implements Component {
         soundList.add(sound);
     }
 
-    public void addSound(String filename){
-        addSound(new Sound(filename));
-    }
-
-    public void setPosition(Vec2 vec2){
-        alSource3f(sourcePointer, AL_POSITION, vec2.x, vec2.y, 0);
-    }
-
-    public void setPosition(int x, int y){
-        alSource3f(sourcePointer, AL_POSITION, x, y, 0);
-    }
-
     public void setPosition(Vec3 vec3){
         alSource3f(sourcePointer, AL_POSITION, vec3.x, vec3.y, vec3.z);
     }
-
-    public void setPosition(int x, int y, int z){
-        alSource3f(sourcePointer, AL_POSITION, x, y, z);
-    }
-
-
 
     public void setRollOffFactor(int value){
         alSourcef(sourcePointer, AL_ROLLOFF_FACTOR, value);
@@ -83,5 +71,27 @@ public class AudioComp implements Component {
     public void setMaxDistance(int value){
         alSourcef(sourcePointer, AL_MAX_DISTANCE, value);
     }
+
+
+//    public void addSound(String filename){
+//        addSound(new Sound(filename));
+//    }
+//
+//    public void setPosition(Vec2 vec2){
+//        alSource3f(sourcePointer, AL_POSITION, vec2.x, vec2.y, 0);
+//    }
+//
+//    public void setPosition(int x, int y){
+//        alSource3f(sourcePointer, AL_POSITION, x, y, 0);
+//    }
+//
+//
+//
+//    public void setPosition(int x, int y, int z){
+//        alSource3f(sourcePointer, AL_POSITION, x, y, z);
+//    }
+//
+
+
 
 }

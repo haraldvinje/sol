@@ -17,9 +17,8 @@ public class Sound {
 
 
     public Sound(String fileName){
-        this.bufferPointer = alGenBuffers();
         this.fileName = fileName;
-        AudioUtils.initSoundBuffer(fileName, bufferPointer);
+        this.bufferPointer = AudioUtils.initSoundBuffer(fileName);
     }
 
     public int getBufferPointer(){
@@ -28,11 +27,6 @@ public class Sound {
 
 
 
-    public void playSource(int sourcePointer){
-        alSourcei(sourcePointer, AL_BUFFER, bufferPointer);
-//        alSourcei(sourcePointer, AL_LOOPING, AL_TRUE);
-        alSourcePlay(sourcePointer);
-    }
 
     public String toSting(){
         return fileName;

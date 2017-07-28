@@ -3,6 +3,7 @@ package engine.combat.abilities;
 import engine.PositionComp;
 import engine.RotationComp;
 import engine.WorldContainer;
+import engine.audio.AudioComp;
 import engine.combat.DamagerComp;
 import engine.physics.*;
 import engine.visualEffect.VisualEffectComp;
@@ -22,9 +23,10 @@ public class MeleeAbility extends Ability{
     private float relativeAngle;
 
 
-    public MeleeAbility(WorldContainer wc, int startupTime, int activeHitboxTime, int endlagTime, int rechargeTime,
+
+    public MeleeAbility(WorldContainer wc, int startEffectSoundIndex, int startupTime, int activeHitboxTime, int endlagTime, int rechargeTime,
                         Shape hitboxShape, float distance){
-        super(wc, startupTime, activeHitboxTime, endlagTime, rechargeTime);
+        super(wc, startEffectSoundIndex, startupTime, activeHitboxTime, endlagTime, rechargeTime);
 
         this.relativeDistance = distance;
         this.relativeAngle = 0;
@@ -36,7 +38,6 @@ public class MeleeAbility extends Ability{
         if (hitboxShape instanceof Rectangle){
             throw new UnsupportedOperationException("Cannot have rectangle hitboxes as of now");
         }
-
 
     }
 //    public MeleeAbility(WorldContainer wc){
@@ -67,9 +68,13 @@ public class MeleeAbility extends Ability{
 
         PositionComp reqPosComp = (PositionComp)wc.getComponent(requestingEntity, PositionComp.class);
         RotationComp reqRotComp = (RotationComp)wc.getComponent(requestingEntity, RotationComp.class);
+        AudioComp reqAudioComp = (AudioComp)wc.getComponent(requestingEntity, AudioComp.class);
 
         RotationComp hbRotComp = (RotationComp)wc.getComponent(hitboxEntity, RotationComp.class);
         HitboxComp hbHitbComp = (HitboxComp) wc.getComponent(hitboxEntity, HitboxComp.class);
+
+
+
 
         //set hitbox comp state
         hbHitbComp.reset();
@@ -81,6 +86,7 @@ public class MeleeAbility extends Ability{
 
         //set relative positiom
         positionHitbox(wc, requestingEntity);
+
     }
 
     @Override

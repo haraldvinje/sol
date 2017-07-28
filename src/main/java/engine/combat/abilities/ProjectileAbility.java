@@ -26,9 +26,9 @@ public class ProjectileAbility extends Ability {
 
 
 
-    public ProjectileAbility(WorldContainer wc, int projectileEntity, int startupTime, int endlagTime, int rechargeTime,
+    public ProjectileAbility(WorldContainer wc, int startEffectSoundIndex, int projectileEntity, int startupTime, int endlagTime, int rechargeTime,
                              float projStartSpeed, int projLifeTime) {
-        super(wc, startupTime, 0, endlagTime, rechargeTime);
+        super(wc, startEffectSoundIndex, startupTime, 0, endlagTime, rechargeTime);
 
         this.projEntity = projectileEntity;
 

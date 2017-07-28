@@ -3,6 +3,7 @@ package game;
 
 import engine.*;
 
+import engine.audio.AudioMaster;
 import engine.character.*;
 import engine.combat.DamageResolutionSys;
 import engine.combat.DamageableComp;
@@ -47,6 +48,7 @@ public class Game {
         userInput = new UserInput(window, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
         Font.loadFonts(FontType.BROADWAY);
+        AudioMaster.init();
 
 
         wc = new WorldContainer(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);

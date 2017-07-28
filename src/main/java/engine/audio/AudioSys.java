@@ -30,7 +30,6 @@ public class AudioSys implements Sys {
 
             ac.setPosition(posComp.getPos3());
 
-
             if (ac.requestSound!=-1){
                 ac.playSound(ac.requestSound);
             }
@@ -41,7 +40,6 @@ public class AudioSys implements Sys {
 
         wc.entitiesOfComponentTypeStream(SoundListenerComp.class).forEach(entity-> {
             PositionComp posComp = (PositionComp) wc.getComponent(entity, PositionComp.class);
-            System.out.println("Position for listener: " + posComp.getPos());
             alListener3f(AL_POSITION, posComp.getX(), posComp.getY(), posComp.getZ());
         });
     }
