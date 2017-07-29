@@ -5,6 +5,7 @@ import utils.maths.Vec2;
 import utils.maths.Vec3;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.lwjgl.openal.AL10.*;
@@ -16,17 +17,19 @@ public class AudioComp implements Component {
 
     public List<Sound> soundList = new ArrayList<Sound>();
 
+
     private int sourcePointer;
 
     public int requestSound = -1;
 
 
-    public AudioComp(Sound s){
-        this(s, 20,50,300);
+    public AudioComp(Sound... s){
+        this(Arrays.asList(s), 20,50,300);
     }
 
     public AudioComp(Sound s, int rollOffFactor, int referenceDistance, int maxDistance){
-        soundList.add(s);
+        this.soundList.add(s);
+
         this.sourcePointer = alGenSources();
         setRollOffFactor(rollOffFactor);
         setReferenceDistance(referenceDistance);
@@ -34,10 +37,23 @@ public class AudioComp implements Component {
     }
 
 
+
+
+    public AudioComp(List<Sound> soundList, int rollOffFactor, int referenceDistance, int maxDistance){
+        this.soundList = soundList;
+
+        this.sourcePointer = alGenSources();
+        setRollOffFactor(rollOffFactor);
+        setReferenceDistance(referenceDistance);
+        setMaxDistance(maxDistance);
+    }
+
+
+
+
     public AudioComp(List<Sound> soundList){
         this.soundList = soundList;
         this.sourcePointer = alGenSources();
-
     }
 
     public void playSound(int i){
@@ -45,8 +61,8 @@ public class AudioComp implements Component {
     }
 
     private void playSource(Sound sound){
+        alSourceStop(sourcePointer);
         alSourcei(sourcePointer, AL_BUFFER, sound.getBufferPointer());
-//        alSourcei(sourcePointer, AL_LOOPING, AL_TRUE);
         alSourcePlay(sourcePointer);
     }
 
@@ -72,6 +88,15 @@ public class AudioComp implements Component {
         alSourcef(sourcePointer, AL_MAX_DISTANCE, value);
     }
 
+
+    public void backgroundMusic(){
+        alSourcei( sourcePointer, AL_SOURCE_RELATIVE, AL_TRUE );
+        alSourcei(sourcePointer, AL_LOOPING, AL_TRUE);
+
+
+        alSourcef( sourcePointer, AL_ROLLOFF_FACTOR, 0.0f );
+
+    }
 
 //    public void addSound(String filename){
 //        addSound(new Sound(filename));
