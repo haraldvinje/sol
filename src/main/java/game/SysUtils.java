@@ -4,6 +4,7 @@ import engine.OnScreenSys;
 import engine.UserCharacterInputSys;
 import engine.UserInput;
 import engine.WorldContainer;
+import engine.audio.AudioSys;
 import engine.character.CharacterSys;
 import engine.character.UserInputToCharacterSys;
 import engine.combat.DamageResolutionSys;
@@ -60,7 +61,7 @@ public class SysUtils {
 
         //visual effect starting and progression
         wc.addSystem(new VisualEffectSys());
-        //audio sys
+        wc.addSystem(new AudioSys());
 
         //containing entities on screen
         wc.addSystem(new OnScreenSys(wc, 2));
@@ -111,7 +112,10 @@ public class SysUtils {
         wc.addSystem(new ViewControlSys());
 
         wc.addSystem(new ClientNetworkOutSys(tcpPacketOut, userInput));
+
         wc.addSystem(new VisualEffectSys());
+        wc.addSystem(new AudioSys());
+
 
         wc.addSystem(new OnScreenSys(wc, 2));
 

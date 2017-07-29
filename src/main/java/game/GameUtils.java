@@ -78,8 +78,6 @@ public class GameUtils {
         wc.assignComponentType(AudioComp.class);
         wc.assignComponentType(SoundListenerComp.class);
 
-
-
     }
 
 

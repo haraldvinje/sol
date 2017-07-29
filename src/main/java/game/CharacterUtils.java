@@ -153,11 +153,12 @@ public class CharacterUtils {
         MeleeAbility abMeteorpunch = new MeleeAbility(wc, -1, 15, 3, 4, 60, new Circle(32), 64);
         abMeteorpunch.setDamagerValues(wc, 500, 1000, 1.5f, -128f, false);
 
-        Sound ronaldoSuh = new Sound("audio/si.ogg");
+        List<Sound> sounds = new ArrayList<>();
+        sounds.add( new Sound("audio/si.ogg") );
 
 
         return createCharacter(wc, controlled, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
-                abFrogpunch, abHook, abMeteorpunch, ronaldoSuh);
+                abFrogpunch, abHook, abMeteorpunch, sounds);
     }
 
     private static int createShitface(WorldContainer wc, boolean controlled, float x, float y) {
@@ -175,11 +176,12 @@ public class CharacterUtils {
         MeleeAbility abMeteorpunch = new MeleeAbility(wc, -1, 15, 3, 4, 60, new Circle(32), 64);
         abMeteorpunch.setDamagerValues(wc, 50, 100, 1.5f, -128f, false);
 
-        Sound ronaldoSuh = new Sound("audio/si.ogg");
 
+        List<Sound> sounds = new ArrayList<Sound>();
+        sounds.add( new Sound("audio/si.ogg") );
 
         return createCharacter(wc, controlled, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
-                abFrogpunch, abHook, abMeteorpunch, ronaldoSuh);
+                abFrogpunch, abHook, abMeteorpunch, sounds );
     }
 
 
@@ -205,51 +207,6 @@ public class CharacterUtils {
     }
 
 
-
-    private static int createCharacter(WorldContainer wc, boolean controlled, float x, float y, String imagePath, float radiusOnImage, float imageWidth, float imageHeight, float offsetXOnImage, float offsetYOnImage, float radius, float moveAccel, Ability ab1, Ability ab2, Ability ab3, Sound sound1) {
-        int characterEntity = wc.createEntity();
-
-        float scale = radius/radiusOnImage;
-        float width = imageWidth*scale;
-        float height = imageHeight*scale;
-        float offsetX = offsetXOnImage*scale;
-        float offsetY = offsetYOnImage*scale;
-
-        wc.addComponent(characterEntity, new CharacterComp(moveAccel));//1500f));
-        wc.addComponent(characterEntity, new PositionComp(x, y, (float)(characterCount++)/100f ) ); //z value is a way to make draw ordering and depth positioning correspond. Else alpha images will appear incorrect.
-        wc.addComponent(characterEntity, new RotationComp());
-
-        wc.addComponent(characterEntity, new TexturedMeshComp(TexturedMeshUtils.createRectangle(imagePath, width, height)));
-        wc.addComponent(characterEntity, new MeshCenterComp(offsetX, offsetY));
-
-        wc.addComponent(characterEntity, new AbilityComp(ab1, ab2, ab3));
-
-        //server and offline
-        wc.addComponent(characterEntity, new PhysicsComp(80, 5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
-        wc.addComponent(characterEntity, new CollisionComp(new Circle(radius)));
-        wc.addComponent(characterEntity, new NaturalResolutionComp());
-
-        wc.addComponent(characterEntity, new AffectedByHoleComp());
-
-        wc.addComponent(characterEntity, new DamageableComp());
-        wc.addComponent(characterEntity, new CharacterInputComp());
-
-        //client
-        wc.addComponent(characterEntity, new InterpolationComp());
-
-        wc.addComponent(characterEntity, new AudioComp(sound1, 1, 100, 2000));
-
-        if (controlled) {
-            wc.addComponent(characterEntity, new UserCharacterInputComp());
-            wc.addComponent(characterEntity, new ViewControlComp( -GameUtils.VIEW_WIDTH/2f, -GameUtils.VIEW_HEIGHT/2f) );
-            wc.addComponent(characterEntity, new ControlledComp());
-            wc.addComponent(characterEntity, new SoundListenerComp());
-
-        }
-
-
-        return characterEntity;
-    }
 
     private static int createCharacter(WorldContainer wc, boolean controlled, float x, float y, String imagePath, float radiusOnImage, float imageWidth, float imageHeight, float offsetXOnImage, float offsetYOnImage, float radius, float moveAccel, Ability ab1, Ability ab2, Ability ab3, List<Sound> soundList) {
         int characterEntity = wc.createEntity();
