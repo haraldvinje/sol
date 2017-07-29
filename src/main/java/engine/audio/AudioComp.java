@@ -66,6 +66,10 @@ public class AudioComp implements Component {
         alSourcePlay(sourcePointer);
     }
 
+    public void stopSound() {
+        alSourceStop(sourcePointer);
+
+    }
 
 
     public void addSound(Sound sound){

@@ -2,7 +2,9 @@ package game.client;
 
 import engine.UserInput;
 import engine.WorldContainer;
+import engine.audio.AudioComp;
 import engine.audio.AudioMaster;
+import engine.audio.Sound;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
 import engine.graphics.view_.View;
@@ -40,7 +42,7 @@ public class ClientIngame implements Runnable{
 
 
     private ClientGameTeams teams;
-
+    private AudioComp backgroundAudioComp;
 
 
     public ClientIngame() {
@@ -68,7 +70,6 @@ public class ClientIngame implements Runnable{
     @Override
     public void run() {
 
-        window = new Window(0.5f, 0.5f, "Client   SIIII");
         userInput = new UserInput(window, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
 
@@ -90,6 +91,12 @@ public class ClientIngame implements Runnable{
         //print initial state
         System.out.println("Initial state:");
         System.out.println(wc.entitiesToString());
+
+        //play background music
+        Sound battlefield = new Sound("audio/meleeBattlefield.ogg");
+        backgroundAudioComp = new AudioComp(battlefield, 1, 500, 600);
+        backgroundAudioComp.backgroundMusic();
+        backgroundAudioComp.playSound(0);
 
 
         //game loop
@@ -125,6 +132,9 @@ public class ClientIngame implements Runnable{
     }
 
     private void close() {
+
+        //stop background sound
+        backgroundAudioComp.stopSound();
 
         window.close();
     }
