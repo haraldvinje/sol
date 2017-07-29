@@ -1,11 +1,6 @@
-package game;
+package game.server;
 
-import engine.network.server.Server;
-import engine.network.server.ServerClientHandler;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

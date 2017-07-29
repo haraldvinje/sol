@@ -4,67 +4,58 @@ import engine.UserInput;
 import engine.WorldContainer;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
+import engine.graphics.view_.View;
 import engine.network.TcpPacketInput;
 import engine.network.TcpPacketOutput;
 import engine.window.Window;
 import game.CharacterUtils;
 import game.ClientGameTeams;
 import game.GameUtils;
+import game.SysUtils;
 
 import java.net.Socket;
 
 /**
  * Created by eirik on 22.06.2017.
  */
-public class ClientGame implements Runnable{
+public class ClientIngame implements Runnable{
 
     private static final float FRAME_INTERVAL = 1.0f/60.0f;
 
     public static final float WINDOW_WIDTH = 1600f, WINDOW_HEIGHT = 900f;
 
-
-
-    private Window window;
-    private UserInput userInput;
-
-    private Socket socket;
-
-
     private long lastTime;
-
-    private WorldContainer wc;
-
     private boolean running = true;
 
 
 
+    private TcpPacketInput tcpPacketIn;
+    private TcpPacketOutput tcpPacketOut;
+
+    private Window window;
+    private UserInput userInput;
+
+    private WorldContainer wc;
+
+
     private ClientGameTeams teams;
-//    private List<Integer> friendlyCharacters, enemyCharacters;
-//    private int clientCharacterId;
-//    private int team;
 
 
 
-    public ClientGame() {
+    public ClientIngame() {
     }
-    public ClientGame(Socket socket) {
-        this.socket = socket;
-    }
-
 
     public void init(TcpPacketInput tcpPacketIn, TcpPacketOutput tcpPacketOut, ClientGameTeams teams) {
+        this.tcpPacketIn = tcpPacketIn;
+        this.tcpPacketOut = tcpPacketOut;
 
         this.teams = teams;
 
-        wc = new WorldContainer(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
+        wc = new WorldContainer( new View(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT) );
 
         System.out.println("HEELLLLLOOOOO");
-
-        //set program state
-        GameUtils.PROGRAM = GameUtils.CLIENT;
-        GameUtils.socket = socket;
-
     }
+
 
     public void terminate() {
         running = false;
@@ -76,27 +67,28 @@ public class ClientGame implements Runnable{
     @Override
     public void run() {
 
-        System.out.println("Running client");
         window = new Window(0.5f, 0.5f, "Client   SIIII");
         userInput = new UserInput(window, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
+
+        //load stuff
+        Font.loadFonts(FontType.BROADWAY);
+
 
         GameUtils.assignComponentTypes(wc);
 
         GameUtils.createMap(wc);
-
         CharacterUtils.createClientCharacters(wc, teams);
 
-
-
-        Font.loadFonts(FontType.BROADWAY);
-
-        GameUtils.assignSystems(wc, window, userInput);
+        //do this afte rbecaus of onscreen sys wich creates entities..
+        SysUtils.addClientSystems(wc, window, userInput, tcpPacketIn, tcpPacketOut);
 
 
         //print initial state
         System.out.println("Initial state:");
         System.out.println(wc.entitiesToString());
 
+
+        //game loop
         lastTime = System.nanoTime();
 
         float timeSinceUpdate = 0;

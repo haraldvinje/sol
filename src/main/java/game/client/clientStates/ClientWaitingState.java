@@ -1,4 +1,4 @@
-package engine.network.client.clientStates;
+package game.client.clientStates;
 
 import engine.PositionComp;
 import engine.WorldContainer;
@@ -10,6 +10,7 @@ import engine.graphics.text.Font;
 import engine.graphics.text.TextMesh;
 import engine.network.*;
 import engine.network.client.*;
+import game.client.Client;
 import utils.maths.Vec4;
 
 /**
@@ -42,6 +43,7 @@ public class ClientWaitingState extends ClientState {
 
 //        nextMessageId = -1;
         inServerQueue = false;
+        ClientUtils.setEntityString(wc, queueTextEntity, "");
 
         //tell server that we want to go into queue
         sendGotoQueue();

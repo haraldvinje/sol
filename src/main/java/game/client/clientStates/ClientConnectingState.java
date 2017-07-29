@@ -1,17 +1,15 @@
-package engine.network.client.clientStates;
+package game.client.clientStates;
 
 import engine.PositionComp;
 import engine.UserInput;
 import engine.WorldContainer;
-import engine.graphics.ColoredMeshComp;
-import engine.graphics.ColoredMeshUtils;
 import engine.graphics.MeshCenterComp;
 import engine.graphics.ViewRenderComp;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
 import engine.graphics.text.TextMesh;
 import engine.network.NetworkUtils;
-import engine.network.client.Client;
+import game.client.Client;
 import engine.network.client.ClientState;
 import engine.network.client.ClientStates;
 import utils.maths.Vec4;

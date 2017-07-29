@@ -1,10 +1,6 @@
-package engine.network.client.clientStates;
+package game.client.clientStates;
 
 import engine.PositionComp;
-import engine.UserInput;
-import engine.WorldContainer;
-import engine.graphics.ColoredMeshComp;
-import engine.graphics.ColoredMeshUtils;
 import engine.graphics.ViewRenderComp;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;

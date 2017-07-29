@@ -1,4 +1,4 @@
-package engine.network.server;
+package game.server;
 
 import engine.PositionComp;
 import engine.RotationComp;
@@ -9,12 +9,7 @@ import engine.graphics.text.TextMeshComp;
 import engine.graphics.view_.ViewControlComp;
 import engine.network.NetworkPregamePackets;
 import engine.network.NetworkUtils;
-import engine.network.client.ClientStateUtils;
-import engine.network.client.ClientStates;
 import engine.window.Window;
-import game.ServerGame;
-import game.ServerGameTeams;
-import game.ServerInGame;
 
 import java.util.*;
 

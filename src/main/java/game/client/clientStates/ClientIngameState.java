@@ -1,4 +1,4 @@
-package engine.network.client.clientStates;
+package game.client.clientStates;
 
 import engine.PositionComp;
 import engine.WorldContainer;
@@ -9,7 +9,7 @@ import engine.network.NetworkPregamePackets;
 import engine.network.NetworkPregameUtils;
 import engine.network.client.ClientState;
 import engine.network.client.ClientStates;
-import game.client.ClientGame;
+import game.client.ClientIngame;
 import game.ClientGameTeams;
 
 /**
@@ -19,7 +19,7 @@ public class ClientIngameState extends ClientState {
 
 
     private Thread gameThread;
-    private ClientGame game;
+    private ClientIngame game;
 
     private boolean playing;
 
@@ -85,8 +85,8 @@ public class ClientIngameState extends ClientState {
     }
 
     private void createGame(ClientGameTeams teams) {
-        game = new ClientGame(client.getSocket());
-        game.init(null, null, teams);
+        game = new ClientIngame();
+        game.init(client.getTcpPacketIn(), client.getTcpPacketOut(), teams);
         gameThread = new Thread(game);
 
         gameThread.start();

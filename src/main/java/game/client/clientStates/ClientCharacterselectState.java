@@ -1,4 +1,4 @@
-package engine.network.client.clientStates;
+package game.client.clientStates;
 
 import engine.PositionComp;
 import engine.UserInput;
@@ -6,7 +6,7 @@ import engine.WorldContainer;
 import engine.graphics.*;
 import engine.network.NetworkDataOutput;
 import engine.network.NetworkPregamePackets;
-import engine.network.client.Client;
+import game.client.Client;
 import engine.network.client.ClientState;
 import engine.network.client.ClientStates;
 import game.CharacterUtils;

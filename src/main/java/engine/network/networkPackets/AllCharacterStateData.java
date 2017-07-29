@@ -1,4 +1,6 @@
-package engine.network;
+package engine.network.networkPackets;
+
+import engine.network.NetworkUtils;
 
 import java.util.Arrays;
 

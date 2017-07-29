@@ -1,4 +1,4 @@
-package engine.network.server;
+package game.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;

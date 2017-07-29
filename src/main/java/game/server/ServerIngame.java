@@ -1,14 +1,16 @@
-package game;
+package game.server;
 
 import engine.UserInput;
 import engine.WorldContainer;
 import engine.character.*;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
-import engine.network.NetworkPregamePackets;
-import engine.network.server.ServerClientHandler;
+import engine.graphics.view_.View;
 import engine.physics.*;
 import engine.window.Window;
+import game.CharacterUtils;
+import game.GameUtils;
+import game.SysUtils;
 
 import java.util.*;
 
@@ -16,7 +18,7 @@ import java.util.*;
 /**
  * Created by eirik on 13.06.2017.
  */
-public class ServerInGame {
+public class ServerIngame {
 
 
     private static final float FRAME_INTERVAL = 1.0f/60.0f;
@@ -47,7 +49,7 @@ public class ServerInGame {
 
 
 
-    public ServerInGame() {
+    public ServerIngame() {
 
     }
 
@@ -59,13 +61,6 @@ public class ServerInGame {
 
         //add an stockLoss entry for every client
         stockLossCount = new int[teams.getTotalClientCount()];
-
-        GameUtils.CLIENT_HANDELERS = Arrays.asList( teams.getAllClients() );
-
-        GameUtils.PROGRAM = GameUtils.SERVER;
-
-        wc = new WorldContainer(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
-
     }
 
 
@@ -74,23 +69,24 @@ public class ServerInGame {
         this.window = new Window(0.3f, "Server ingame");
         this.userInput = new UserInput(window, 1, 1);
 
+        wc = new WorldContainer(new View(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT) );
+
+        //load other stuff
         Font.loadFonts(FontType.BROADWAY);
 
-
-        System.out.println("Server game initiated with clients: "+GameUtils.CLIENT_HANDELERS);
-
-
         GameUtils.assignComponentTypes(wc);
+        SysUtils.addServerSystems(wc, window, Arrays.asList( teams.getAllClients() ) );
 
-        GameUtils.assignSystems(wc, window, userInput);
+        System.out.println("Server game initiated with clients: "+ Arrays.toString(teams.getAllClients()) );
 
+
+        //create entities
         GameUtils.createMap(wc);
-
         CharacterUtils.createServerCharacters(wc, teams);
 
 
+        //game loop
         lastTime = System.nanoTime();
-
 
         float timeSinceUpdate = 0;
 
@@ -111,78 +107,6 @@ public class ServerInGame {
 
         onTerminate();
     }
-
-
-    private void createCharacters() {
-
-//        //decode wich characters are on wich teams
-//        List< List<Integer> > teamCharacters = new ArrayList<>();
-//        teamCharacters.add(new ArrayList<>());
-//        teamCharacters.add(new ArrayList<>());
-//
-//        for (int i = 0; i < teamClients.size(); i++) {
-//            List<ServerClientHandler> team = teamClients.get(i);
-//
-//            for (int j = 0; j < team.size(); j++) {
-//                ServerClientHandler client = team.get(j);
-//
-//                //find the character corresponding to the client and add to character list
-//                int charId = clientCharacters.get(client);
-//                teamCharacters.get(i).add(charId);
-//            }
-//        }
-
-
-
-        //add characters to world container
-
-    }
-
-    private void sendInitialGameState(List< List<Integer> > teamCharacters) {
-
-//        for (int i = 0; i < teamClients.size(); i++) {
-//
-//            List<ServerClientHandler> team = teamClients.get(i);
-//
-//            for (int j = 0; j < team.size(); j++) {
-//                ServerClientHandler client = team.get(j);
-//
-//                //send state id of client
-////                client.sendInt(NetworkPregamePackets.CHARSELECT_ID);
-//
-//                //send meassage id
-//                client.sendInt(NetworkPregamePackets.CHARSELECT_SERVER_GOTO_GAME);
-//
-//                //send number of chars on team1
-//                client.sendInt(teamCharacters.get(0).size());
-//                //number of chars on team 2
-//                client.sendInt(teamCharacters.get(1).size());
-//
-//                //clients team1 - team2
-//                sendCharacterIds(client, teamCharacters);
-//
-//                //send wich character the client controls
-//                //what team is the client on
-//                client.sendInt(i);
-//
-//                //which index is he
-//                client.sendInt(j);
-//            }
-//
-//        }
-    }
-
-    private void sendCharacterIds(ServerClientHandler client, List< List<Integer>> teamCharacters) {
-        for (int i = 0; i < teamCharacters.size(); i++) {
-            List<Integer> team = teamCharacters.get(i);
-
-            for (int j = 0; j < team.size(); j++) {
-
-                client.sendInt( team.get(j) );
-            }
-        }
-    }
-
 
 
     public void update() {

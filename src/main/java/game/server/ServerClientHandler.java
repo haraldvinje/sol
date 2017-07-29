@@ -1,12 +1,15 @@
-package engine.network.server;
+package game.server;
 
 import engine.network.*;
+import engine.network.networkPackets.AbilityStartedData;
+import engine.network.networkPackets.AllCharacterStateData;
+import engine.network.networkPackets.CharacterInputData;
+import engine.network.networkPackets.HitDetectedData;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.LinkedList;
 
 /**
@@ -60,123 +63,86 @@ public class ServerClientHandler {
         return tcpPacketOut;
     }
 
-    public void sendEmptyPacket(int packetId){
-        tcpPacketOut.sendEmpty(packetId);
-    }
 
-    public int available() {
-        try {
-            return inputStream.available();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public boolean intAvailable(int count) {
-        return available() >= Integer.BYTES * count;
-    }
-
-    public void sendInt(int i) {
-        try {
-            outputStream.writeInt(i);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public int readInt() {
-        try {
-            return inputStream.readInt();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     /**
      *
      * @param stateData
      * @return false if socket is disconnected, true otherwise
      */
-    public boolean sendCharacterData(AllCharacterStateData stateData) {
-        try {
-            outputStream.writeInt(NetworkUtils.SERVER_CHARACTER_STATE_ID);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void sendCharacterData(AllCharacterStateData stateData) {
+        //translate
+        NetworkDataOutput dataOut = NetworkUtils.gameStateToPacket(stateData);
 
-        return NetworkUtils.gameStateToStream(stateData, outputStream);
+        //send
+        tcpPacketOut.send(NetworkUtils.SERVER_CHARACTER_STATE_ID, dataOut);
     }
-    boolean sendAbilityStarted(AbilityStartedData abData) {
-        try {
-            outputStream.writeInt(NetworkUtils.SERVER_ABILITY_STARTED_ID);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return NetworkUtils.abilityStartedDataToStream(outputStream, abData);
+    public void sendAbilityStarted(AbilityStartedData abData) {
+        //translate
+        NetworkDataOutput dataOut = NetworkUtils.abilityStartedDataToPacket(abData);
+
+        //send
+        tcpPacketOut.send(NetworkUtils.SERVER_ABILITY_STARTED_ID, dataOut);
     }
-    boolean sendHitDetected(HitDetectedData hitData) {
-        try {
-            outputStream.writeInt(NetworkUtils.SERVER_HIT_DETECTED_ID);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return NetworkUtils.hitDetectedToStream(outputStream, hitData);
+    public void sendHitDetected(HitDetectedData hitData) {
+        //translate
+        NetworkDataOutput dataOut = NetworkUtils.hitDetectedToPacket(hitData);
+
+        //send
+        tcpPacketOut.send(NetworkUtils.SERVER_HIT_DETECTED_ID, dataOut);
     }
-    boolean sendProjectileDead(ProjectileDeadData projDeadData) {
-        try {
-            outputStream.writeInt(NetworkUtils.SERVER_PROJECTILE_DEAD_ID);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return NetworkUtils.projectileDeadToStream(outputStream, projDeadData);
+    public void sendProjectileDead(ProjectileDeadData projDeadData) {
+        //translate
+        NetworkDataOutput dataOut = NetworkUtils.projectileDeadToPacket(projDeadData);
+
+        //send
+        tcpPacketOut.send(NetworkUtils.SERVER_PROJECTILE_DEAD_ID, dataOut);
     }
-
-
-
-
-
-
-
-    public int getCharacterSelectedData(){
-        int characterSelected = -1;
-        try {
-            if (inputStream.available()>=1){
-                characterSelected = inputStream.readInt();
-            }
-
-        }
-        catch (IOException e){
-            System.out.println("IO Exception occured");
-        }
-        return characterSelected;
-    }
-
 
 
     public CharacterInputData getInputData() {
-        try {
-            int messageBytes = CharacterInputData.BYTES;
 
-            if (inputStream.available() >= messageBytes) {
-
-                //remove delayed data
-                while (inputStream.available() >= messageBytes*(2 + NetworkUtils.SERVER_INPUT_BUFFERING) ) {
-                    inputStream.skipBytes(messageBytes);
-                }
-
-                return NetworkUtils.streamToCharacterInput(inputStream);
-
-            }
-            else {
-                //System.err.println("Not enough input for a inputState, numb of bytes ready: " + inputStream.available());
-                return null;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new IllegalStateException("IO exception");
+        //get newest input
+        LinkedList<NetworkDataInput> inputs = tcpPacketIn.pollAllPackets(NetworkUtils.CLIENT_CHARACTER_INPUT);
+        if (!inputs.isEmpty()) {
+            return NetworkUtils.packetToCharacterInput(inputs.poll());
         }
 
+        return null;
     }
 
+
+
+//    public void sendEmptyPacket(int packetId){
+//        tcpPacketOut.sendEmpty(packetId);
+//    }
+//
+//    public int available() {
+//        try {
+//            return inputStream.available();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+//
+//    public boolean intAvailable(int count) {
+//        return available() >= Integer.BYTES * count;
+//    }
+//
+//    public void sendInt(int i) {
+//        try {
+//            outputStream.writeInt(i);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    public int readInt() {
+//        try {
+//            return inputStream.readInt();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
 }

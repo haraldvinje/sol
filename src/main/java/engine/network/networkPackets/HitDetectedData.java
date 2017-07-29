@@ -1,4 +1,4 @@
-package engine.network;
+package engine.network.networkPackets;
 
 /**
  * Created by eirik on 07.07.2017.

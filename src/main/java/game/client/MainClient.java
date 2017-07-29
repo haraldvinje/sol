@@ -1,13 +1,4 @@
-package game;
-
-import engine.network.NetworkUtils;
-import engine.network.client.Client;
-import java.io.DataInputStream;
-
-import java.io.IOException;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
+package game.client;
 
 /**
  * Created by eirik on 22.06.2017.
@@ -44,7 +35,7 @@ public class MainClient {
 //            e.printStackTrace();
 //        }
 //
-//        ClientGame cg = new ClientGame(socket);
+//        ClientIngame cg = new ClientIngame(socket);
 //        cg.init(null, null, friendlyCharacters, enemyCharacters, team, 0);
 //        cg.run();
 

@@ -1,15 +1,11 @@
-package game;
+package game.server;
 
 import engine.UserInput;
 import engine.network.NetworkDataInput;
 import engine.network.NetworkDataOutput;
 import engine.network.NetworkPregamePackets;
 import engine.network.NetworkPregameUtils;
-import engine.network.server.ServerClientHandler;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import game.ClientGameTeams;
 
 /**
  * Created by haraldvinje on 06-Jul-17.
@@ -19,7 +15,7 @@ public class ServerGame implements Runnable {
 
 
     private ServerCharacterSelection characterSelection;
-    private ServerInGame serverInGame;
+    private ServerIngame serverIngame;
 
 //    private List< List<ServerClientHandler> > teamClients;
 //
@@ -142,7 +138,7 @@ public class ServerGame implements Runnable {
         if (waitingClientsIngame == 0) {
 
             //blocking until game ends
-            serverInGame.start();
+            serverIngame.start();
             characterSelection.getCharacterIds().clear();
         }
 
@@ -151,8 +147,8 @@ public class ServerGame implements Runnable {
     private void initGame() {
         //init game
         System.out.println("Initializing inGame, waiting for clients");
-        serverInGame = new ServerInGame();
-        serverInGame.init(this, teams);
+        serverIngame = new ServerIngame();
+        serverIngame.init(this, teams);
 
         //tell clients to go to ingame
         teams.forEachClient(client -> {
@@ -186,8 +182,8 @@ public class ServerGame implements Runnable {
     }
 
     public void terminate() {
-        if (serverInGame != null)
-            serverInGame.terminate();
+        if (serverIngame != null)
+            serverIngame.terminate();
 
         running = false;
     }

@@ -1,14 +1,16 @@
-package engine.network.client;
+package game.client;
 
 import engine.*;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
-import engine.network.NetworkDataInput;
-import engine.network.NetworkDataOutput;
 import engine.network.TcpPacketInput;
 import engine.network.TcpPacketOutput;
-import engine.network.client.clientStates.*;
+import engine.network.client.ClientState;
+import engine.network.client.ClientStateUtils;
+import engine.network.client.ClientStates;
 import engine.window.Window;
+import engine.network.client.ClientStates;
+import game.client.clientStates.*;
 
 import java.io.IOException;
 import java.net.Socket;
