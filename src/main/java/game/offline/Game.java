@@ -1,4 +1,4 @@
-package game;
+package game.offline;
 
 
 import engine.*;
@@ -14,8 +14,13 @@ import engine.combat.abilities.MeleeAbility;
 import engine.graphics.*;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
+import engine.graphics.view_.View;
 import engine.physics.*;
 import engine.window.Window;
+import game.CharacterUtils;
+import game.ClientGameTeams;
+import game.GameUtils;
+import game.SysUtils;
 import utils.maths.M;
 
 import java.util.ArrayList;
@@ -43,35 +48,32 @@ public class Game {
 
 
     public void init() {
+
         window = new Window(0.8f, 0.8f,"SIIII");
         userInput = new UserInput(window, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
+        wc = new WorldContainer( new View(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT) );
+
+
+        //load stuff
         Font.loadFonts(FontType.BROADWAY);
 
-
-        wc = new WorldContainer(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
+        GameUtils.assignComponentTypes(wc);
+        SysUtils.addOfflineSystems(wc, window, userInput);
 
 
         System.out.println("HEELLLLLOOOOO");
 
-
-        GameUtils.PROGRAM = GameUtils.OFFLINE;
-
-        GameUtils.assignComponentTypes(wc);
-        GameUtils.assignSystems(wc, window, userInput);
-
-        //GameUtils.createInitialEntities(wc);
         GameUtils.createMap(wc);
 
-        List<Integer> team1Chars = new ArrayList<>();
-        List<Integer> team2Chars = new ArrayList<>();
+        int[][] characterIds = {
+                {CharacterUtils.SHRANK},
+                {CharacterUtils.SCHMATHIS}
+        };
 
-        team1Chars.add(CharacterUtils.SHRANK);
-//        team1Chars.add(CharacterUtils.SHRANK);
+        ClientGameTeams teams = new ClientGameTeams(characterIds, 0, 0);
 
-        team2Chars.add(CharacterUtils.SCHMATHIS);
-
-        CharacterUtils.createOfflineCharacters(wc, team1Chars, team2Chars, 0, 0);
+        CharacterUtils.createOfflineCharacters(wc, teams);
     }
 
 

@@ -1,5 +1,9 @@
 package engine.network;
 
+import engine.network.networkPackets.AbilityStartedData;
+import engine.network.networkPackets.AllCharacterStateData;
+import engine.network.networkPackets.CharacterInputData;
+import engine.network.networkPackets.HitDetectedData;
 import utils.maths.M;
 
 import java.io.DataInputStream;
@@ -31,181 +35,169 @@ public class NetworkUtils {
             SERVER_ABILITY_STARTED_ID = 1,
             SERVER_HIT_DETECTED_ID = 2,
             SERVER_CHARACTER_DEAD_ID = 3,
-            SERVER_PROJECTILE_DEAD_ID = 4;
+            SERVER_PROJECTILE_DEAD_ID = 4,
 
-    /**
-     *
-     * @param stateData
-     * @param out
-     * @return false, if reciever is disconnected
-     */
-    public static boolean gameStateToStream(AllCharacterStateData stateData, DataOutputStream out) {
-        //simulate packet loss
-        if (PACKET_LOSS_TO_CLIENT > 0) {
-            if (M.random() <= PACKET_LOSS_TO_CLIENT) {
-                return true;
-            }
+            CLIENT_CHARACTER_INPUT = 5;
+
+
+    public static NetworkDataOutput gameStateToPacket(AllCharacterStateData stateData) {
+//        //simulate packet loss
+//        if (PACKET_LOSS_TO_CLIENT > 0) {
+//            if (M.random() <= PACKET_LOSS_TO_CLIENT) {
+//                return true;
+//            }
+//        }
+
+        NetworkDataOutput out = new NetworkDataOutput();
+
+        out.writeInt(stateData.getFrameNumber()); //write frame number
+
+        for (int i = 0; i < NetworkUtils.CHARACTER_NUMB; i++) {
+            out.writeFloat(stateData.getX(i));
+            out.writeFloat(stateData.getY(i));
+            out.writeFloat(stateData.getRotation(i));
         }
-        try {
 
-            out.writeInt(stateData.getFrameNumber()); //write frame number
-
-            for (int i = 0; i < NetworkUtils.CHARACTER_NUMB; i++) {
-                out.writeFloat(stateData.getX(i));
-                out.writeFloat(stateData.getY(i));
-                out.writeFloat(stateData.getRotation(i));
-            }
-
-        } catch (SocketException e) {
-            return false;
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            throw new IllegalStateException("An IO exception that is not a socket exception occured");
-        }
-        return true;
+        return out;
     }
 
-    public static AllCharacterStateData streamToGameState(DataInputStream in) {
+    public static AllCharacterStateData packetToGameState(NetworkDataInput in) {
         AllCharacterStateData state = new AllCharacterStateData();
 
-        try {
-            state.setFrameNumber(in.readInt()); //read frame number
+        state.setFrameNumber(in.readInt()); //read frame number
 
-            for (int i = 0; i < NetworkUtils.CHARACTER_NUMB; i++) {
-                state.setX(i, in.readFloat());
-                state.setY(i, in.readFloat());
-                state.setRotation(i, in.readFloat());
-            }
-
-
-            return state;
+        for (int i = 0; i < NetworkUtils.CHARACTER_NUMB; i++) {
+            state.setX(i, in.readFloat());
+            state.setY(i, in.readFloat());
+            state.setRotation(i, in.readFloat());
         }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        throw new IllegalStateException();
+
+        return state;
     }
 
-    public static boolean characterInputToStream(CharacterInputData charInput, DataOutputStream out) {
-        //simulate packet loss
-        if (PACKET_LOSS_TO_SERVER > 0) {
-            if (M.random() <= PACKET_LOSS_TO_SERVER) {
-                return true;
-            }
-        }
-        try {
-            out.writeBoolean(charInput.isMoveLeft());
-            out.writeBoolean(charInput.isMoveRight());
-            out.writeBoolean(charInput.isMoveUp());
-            out.writeBoolean(charInput.isMoveDown());
+    public static NetworkDataOutput characterInputToPacket(CharacterInputData charInput) {
+//        //simulate packet loss
+//        if (PACKET_LOSS_TO_SERVER > 0) {
+//            if (M.random() <= PACKET_LOSS_TO_SERVER) {
+//                return true;
+//            }
+//        }
 
-            out.writeBoolean(charInput.isAction1());
-            out.writeBoolean(charInput.isAction2());
-            out.writeBoolean(charInput.isAction3());
+        NetworkDataOutput out = new NetworkDataOutput();
 
-            out.writeFloat(charInput.getAimX());
-            out.writeFloat(charInput.getAimY());
-        }
-        catch (SocketException e) {
-            return false;
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+        out.writeBoolean(charInput.isMoveLeft());
+        out.writeBoolean(charInput.isMoveRight());
+        out.writeBoolean(charInput.isMoveUp());
+        out.writeBoolean(charInput.isMoveDown());
 
-        return true;
+        out.writeBoolean(charInput.isAction1());
+        out.writeBoolean(charInput.isAction2());
+        out.writeBoolean(charInput.isAction3());
+
+        out.writeFloat(charInput.getAimX());
+        out.writeFloat(charInput.getAimY());
+
+        return out;
     }
 
-    public static CharacterInputData streamToCharacterInput(DataInputStream in) {
+    public static CharacterInputData packetToCharacterInput(NetworkDataInput in) {
         CharacterInputData id = new CharacterInputData();
-        try {
-            id.setMovement(in.readBoolean(), in.readBoolean(), in.readBoolean(), in.readBoolean());
-            id.setActions(in.readBoolean(), in.readBoolean(), in.readBoolean());
-            id.setAim(in.readFloat(), in.readFloat());
-        }
-        catch(IOException e) {
-            e.printStackTrace();
-        }
+
+        id.setMovement(in.readBoolean(), in.readBoolean(), in.readBoolean(), in.readBoolean());
+        id.setActions(in.readBoolean(), in.readBoolean(), in.readBoolean());
+        id.setAim(in.readFloat(), in.readFloat());
 
         return id;
     }
 
 
-    public static boolean abilityStartedDataToStream(DataOutputStream stream, AbilityStartedData data) {
-        try {
-            stream.writeInt(data.getEntityId());
-            stream.writeInt(data.getAbilityId());
-        }
-        catch (SocketException e) {
-            return false;
-        }
-        catch(IOException e) {e.printStackTrace(); throw new IllegalStateException("");}
+    public static NetworkDataOutput abilityStartedDataToPacket(AbilityStartedData data) {
+        NetworkDataOutput out = new NetworkDataOutput();
 
-        return true;
+        out.writeInt(data.getEntityId());
+        out.writeInt(data.getAbilityId());
+
+        return out;
     }
-    public static AbilityStartedData streamToAbilityStarted(DataInputStream stream) {
+    public static AbilityStartedData packetToAbilityStarted(NetworkDataInput in) {
         AbilityStartedData data = new AbilityStartedData();
-        try {
-            data.setEntityId( stream.readInt() );
-            data.setAbilityId( stream.readInt() );
-        }
-        catch(IOException e) {e.printStackTrace(); throw new IllegalStateException("");}
+
+        data.setEntityId( in.readInt() );
+        data.setAbilityId( in.readInt() );
 
         return data;
     }
 
 
-    public static boolean hitDetectedToStream(DataOutputStream stream, HitDetectedData data) {
-        try {
-            stream.writeInt(data.getEntityDamager());
-            stream.writeInt(data.getEntityDamageable());
-            stream.writeFloat(data.getDamageTaken());
-        }
-        catch (SocketException e) {
-            return false;
-        }
-        catch(IOException e) {e.printStackTrace(); throw new IllegalStateException("");}
+    public static NetworkDataOutput hitDetectedToPacket(HitDetectedData data) {
+        NetworkDataOutput out = new NetworkDataOutput();
 
-        return true;
+        out.writeInt(data.getEntityDamager());
+        out.writeInt(data.getEntityDamageable());
+        out.writeFloat(data.getDamageTaken());
+
+        return out;
     }
 
-    public static HitDetectedData streamToHitDetected(DataInputStream stream) {
+    public static HitDetectedData packetToHitDetected(NetworkDataInput out) {
         HitDetectedData data = new HitDetectedData();
-        try {
-            data.setEntityDamager( stream.readInt() );
-            data.setEntityDamageable( stream.readInt() );
-            data.setDamageTaken( stream.readFloat() );
-        }
-        catch(IOException e) {e.printStackTrace(); throw new IllegalStateException("");}
+
+        data.setEntityDamager( out.readInt() );
+        data.setEntityDamageable( out.readInt() );
+        data.setDamageTaken( out.readFloat() );
 
         return data;
     }
 
 
-    public static boolean projectileDeadToStream(DataOutputStream stream, ProjectileDeadData data) {
-        try {
-            stream.writeInt(data.getEntityOwnerId());
-            stream.writeInt(data.getProjectileAbilityId());
-        }
-        catch (SocketException e) {
-            return false;
-        }
-        catch(IOException e) {e.printStackTrace(); throw new IllegalStateException("");}
+    public static NetworkDataOutput projectileDeadToPacket(ProjectileDeadData data) {
+        NetworkDataOutput out = new NetworkDataOutput();
 
-        return true;
+        out.writeInt(data.getEntityOwnerId());
+        out.writeInt(data.getProjectileAbilityId());
+
+        return out;
     }
 
-    public static ProjectileDeadData streamToProjectileDead(DataInputStream stream) {
+    public static ProjectileDeadData packetToProjectileDead(NetworkDataInput in) {
         ProjectileDeadData data = new ProjectileDeadData();
-        try {
-            data.setEntityOwnerId( stream.readInt() );
-            data.setProjectileAbilityId( stream.readInt() );
-        }
-        catch(IOException e) {e.printStackTrace(); throw new IllegalStateException("");}
+
+        data.setEntityOwnerId( in.readInt() );
+        data.setProjectileAbilityId( in.readInt() );
 
         return data;
     }
 
+
+//
+//    public static boolean sendClientStateId(int id, DataOutputStream outputStream) {
+//
+//        try{
+//            System.out.println("Sending id: " + id + " to " + outputStream.toString());
+//            outputStream.write(id);
+//        }
+//
+//
+//        catch (SocketException e) {
+//            return false;
+//        }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return true;
+//
+//    }
+//
+//    public static int streamToCharacterSelected(DataInputStream inputStream) {
+//        int characterId = -1;
+//        try{
+//            characterId = inputStream.readInt();
+//        }
+//        catch (IOException e){
+//            System.out.println("Could not read");
+//        }
+//        return characterId;
+//    }
 
 }

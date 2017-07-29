@@ -1,6 +1,4 @@
-package game;
-
-import engine.network.server.Server;
+package game.server;
 
 /**
  * Created by eirik on 22.06.2017.

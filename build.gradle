@@ -48,7 +48,7 @@ task runServer(type: JavaExec) {
 
     classpath = sourceSets.main.runtimeClasspath
 
-    main = 'game.MainServer'
+    main = 'game.server.MainServer'
 
     systemProperty 'java.library.path', project.nativeLibsDir
 }
@@ -59,7 +59,7 @@ task runClient(type: JavaExec) {
 
     args = ["localhost"]//["192.168.1.24"]
 
-    main = 'game.MainClient'
+    main = 'game.client.MainClient'
 
     systemProperty 'java.library.path', project.nativeLibsDir
 }
@@ -68,7 +68,7 @@ task runServerClient(dependsOn: ['runClient', 'runServer'])
 runClient.mustRunAfter runServer
 
 run {
-    mainClassName = 'game.Main'
+    mainClassName = 'game.offline.Main'
 
     systemProperty 'java.library.path', project.nativeLibsDir
 }

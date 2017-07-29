@@ -1,7 +1,6 @@
 package engine;
 
-import engine.Component;
-import engine.network.CharacterInputData;
+import engine.network.networkPackets.CharacterInputData;
 
 /**
  * should be filled with relevant user input for a character each frame

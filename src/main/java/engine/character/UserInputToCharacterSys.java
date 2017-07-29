@@ -3,7 +3,7 @@ package engine.character;
 import engine.Sys;
 import engine.UserCharacterInputComp;
 import engine.WorldContainer;
-import engine.network.CharacterInputData;
+import engine.network.networkPackets.CharacterInputData;
 
 /**
  * Created by eirik on 05.07.2017.

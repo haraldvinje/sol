@@ -11,6 +11,8 @@ import engine.combat.abilities.AbilityComp;
 import engine.combat.abilities.HitboxComp;
 import engine.combat.abilities.ProjectileComp;
 import engine.network.*;
+import engine.network.networkPackets.*;
+import game.server.ServerClientHandler;
 
 import java.util.*;
 
@@ -42,6 +44,9 @@ public class ServerNetworkSys implements Sys {
     @Override
     public void update() {
 
+        //poll client network input
+        clientHandlers.forEach(client -> client.getTcpPacketIn().pollPackets());
+
         updateCharactersByInput();
 
         sendGameDataToClients();
@@ -66,6 +71,8 @@ public class ServerNetworkSys implements Sys {
 
             //get input from each client, hoply corresponding to character ordering, and update the entity
             CharacterInputComp inpComp = (CharacterInputComp) wc.getComponent(entity, CharacterInputComp.class);
+
+            //data from clients
             CharacterInputData inData = clientHandlers.get(i).getInputData();
 
             if (inData != null) {
@@ -168,15 +175,7 @@ public class ServerNetworkSys implements Sys {
 
 
     public void sendCharacterData(AllCharacterStateData gameState) {
-        ListIterator<ServerClientHandler> it = clientHandlers.listIterator();
-        while (it.hasNext()) {
-            ServerClientHandler handler = it.next();
-
-            //if client is disconnected, remove it
-            if (!handler.sendCharacterData(gameState) ) {
-                it.remove();
-            }
-        }
+        clientHandlers.forEach(client -> client.sendCharacterData(gameState));
     }
 
     private void sendAbilityStarted(AbilityStartedData abData) {

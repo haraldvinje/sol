@@ -1,29 +1,24 @@
-package game;
+package game.server;
 
-import engine.PositionComp;
-import engine.RotationComp;
 import engine.UserInput;
 import engine.WorldContainer;
 import engine.character.*;
-import engine.combat.DamageResolutionSys;
-import engine.combat.DamageableComp;
-import engine.combat.DamagerComp;
-import engine.graphics.*;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
-import engine.network.server.ServerClientHandler;
-import engine.network.server.ServerNetworkSys;
+import engine.graphics.view_.View;
 import engine.physics.*;
 import engine.window.Window;
+import game.CharacterUtils;
+import game.GameUtils;
+import game.SysUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 /**
  * Created by eirik on 13.06.2017.
  */
-public class ServerGame implements Runnable{
+public class ServerIngame {
 
 
     private static final float FRAME_INTERVAL = 1.0f/60.0f;
@@ -33,67 +28,64 @@ public class ServerGame implements Runnable{
                                 WINDOW_HEIGHT = GameUtils.MAP_HEIGHT /4;
 
 
-    private boolean shouldTerminate = false;
+//    private ServerCharacterSelection charactersSelected;
 
+    private ServerGame serverGame;
 
     private Window window;
     private UserInput userInput;
 
     private WorldContainer wc;
 
-
     private boolean running = true;
-
     private long lastTime;
+
+
+    private ServerGameTeams teams;
+//    private List< List<ServerClientHandler> > teamClients;
+//    private HashMap<ServerClientHandler, Integer> clientCharacters;
 
     private int[] stockLossCount;
 
 
-    public void init( List<ServerClientHandler> clientHandlers) {
 
-        //window = new Window(WINDOW_WIDTH, WINDOW_HEIGHT, "Server   SIIII");
-        //userInput = new UserInput(window);
-
-        //add an stockLoss entry for every client
-        stockLossCount = new int[clientHandlers.size()];
-
-        GameUtils.CLIENT_HANDELERS = clientHandlers;
-
-        GameUtils.PROGRAM = GameUtils.SERVER;
-
-        wc = new WorldContainer(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
+    public ServerIngame() {
 
     }
 
-    @Override
-    public void run() {
+
+    public void init( ServerGame serverGame, ServerGameTeams teams) {
+        this.serverGame = serverGame;
+        this.teams = teams;
+
+
+        //add an stockLoss entry for every client
+        stockLossCount = new int[teams.getTotalClientCount()];
+    }
+
+
+    public void start() {
 
         this.window = new Window(0.3f, "Server ingame");
         this.userInput = new UserInput(window, 1, 1);
 
+        wc = new WorldContainer(new View(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT) );
+
+        //load other stuff
         Font.loadFonts(FontType.BROADWAY);
 
+        GameUtils.assignComponentTypes(wc);
+        SysUtils.addServerSystems(wc, window, Arrays.asList( teams.getAllClients() ) );
 
-        System.out.println("Server game initiated with clients: "+GameUtils.CLIENT_HANDELERS);
+        System.out.println("Server game initiated with clients: "+ Arrays.toString(teams.getAllClients()) );
+
 
         //create entities
-        GameUtils.assignComponentTypes(wc);
-
-        GameUtils.assignSystems(wc, window, userInput);
-
         GameUtils.createMap(wc);
-
-        ArrayList<Integer> team1Chars = new ArrayList<>();
-        ArrayList<Integer> team2Chars = new ArrayList<>();
-        team1Chars.add(0);
-        team2Chars.add(1);
-        CharacterUtils.createServerCharacters(wc, team1Chars, team2Chars);
+        CharacterUtils.createServerCharacters(wc, teams);
 
 
-        //print initial state
-        System.out.println("Initial state:");
-        System.out.println(wc.entitiesToString());
-
+        //game loop
         lastTime = System.nanoTime();
 
         float timeSinceUpdate = 0;
@@ -115,8 +107,6 @@ public class ServerGame implements Runnable{
 
         onTerminate();
     }
-
-
 
 
     public void update() {
@@ -143,8 +133,7 @@ public class ServerGame implements Runnable{
     }
     private void gameOver(int winner) {
         System.out.println("Player "+ winner + " won!");
-        setShouldTerminate();
-
+        serverGame.setShouldTerminate();
     }
 
     private void onTerminate() {
@@ -153,15 +142,9 @@ public class ServerGame implements Runnable{
         window.close();
     }
 
-    private void setShouldTerminate() {
-        synchronized (this) {
-            shouldTerminate = true;
-        }
-    }
-    public boolean isShouldTerminate(){
-        synchronized (this) {
-            return shouldTerminate;
-        }
+
+    public ServerGameTeams getTeams() {
+        return teams;
     }
 
     public void terminate() {
