@@ -34,10 +34,13 @@ public class WorldContainer {
 
 
 
+    public WorldContainer(View view) {
+        this.view = view;
 
+    }
+    @Deprecated
     public WorldContainer(float viewWidth, float viewHeight) {
-
-        view = new View(viewWidth, viewHeight);
+        this(new View(viewWidth, viewHeight));
     }
 
     /**
