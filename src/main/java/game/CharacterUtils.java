@@ -110,7 +110,7 @@ public class CharacterUtils {
         float[] color1 = {1, 1, 0};
         float[] color2 = {1, 0, 1};
         int proj1Entity = ProjectileUtils.allocateSinglecolorProjectileAbility(wc, 8, color1, sndBoom);
-        int proj2Entity = ProjectileUtils.allocateSinglecolorProjectileAbility(wc, 20, color2, sndBoom);
+        int proj2Entity = ProjectileUtils.allocateSinglecolorProjectileAbility(wc, 20, color2, sndHit);
 
         int rapidShotSoundIndex = 0;
         int powershotSoundIndex = 1;
@@ -125,7 +125,7 @@ public class CharacterUtils {
         abHyperbeam.setDamagerValues( wc, 350,900, 1.1f, -256, false);
 
         //puffer
-        MeleeAbility abPuffer = new MeleeAbility(wc, boomSoundIndex, 8, 2, 8, 60*3, new Circle(128f), 0f, sndHit);
+        MeleeAbility abPuffer = new MeleeAbility(wc, boomSoundIndex, 8, 2, 8, 60*3, new Circle(128f), 0f, sndBoom);
         abPuffer.setDamagerValues(wc, 20, 900f, 0.1f, 0f, false);
 
 
