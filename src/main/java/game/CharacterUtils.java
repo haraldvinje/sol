@@ -4,6 +4,9 @@ import engine.PositionComp;
 import engine.RotationComp;
 import engine.UserCharacterInputComp;
 import engine.WorldContainer;
+import engine.audio.AudioComp;
+import engine.audio.Sound;
+import engine.audio.SoundListenerComp;
 import engine.character.CharacterComp;
 import engine.character.CharacterInputComp;
 import engine.combat.DamageableComp;
@@ -18,6 +21,8 @@ import engine.visualEffect.VisualEffectComp;
 import engine.visualEffect.VisualEffectUtils;
 import game.server.ServerGameTeams;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,8 +30,9 @@ import java.util.List;
  */
 public class CharacterUtils {
 
+
     public static final int CHARACTER_COUNT = 2;
-    public static final int SHRANK = 0, SCHMATHIS = 1;
+    public static final int SHRANK = 0, SCHMATHIAS = 1;
 
     private static float hitboxDepth = 1;
 
@@ -86,7 +92,7 @@ public class CharacterUtils {
         switch(characterId) {
             case SHRANK: charEnt = createShrank(wc, controlled, x, y);
                 break;
-            case SCHMATHIS: charEnt = createSchmathias(wc, controlled, x, y);
+            case SCHMATHIAS: charEnt = createSchmathias(wc, controlled, x, y);
                 break;
             default:
                 throw new IllegalArgumentException("no character of id given");
@@ -101,58 +107,81 @@ public class CharacterUtils {
         int proj1Entity = ProjectileUtils.allocateSinglecolorProjectileAbility(wc, 8, color1);
         int proj2Entity = ProjectileUtils.allocateSinglecolorProjectileAbility(wc, 20, color2);
 
+        int rapidShotSoundIndex = 0;
+        int powershotSoundIndex = 1;
+        int boomSoundIndex = 2;
+
         //rapidshot
-        ProjectileAbility abRapidshot = new ProjectileAbility(wc, proj1Entity, 2, 2, 30, 1200, 30 );
+        ProjectileAbility abRapidshot = new ProjectileAbility(wc, rapidShotSoundIndex, proj1Entity, 2, 2, 30, 1200, 30 );
         abRapidshot.setDamagerValues(wc, 100, 180, 0.5f, -128, false);
 
         //hyperbeam3
-        ProjectileAbility abHyperbeam = new ProjectileAbility(wc, proj2Entity, 15, 10, 120, 1500, 120);
+        ProjectileAbility abHyperbeam = new ProjectileAbility(wc, powershotSoundIndex, proj2Entity, 15, 10, 120, 1500, 120);
         abHyperbeam.setDamagerValues( wc, 350,900, 1.1f, -256, false);
 
         //puffer
-        MeleeAbility abPuffer = new MeleeAbility(wc, 8, 2, 8, 60*3, new Circle(128f), 0f);
+        MeleeAbility abPuffer = new MeleeAbility(wc, boomSoundIndex, 8, 2, 8, 60*3, new Circle(128f), 0f);
         abPuffer.setDamagerValues(wc, 20, 900f, 0.1f, 0f, false);
 
+        Sound sndPowershot = new Sound("audio/powershot.ogg");
+        Sound sndBoom = new Sound ("audio/boom-bang.ogg");
+        Sound sndRapidsShot = new Sound("audio/click4.ogg");
+
+       List<Sound> soundList = new ArrayList<Sound>();
+       soundList.add(rapidShotSoundIndex, sndRapidsShot);
+       soundList.add(powershotSoundIndex, sndPowershot);
+       soundList.add(boomSoundIndex, sndBoom);
+
+
         return createCharacter(wc, controlled, x, y, "sol_frank.png", 160f/2f, 512, 256, 180, 130, 32, 1800f,
-                abRapidshot, abHyperbeam, abPuffer);
+                abRapidshot, abHyperbeam, abPuffer,
+                soundList);
     }
 
     private static int createSchmathias(WorldContainer wc, boolean controlled, float x, float y) {
 
         //frogpunch
-        MeleeAbility abFrogpunch = new MeleeAbility(wc, 3, 5, 3, 20, new Circle(64f),48.0f);
+        MeleeAbility abFrogpunch = new MeleeAbility(wc, -1, 3, 5, 3, 20, new Circle(64f),48.0f);
         abFrogpunch.setDamagerValues(wc, 150, 700, 0.8f, -48f, false);
 
         //hook
         int hookProjEntity = ProjectileUtils.allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
-        ProjectileAbility abHook = new ProjectileAbility(wc, hookProjEntity, 5, 18, 50, 900, 30);
+        ProjectileAbility abHook = new ProjectileAbility(wc, -1, hookProjEntity, 5, 18, 50, 900, 30);
         abHook.setDamagerValues(wc, 200f, 1400f, 0.2f, -128, true);
 
         //meteorpunch
-        MeleeAbility abMeteorpunch = new MeleeAbility(wc, 15, 3, 4, 60, new Circle(32), 64);
+        MeleeAbility abMeteorpunch = new MeleeAbility(wc, -1, 15, 3, 4, 60, new Circle(32), 64);
         abMeteorpunch.setDamagerValues(wc, 500, 1000, 1.5f, -128f, false);
 
+        List<Sound> sounds = new ArrayList<>();
+        sounds.add( new Sound("audio/si.ogg") );
+
+
         return createCharacter(wc, controlled, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
-                abFrogpunch, abHook, abMeteorpunch);
+                abFrogpunch, abHook, abMeteorpunch, sounds);
     }
 
     private static int createShitface(WorldContainer wc, boolean controlled, float x, float y) {
 
         //frogpunch
-        MeleeAbility abFrogpunch = new MeleeAbility(wc, 3, 5, 3, 20, new Circle(64f),48.0f);
+        MeleeAbility abFrogpunch = new MeleeAbility(wc, -1, 3, 5, 3, 20, new Circle(64f),48.0f);
         abFrogpunch.setDamagerValues(wc, 15, 70, 0.8f, -48f, false);
 
         //hook
         int hookProjEntity = ProjectileUtils.allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
-        ProjectileAbility abHook = new ProjectileAbility(wc, hookProjEntity, 5, 18, 50, 900, 30);
+        ProjectileAbility abHook = new ProjectileAbility(wc, -1, hookProjEntity, 5, 18, 50, 900, 30);
         abHook.setDamagerValues(wc, 20f, 140f, 0.2f, -128, true);
 
         //meteorpunch
-        MeleeAbility abMeteorpunch = new MeleeAbility(wc, 15, 3, 4, 60, new Circle(32), 64);
+        MeleeAbility abMeteorpunch = new MeleeAbility(wc, -1, 15, 3, 4, 60, new Circle(32), 64);
         abMeteorpunch.setDamagerValues(wc, 50, 100, 1.5f, -128f, false);
 
+
+        List<Sound> sounds = new ArrayList<Sound>();
+        sounds.add( new Sound("audio/si.ogg") );
+
         return createCharacter(wc, controlled, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
-                abFrogpunch, abHook, abMeteorpunch);
+                abFrogpunch, abHook, abMeteorpunch, sounds );
     }
 
 
@@ -179,17 +208,17 @@ public class CharacterUtils {
 
 
 
-    private static int createCharacter(WorldContainer wc, boolean controlled, float x, float y, String imagePath, float radiusOnImage, float imageWidth, float imageHeight, float offsetXOnImage, float offsetYOnImage, float radius, float moveAccel, Ability ab1, Ability ab2, Ability ab3) {
+    private static int createCharacter(WorldContainer wc, boolean controlled, float x, float y, String imagePath, float radiusOnImage, float imageWidth, float imageHeight, float offsetXOnImage, float offsetYOnImage, float radius, float moveAccel, Ability ab1, Ability ab2, Ability ab3, List<Sound> soundList) {
         int characterEntity = wc.createEntity();
 
-        float scale = radius/radiusOnImage;
-        float width = imageWidth*scale;
-        float height = imageHeight*scale;
-        float offsetX = offsetXOnImage*scale;
-        float offsetY = offsetYOnImage*scale;
+        float scale = radius / radiusOnImage;
+        float width = imageWidth * scale;
+        float height = imageHeight * scale;
+        float offsetX = offsetXOnImage * scale;
+        float offsetY = offsetYOnImage * scale;
 
         wc.addComponent(characterEntity, new CharacterComp(moveAccel));//1500f));
-        wc.addComponent(characterEntity, new PositionComp(x, y, (float)(characterCount++)/100f ) ); //z value is a way to make draw ordering and depth positioning correspond. Else alpha images will appear incorrect.
+        wc.addComponent(characterEntity, new PositionComp(x, y, (float) (characterCount++) / 100f)); //z value is a way to make draw ordering and depth positioning correspond. Else alpha images will appear incorrect.
         wc.addComponent(characterEntity, new RotationComp());
 
         wc.addComponent(characterEntity, new TexturedMeshComp(TexturedMeshUtils.createRectangle(imagePath, width, height)));
@@ -210,15 +239,18 @@ public class CharacterUtils {
         //client
         wc.addComponent(characterEntity, new InterpolationComp());
 
+        wc.addComponent(characterEntity, new AudioComp(soundList, 1, 100, 2000));
+
         if (controlled) {
             wc.addComponent(characterEntity, new UserCharacterInputComp());
-            wc.addComponent(characterEntity, new ViewControlComp( -GameUtils.VIEW_WIDTH/2f, -GameUtils.VIEW_HEIGHT/2f) );
+            wc.addComponent(characterEntity, new ViewControlComp(-GameUtils.VIEW_WIDTH / 2f, -GameUtils.VIEW_HEIGHT / 2f));
             wc.addComponent(characterEntity, new ControlledComp());
+            wc.addComponent(characterEntity, new SoundListenerComp());
+
         }
 
 
         return characterEntity;
+
     }
-
-
 }

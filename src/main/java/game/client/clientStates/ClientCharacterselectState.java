@@ -163,7 +163,7 @@ public class ClientCharacterselectState extends ClientState {
 
         //store character icons in list
         characterIconEntities[CharacterUtils.SHRANK] = shrankIcon;
-        characterIconEntities[CharacterUtils.SCHMATHIS] = schmathiasIcon;
+        characterIconEntities[CharacterUtils.SCHMATHIAS] = schmathiasIcon;
 
 
         this.cursorEntity  = wc.createEntity();

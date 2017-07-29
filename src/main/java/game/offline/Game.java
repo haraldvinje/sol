@@ -3,28 +3,16 @@ package game.offline;
 
 import engine.*;
 
-import engine.character.*;
-import engine.combat.DamageResolutionSys;
-import engine.combat.DamageableComp;
-import engine.combat.DamagerComp;
-import engine.combat.abilities.Ability;
-import engine.combat.abilities.AbilityComp;
-import engine.combat.abilities.AbilitySys;
-import engine.combat.abilities.MeleeAbility;
+import engine.audio.AudioMaster;
 import engine.graphics.*;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
 import engine.graphics.view_.View;
-import engine.physics.*;
 import engine.window.Window;
 import game.CharacterUtils;
 import game.ClientGameTeams;
 import game.GameUtils;
 import game.SysUtils;
-import utils.maths.M;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by eirik on 13.06.2017.
@@ -52,28 +40,30 @@ public class Game {
         window = new Window(0.8f, 0.8f,"SIIII");
         userInput = new UserInput(window, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
+        Font.loadFonts(FontType.BROADWAY);
+        AudioMaster.init();
+
         wc = new WorldContainer( new View(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT) );
 
 
-        //load stuff
-        Font.loadFonts(FontType.BROADWAY);
-
         GameUtils.assignComponentTypes(wc);
-        SysUtils.addOfflineSystems(wc, window, userInput);
-
-
-        System.out.println("HEELLLLLOOOOO");
 
         GameUtils.createMap(wc);
 
         int[][] characterIds = {
                 {CharacterUtils.SHRANK},
-                {CharacterUtils.SCHMATHIS}
+                {CharacterUtils.SCHMATHIAS}
         };
 
         ClientGameTeams teams = new ClientGameTeams(characterIds, 0, 0);
 
         CharacterUtils.createOfflineCharacters(wc, teams);
+
+
+        SysUtils.addOfflineSystems(wc, window, userInput);
+
+
+        System.out.println("HEELLLLLOOOOO");
     }
 
 

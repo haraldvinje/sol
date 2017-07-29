@@ -2,6 +2,7 @@ package game.server;
 
 import engine.UserInput;
 import engine.WorldContainer;
+import engine.audio.AudioMaster;
 import engine.character.*;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
@@ -73,9 +74,13 @@ public class ServerIngame {
 
         //load other stuff
         Font.loadFonts(FontType.BROADWAY);
+        AudioMaster.init();
+
 
         GameUtils.assignComponentTypes(wc);
         SysUtils.addServerSystems(wc, window, Arrays.asList( teams.getAllClients() ) );
+
+
 
         System.out.println("Server game initiated with clients: "+ Arrays.toString(teams.getAllClients()) );
 

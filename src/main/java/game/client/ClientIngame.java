@@ -2,6 +2,7 @@ package game.client;
 
 import engine.UserInput;
 import engine.WorldContainer;
+import engine.audio.AudioMaster;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
 import engine.graphics.view_.View;
@@ -70,8 +71,11 @@ public class ClientIngame implements Runnable{
         window = new Window(0.5f, 0.5f, "Client   SIIII");
         userInput = new UserInput(window, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
+
         //load stuff
         Font.loadFonts(FontType.BROADWAY);
+        AudioMaster.init();
+
 
 
         GameUtils.assignComponentTypes(wc);

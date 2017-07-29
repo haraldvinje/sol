@@ -27,10 +27,14 @@ dependencies {
     compile "org.lwjgl:lwjgl:${lwjglVersion}"
     compile "org.lwjgl:lwjgl-glfw:${lwjglVersion}"
     compile "org.lwjgl:lwjgl-opengl:${lwjglVersion}"
+    compile "org.lwjgl:lwjgl-openal:${lwjglVersion}"
+    compile "org.lwjgl:lwjgl-stb:${lwjglVersion}"
 
     nativeBundle "org.lwjgl:lwjgl:${lwjglVersion}:natives-windows@jar"
     nativeBundle "org.lwjgl:lwjgl-glfw:${lwjglVersion}:natives-windows@jar"
     nativeBundle "org.lwjgl:lwjgl-opengl:${lwjglVersion}:natives-windows@jar"
+    nativeBundle "org.lwjgl:lwjgl-openal:${lwjglVersion}:natives-windows@jar"
+    nativeBundle "org.lwjgl:lwjgl-stb:${lwjglVersion}:natives-windows@jar"
 
 
     // Use JUnit test framework
@@ -68,6 +72,7 @@ task runServerClient(dependsOn: ['runClient', 'runServer'])
 runClient.mustRunAfter runServer
 
 run {
+
     mainClassName = 'game.offline.Main'
 
     systemProperty 'java.library.path', project.nativeLibsDir

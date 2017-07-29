@@ -85,7 +85,7 @@ public class CharacterSys implements Sys {
 
         updateMove(charComp, inputComp, phComp);
         updateRotation(entity, inputComp, posComp, rotComp);
-        updateAbilities(charComp, abComp, inputComp, posComp, rotComp);
+        updateAbilities(entity, charComp, abComp, inputComp, posComp, rotComp);
     }
 
     private void checkHoleAffected(int charNumb, PositionComp posComp, PhysicsComp physComp, CharacterComp charComp, DamageableComp dmgablComp, AffectedByHoleComp affholeComp) {
@@ -130,8 +130,9 @@ public class CharacterSys implements Sys {
         rotComp.addAngle(diffAngle * 0.3f);
     }
 
-    private void updateAbilities(CharacterComp charComp, AbilityComp abComp, CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
+    private void updateAbilities(int entity, CharacterComp charComp, AbilityComp abComp, CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
         //System.out.println(inputComp.isAction1());
+
 
         if (inputComp.isAction1()){
             abComp.requestExecution(0);

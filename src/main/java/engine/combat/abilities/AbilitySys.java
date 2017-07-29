@@ -4,6 +4,7 @@ import engine.PositionComp;
 import engine.RotationComp;
 import engine.Sys;
 import engine.WorldContainer;
+import engine.audio.AudioComp;
 import engine.combat.DamageableComp;
 import engine.physics.PhysicsComp;
 import javafx.geometry.Pos;
@@ -33,6 +34,7 @@ public class AbilitySys implements Sys {
             PositionComp posComp = (PositionComp) wc.getComponent(entity, PositionComp.class);
             RotationComp rotComp = (RotationComp) wc.getComponent(entity, RotationComp.class);
             AbilityComp abComp = (AbilityComp) wc.getComponent(entity, AbilityComp.class);
+            AudioComp audioComp = (AudioComp) wc.getComponent(entity, AudioComp.class);
 
             if (wc.hasComponent(entity, DamageableComp.class)) {
                 DamageableComp dmgableComp = (DamageableComp)wc.getComponent(entity, DamageableComp.class);
@@ -47,7 +49,7 @@ public class AbilitySys implements Sys {
                 abortAbilityExecution(abComp, entity);
             }
 
-            abComp.streamAbilities().forEach(a -> updateMeleeAbility(entity, a, abComp, posComp, rotComp ) );
+            abComp.streamAbilities().forEach(a -> updateMeleeAbility(entity, a, abComp, posComp, rotComp, audioComp ) );
         });
     }
 
@@ -69,7 +71,7 @@ public class AbilitySys implements Sys {
         }
     }
 
-    private void updateMeleeAbility(int entity, Ability ability, AbilityComp abComp, PositionComp posComp, RotationComp rotComp){
+    private void updateMeleeAbility(int entity, Ability ability, AbilityComp abComp, PositionComp posComp, RotationComp rotComp, AudioComp audioComp){
 
         int startupTime = ability.getStartupTime();
         int effectTime = ability.getEffectTime();
@@ -89,6 +91,8 @@ public class AbilitySys implements Sys {
                 if (ability.isRequestingExecution()) {
 
                     startExecution(abComp, ability);
+                    AudioComp ac = (AudioComp)wc.getComponent(entity, AudioComp.class);
+
                 }
             }
 
@@ -98,7 +102,7 @@ public class AbilitySys implements Sys {
                 if (ability.counter < startupTime) {
                     //do nothing, but keeps the flow straight
                 } else if (ability.counter == startupTime) {
-                    startEffect(ability, entity);
+                    startEffect(ability, entity, audioComp);
                 } else if (ability.counter < startupTime + effectTime) {
                     duringEffect(ability, entity);
                 } else if (ability.counter == startupTime + effectTime) {
@@ -124,8 +128,13 @@ public class AbilitySys implements Sys {
         ability.counter = 0;
     }
 
-    private void startEffect(Ability ability, int entity){
+    private void startEffect(Ability ability, int entity, AudioComp audioComp){
         ability.startEffect(wc, entity);
+
+        //play start effect sound
+        if (ability.getStartEffectSoundIndex() != -1) {
+            audioComp.requestSound = ability.getStartEffectSoundIndex();
+        }
     }
 
 
