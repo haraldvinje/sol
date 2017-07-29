@@ -31,8 +31,8 @@ import java.util.List;
 public class CharacterUtils {
 
 
-    public static final int CHARACTER_COUNT = 2;
-    public static final int SHRANK = 0, SCHMATHIAS = 1;
+    public static final int CHARACTER_COUNT = 3;
+    public static final int SHRANK = 0, SCHMATHIAS = 1, BRAIL = 2;
 
     private static float hitboxDepth = 1;
 
@@ -93,6 +93,8 @@ public class CharacterUtils {
             case SHRANK: charEnt = createShrank(wc, controlled, x, y);
                 break;
             case SCHMATHIAS: charEnt = createSchmathias(wc, controlled, x, y);
+                break;
+            case BRAIL: charEnt = createBrail(wc, controlled, x, y);
                 break;
             default:
                 throw new IllegalArgumentException("no character of id given");
@@ -160,6 +162,39 @@ public class CharacterUtils {
         List<Sound> sounds = new ArrayList<>();
         sounds.add(suhSoundIndex, new Sound("audio/si.ogg") );
 
+
+        return createCharacter(wc, controlled, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
+                abFrogpunch, abHook, abMeteorpunch, sounds);
+    }
+
+    private static int createBrail(WorldContainer wc, boolean controlled, float x, float y) {
+        Sound snd1 = new Sound("audio/click4.ogg");
+        Sound snd2 = new Sound("audio/laser02.ogg");
+        Sound snd3 = new Sound("audio/snabbe.ogg");
+
+        int ab1CharSnd = 0;
+        int ab2CharSnd = 1;
+        int ab3CharSnd = 2;
+
+        float[] purple = {1.0f, 0f, 1.0f};
+
+        //lightForce
+        MeleeAbility abFrogpunch = new MeleeAbility(wc, ab1CharSnd, 6, 6, 6, 30, new Circle(64f),64.0f, null);
+        abFrogpunch.setDamagerValues(wc, 200, 800, 0.9f, -48f, false);
+
+        //chagger
+        int chaggProjectile = ProjectileUtils.allocateSinglecolorProjectileAbility(wc, 64f, purple,null); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
+        ProjectileAbility abHook = new ProjectileAbility(wc, ab2CharSnd, chaggProjectile, 20, 6, 50, 650, 30);
+        abHook.setDamagerValues(wc, 200f, 400, 0.6f, -100, false);
+
+        //scatter
+        MeleeAbility abMeteorpunch = new MeleeAbility(wc, ab3CharSnd, 10, 3, 7, 60, new Circle(96), 128, null);
+        abMeteorpunch.setDamagerValues(wc, 100, 800, 0.5f, 0, true);
+
+        List<Sound> sounds = new ArrayList<>();
+        sounds.add( snd1 );
+        sounds.add( snd2 );
+        sounds.add( snd3 );
 
         return createCharacter(wc, controlled, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
                 abFrogpunch, abHook, abMeteorpunch, sounds);

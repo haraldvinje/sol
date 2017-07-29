@@ -98,6 +98,11 @@ public class ClientCharacterselectState extends ClientState {
             commitCursor();
         }
 
+        try {
+            Thread.sleep(400);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void handleCursorPosition() {
@@ -161,9 +166,15 @@ public class ClientCharacterselectState extends ClientState {
         wc.addComponent(schmathiasIcon, new PositionComp(iconCenterX + characterSpace/2, iconCenterY));
         wc.addComponent(schmathiasIcon, new TexturedMeshComp(TexturedMeshUtils.createRectangle("Schmathias.png", 100, 100)));
 
+        int brailIcon = wc.createEntity();
+        wc.addComponent(brailIcon, new PositionComp(iconCenterX + characterSpace/2 + characterSpace, iconCenterY));
+        wc.addComponent(brailIcon, new TexturedMeshComp(TexturedMeshUtils.createRectangle("Schmathias.png", 100, 100)));
+
+
         //store character icons in list
         characterIconEntities[CharacterUtils.SHRANK] = shrankIcon;
         characterIconEntities[CharacterUtils.SCHMATHIAS] = schmathiasIcon;
+        characterIconEntities[CharacterUtils.BRAIL] = brailIcon;
 
 
         this.cursorEntity  = wc.createEntity();

@@ -51,7 +51,7 @@ public class Game {
         GameUtils.createMap(wc);
 
         int[][] characterIds = {
-                {CharacterUtils.SHRANK},
+                {CharacterUtils.BRAIL},
                 {CharacterUtils.SCHMATHIAS}
         };
 
