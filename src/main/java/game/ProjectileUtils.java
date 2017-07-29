@@ -3,6 +3,8 @@ package game;
 import engine.PositionComp;
 import engine.RotationComp;
 import engine.WorldContainer;
+import engine.audio.AudioComp;
+import engine.audio.Sound;
 import engine.combat.DamagerComp;
 import engine.combat.abilities.HitboxComp;
 import engine.combat.abilities.ProjectileComp;
@@ -21,33 +23,33 @@ public class ProjectileUtils {
     private static float projectileDepth = 1.5f;
 
 
-    public static int allocateSinglecolorProjectileAbility(WorldContainer wc, float radius, float[] color) {
-        int p = allocateNonRenderableProjectileEntity(wc, radius);
+    public static int allocateSinglecolorProjectileAbility(WorldContainer wc, float radius, float[] color, Sound onHitSound) {
+        int p = allocateNonRenderableProjectileEntity(wc, radius, onHitSound);
         wc.addInactiveComponent(p, new ColoredMeshComp( ColoredMeshUtils.createCircleSinglecolor(radius, 12, color) ));
         return p;
     }
 
-    public static int allocateTwocolorProjectileAbility(WorldContainer wc, float radius) {
-        int p = allocateNonRenderableProjectileEntity(wc, radius);
+    public static int allocateTwocolorProjectileAbility(WorldContainer wc, float radius, Sound onHitSound) {
+        int p = allocateNonRenderableProjectileEntity(wc, radius, onHitSound);
         wc.addInactiveComponent(p, new ColoredMeshComp( ColoredMeshUtils.createCircleTwocolor(radius, 12) ));
         return p;
     }
-    public static int allocateImageProjectileEntity(WorldContainer wc, String imagePath, float radiusOnImage, float imageWidth, float imageHeight, float radius) {
+    public static int allocateImageProjectileEntity(WorldContainer wc, String imagePath, float radiusOnImage, float imageWidth, float imageHeight, float radius, Sound onHitSound) {
         float scale = radius/radiusOnImage;
         float width = imageWidth*scale;
         float height = imageHeight*scale;
 
-        int p = allocateNonRenderableProjectileEntity(wc, radius);
+        int p = allocateNonRenderableProjectileEntity(wc, radius, onHitSound);
         wc.addInactiveComponent(p, new TexturedMeshComp(TexturedMeshUtils.createRectangle(imagePath, width, height)) );
         wc.addInactiveComponent(p, new MeshCenterComp(width/2, height/2));
 
         return p;
     }
 
-    public static int allocateNonRenderableProjectileEntity(WorldContainer wc, float radius) {
+    public static int allocateNonRenderableProjectileEntity(WorldContainer wc, float radius, Sound onHitSound) {
         int b = wc.createEntity();
 
-        wc.addInactiveComponent(b, new PositionComp(0,0, projectileDepth));
+        wc.addComponent(b, new PositionComp(0,0, projectileDepth));
         wc.addInactiveComponent(b, new RotationComp());
 
         wc.addInactiveComponent(b, new PhysicsComp(20, 0.05f, 0.3f));
@@ -59,6 +61,10 @@ public class ProjectileUtils {
         wc.addInactiveComponent(b, new CollisionComp(new Circle(radius)));
 
         wc.addComponent(b, new VisualEffectComp(VisualEffectUtils.createOnHitEffect()));
+
+        if (onHitSound != null) {
+            wc.addComponent(b, new AudioComp(onHitSound));
+        }
 
         return b;
     }

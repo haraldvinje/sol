@@ -3,10 +3,12 @@ package engine.combat.abilities;
 import engine.PositionComp;
 import engine.RotationComp;
 import engine.WorldContainer;
+import engine.audio.AudioComp;
 import engine.combat.DamagerComp;
 import engine.physics.Circle;
 import engine.physics.PhysicsComp;
 import engine.physics.Shape;
+import engine.visualEffect.VisualEffectComp;
 import game.GameUtils;
 import utils.maths.Vec2;
 
@@ -94,4 +96,5 @@ public class ProjectileAbility extends Ability {
     void endEffect(WorldContainer wc, int requestingEntity) {
 
     }
+
 }

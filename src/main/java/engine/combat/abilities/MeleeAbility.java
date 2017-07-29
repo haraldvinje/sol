@@ -4,6 +4,7 @@ import engine.PositionComp;
 import engine.RotationComp;
 import engine.WorldContainer;
 import engine.audio.AudioComp;
+import engine.audio.Sound;
 import engine.combat.DamagerComp;
 import engine.physics.*;
 import engine.visualEffect.VisualEffectComp;
@@ -25,14 +26,14 @@ public class MeleeAbility extends Ability{
 
 
     public MeleeAbility(WorldContainer wc, int startEffectSoundIndex, int startupTime, int activeHitboxTime, int endlagTime, int rechargeTime,
-                        Shape hitboxShape, float distance){
+                        Shape hitboxShape, float distance, Sound onHitSound){
         super(wc, startEffectSoundIndex, startupTime, activeHitboxTime, endlagTime, rechargeTime);
 
         this.relativeDistance = distance;
         this.relativeAngle = 0;
 
         if (hitboxShape instanceof Circle){
-            hitboxEntity = CharacterUtils.allocateHitboxEntity(wc, (Circle)hitboxShape);
+            hitboxEntity = CharacterUtils.allocateHitboxEntity(wc, (Circle)hitboxShape, onHitSound);
         }
 
         if (hitboxShape instanceof Rectangle){
@@ -97,8 +98,7 @@ public class MeleeAbility extends Ability{
     @Override
     public void endEffect(WorldContainer wc, int requestingEntity) {
         //deactivate hitbox
-        wc.deactivateEntity(hitboxEntity);
-        wc.activateComponent(hitboxEntity, VisualEffectComp.class);
+        deactivateHitbox(wc);
     }
 
     private void positionHitbox(WorldContainer wc, int requestingEntity) {
@@ -109,6 +109,14 @@ public class MeleeAbility extends Ability{
 
         Vec2 relPos = Vec2.newLenDir(relativeDistance, reqRotComp.getAngle() + relativeAngle );
         hbPosComp.setPos( reqPosComp.getPos().add(relPos) );
+    }
+
+
+    private void deactivateHitbox(WorldContainer wc) {
+        wc.deactivateEntity(hitboxEntity);
+        wc.activateComponent(hitboxEntity, VisualEffectComp.class);
+        wc.activateComponent(hitboxEntity, AudioComp.class);
+        wc.activateComponent(hitboxEntity, PositionComp.class);
     }
 
 }

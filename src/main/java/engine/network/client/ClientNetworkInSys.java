@@ -3,6 +3,7 @@ package engine.network.client;
 import engine.PositionComp;
 import engine.Sys;
 import engine.WorldContainer;
+import engine.audio.AudioComp;
 import engine.character.CharacterComp;
 import engine.combat.DamageableComp;
 import engine.combat.abilities.AbilityComp;
@@ -169,25 +170,22 @@ public class ClientNetworkInSys implements Sys{
         int entityDamaged = data.getEntityDamageable();
         float damageTaken = data.getDamageTaken();
 
-//        if (entityDamaged < 10) {
-//            texts.get(0).getTextMesh().setString(Integer.toString((int)totalDamageTaken));
-//        }
-//        else {
-//            texts.get(1).getTextMesh().setString(Integer.toString((int)totalDamageTaken));
-//
-//        }
-
-        //if hitbox comp isnt already deactivated, start visual effect
-//        if (!wc.hasComponent(entityDamager, VisualEffectComp.class)) {
-//            wc.activateComponent(entityDamager, VisualEffectComp.class);
-//        }
-
+        PositionComp dmgablPosComp = (PositionComp) wc.getComponent(entityDamaged, PositionComp.class);
         DamageableComp dmgableComp = (DamageableComp) wc.getComponent(entityDamaged, DamageableComp.class);
-        VisualEffectComp visefComp = (VisualEffectComp) wc.getComponent(entityDamager, VisualEffectComp.class);
-        PositionComp posComp = (PositionComp) wc.getComponent(entityDamaged, PositionComp.class);
+
+        VisualEffectComp dmgerVisefComp = (VisualEffectComp) wc.getComponent(entityDamager, VisualEffectComp.class);
 
         dmgableComp.applyDamage(damageTaken);
-        visefComp.startEffect(0, posComp.getPos());
+
+        dmgerVisefComp.startEffect(0, dmgablPosComp.getPos());
+
+        if (wc.hasComponent(entityDamager, AudioComp.class)) {
+            AudioComp dmgerAudioComp = (AudioComp) wc.getComponent(entityDamager, AudioComp.class);
+
+            if (dmgerAudioComp.hasSound(0)) {
+                dmgerAudioComp.playSound(0);
+            }
+        }
     }
 
     private void applyProjectileDead(ProjectileDeadData data) {

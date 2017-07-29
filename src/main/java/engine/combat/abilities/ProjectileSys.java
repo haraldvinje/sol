@@ -1,7 +1,9 @@
 package engine.combat.abilities;
 
+import engine.PositionComp;
 import engine.Sys;
 import engine.WorldContainer;
+import engine.audio.AudioComp;
 import engine.combat.DamagerComp;
 import engine.visualEffect.VisualEffect;
 import engine.visualEffect.VisualEffectComp;
@@ -66,6 +68,9 @@ public class ProjectileSys implements Sys {
     private void deactivateProj(int projEntity) {
         wc.deactivateEntity(projEntity);
         wc.activateComponent(projEntity, VisualEffectComp.class);
+        wc.activateComponent(projEntity, AudioComp.class);
+        wc.activateComponent(projEntity, PositionComp.class);
+
     }
 
     @Override

@@ -72,6 +72,10 @@ public class AudioComp implements Component {
     }
 
 
+    public boolean hasSound(int index) {
+        return soundList.size()-1 >= index;
+    }
+
     public void addSound(Sound sound){
         soundList.add(sound);
     }
@@ -97,9 +101,9 @@ public class AudioComp implements Component {
         alSourcei( sourcePointer, AL_SOURCE_RELATIVE, AL_TRUE );
         alSourcei(sourcePointer, AL_LOOPING, AL_TRUE);
 
-
         alSourcef( sourcePointer, AL_ROLLOFF_FACTOR, 0.0f );
 
+        alSourcef(sourcePointer, AL_GAIN, 0.5f);
     }
 
 //    public void addSound(String filename){

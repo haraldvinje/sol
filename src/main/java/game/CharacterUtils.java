@@ -102,10 +102,14 @@ public class CharacterUtils {
     }
 
     private static int createShrank(WorldContainer wc, boolean controlled, float x, float y) {
+        Sound sndPowershot = new Sound("audio/powershot.ogg");
+        Sound sndBoom = new Sound ("audio/boom-bang.ogg");
+        Sound sndRapidsShot = new Sound("audio/click4.ogg");
+
         float[] color1 = {1, 1, 0};
         float[] color2 = {1, 0, 1};
-        int proj1Entity = ProjectileUtils.allocateSinglecolorProjectileAbility(wc, 8, color1);
-        int proj2Entity = ProjectileUtils.allocateSinglecolorProjectileAbility(wc, 20, color2);
+        int proj1Entity = ProjectileUtils.allocateSinglecolorProjectileAbility(wc, 8, color1, sndBoom);
+        int proj2Entity = ProjectileUtils.allocateSinglecolorProjectileAbility(wc, 20, color2, sndBoom);
 
         int rapidShotSoundIndex = 0;
         int powershotSoundIndex = 1;
@@ -120,12 +124,9 @@ public class CharacterUtils {
         abHyperbeam.setDamagerValues( wc, 350,900, 1.1f, -256, false);
 
         //puffer
-        MeleeAbility abPuffer = new MeleeAbility(wc, boomSoundIndex, 8, 2, 8, 60*3, new Circle(128f), 0f);
+        MeleeAbility abPuffer = new MeleeAbility(wc, boomSoundIndex, 8, 2, 8, 60*3, new Circle(128f), 0f, sndBoom);
         abPuffer.setDamagerValues(wc, 20, 900f, 0.1f, 0f, false);
 
-        Sound sndPowershot = new Sound("audio/powershot.ogg");
-        Sound sndBoom = new Sound ("audio/boom-bang.ogg");
-        Sound sndRapidsShot = new Sound("audio/click4.ogg");
 
        List<Sound> soundList = new ArrayList<Sound>();
        soundList.add(rapidShotSoundIndex, sndRapidsShot);
@@ -143,16 +144,16 @@ public class CharacterUtils {
         //frogpunch
         int suhSoundIndex = 0;
 
-        MeleeAbility abFrogpunch = new MeleeAbility(wc, suhSoundIndex, 3, 5, 3, 20, new Circle(64f),48.0f);
+        MeleeAbility abFrogpunch = new MeleeAbility(wc, suhSoundIndex, 3, 5, 3, 20, new Circle(64f),48.0f, null);
         abFrogpunch.setDamagerValues(wc, 150, 700, 0.8f, -48f, false);
 
         //hook
-        int hookProjEntity = ProjectileUtils.allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
+        int hookProjEntity = ProjectileUtils.allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24, null); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
         ProjectileAbility abHook = new ProjectileAbility(wc, suhSoundIndex, hookProjEntity, 5, 18, 50, 900, 30);
         abHook.setDamagerValues(wc, 200f, 1400f, 0.2f, -128, true);
 
         //meteorpunch
-        MeleeAbility abMeteorpunch = new MeleeAbility(wc, suhSoundIndex, 15, 3, 4, 60, new Circle(32), 64);
+        MeleeAbility abMeteorpunch = new MeleeAbility(wc, suhSoundIndex, 15, 3, 4, 60, new Circle(32), 64, null);
         abMeteorpunch.setDamagerValues(wc, 500, 1000, 1.5f, -128f, false);
 
         List<Sound> sounds = new ArrayList<>();
@@ -166,16 +167,16 @@ public class CharacterUtils {
     private static int createShitface(WorldContainer wc, boolean controlled, float x, float y) {
 
         //frogpunch
-        MeleeAbility abFrogpunch = new MeleeAbility(wc, -1, 3, 5, 3, 20, new Circle(64f),48.0f);
+        MeleeAbility abFrogpunch = new MeleeAbility(wc, -1, 3, 5, 3, 20, new Circle(64f),48.0f, null);
         abFrogpunch.setDamagerValues(wc, 15, 70, 0.8f, -48f, false);
 
         //hook
-        int hookProjEntity = ProjectileUtils.allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
+        int hookProjEntity = ProjectileUtils.allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24, null); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
         ProjectileAbility abHook = new ProjectileAbility(wc, -1, hookProjEntity, 5, 18, 50, 900, 30);
         abHook.setDamagerValues(wc, 20f, 140f, 0.2f, -128, true);
 
         //meteorpunch
-        MeleeAbility abMeteorpunch = new MeleeAbility(wc, -1, 15, 3, 4, 60, new Circle(32), 64);
+        MeleeAbility abMeteorpunch = new MeleeAbility(wc, -1, 15, 3, 4, 60, new Circle(32), 64, null);
         abMeteorpunch.setDamagerValues(wc, 50, 100, 1.5f, -128f, false);
 
 
@@ -187,10 +188,10 @@ public class CharacterUtils {
     }
 
 
-    public static int allocateHitboxEntity(WorldContainer wc, Circle shape){
+    public static int allocateHitboxEntity(WorldContainer wc, Circle shape, Sound onHitSound){
         int e = wc.createEntity();
 
-        wc.addInactiveComponent(e, new PositionComp(0, 0, hitboxDepth));
+        wc.addComponent(e, new PositionComp(0, 0, hitboxDepth));
         wc.addInactiveComponent(e, new RotationComp());
 
         //wc.addInactiveComponent(e, new PhysicsComp());
@@ -204,6 +205,10 @@ public class CharacterUtils {
         wc.addInactiveComponent(e, new CollisionComp(shape));
 
         wc.addComponent(e, new VisualEffectComp(VisualEffectUtils.createOnHitEffect()));
+
+        if (onHitSound != null) {
+            wc.addComponent(e, new AudioComp(onHitSound));
+        }
 
         return e;
     }
