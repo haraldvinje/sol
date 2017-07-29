@@ -28,6 +28,9 @@ public class Font {
         if (!loadedFonts.containsKey(type)) throw new IllegalStateException("Trying to access font "+type+" that is not loaded");
         return loadedFonts.get(type);
     }
+    public static Font getDefaultFont() {
+        return getFont(FontType.BROADWAY);
+    }
 
 //    public static void main(String[] args) {
 //        loadFonts(FontType.BROADWAY);
