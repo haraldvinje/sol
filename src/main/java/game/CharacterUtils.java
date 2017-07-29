@@ -141,20 +141,22 @@ public class CharacterUtils {
     private static int createSchmathias(WorldContainer wc, boolean controlled, float x, float y) {
 
         //frogpunch
-        MeleeAbility abFrogpunch = new MeleeAbility(wc, -1, 3, 5, 3, 20, new Circle(64f),48.0f);
+        int suhSoundIndex = 0;
+
+        MeleeAbility abFrogpunch = new MeleeAbility(wc, suhSoundIndex, 3, 5, 3, 20, new Circle(64f),48.0f);
         abFrogpunch.setDamagerValues(wc, 150, 700, 0.8f, -48f, false);
 
         //hook
         int hookProjEntity = ProjectileUtils.allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
-        ProjectileAbility abHook = new ProjectileAbility(wc, -1, hookProjEntity, 5, 18, 50, 900, 30);
+        ProjectileAbility abHook = new ProjectileAbility(wc, suhSoundIndex, hookProjEntity, 5, 18, 50, 900, 30);
         abHook.setDamagerValues(wc, 200f, 1400f, 0.2f, -128, true);
 
         //meteorpunch
-        MeleeAbility abMeteorpunch = new MeleeAbility(wc, -1, 15, 3, 4, 60, new Circle(32), 64);
+        MeleeAbility abMeteorpunch = new MeleeAbility(wc, suhSoundIndex, 15, 3, 4, 60, new Circle(32), 64);
         abMeteorpunch.setDamagerValues(wc, 500, 1000, 1.5f, -128f, false);
 
         List<Sound> sounds = new ArrayList<>();
-        sounds.add( new Sound("audio/si.ogg") );
+        sounds.add(suhSoundIndex, new Sound("audio/si.ogg") );
 
 
         return createCharacter(wc, controlled, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
