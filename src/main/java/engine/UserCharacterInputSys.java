@@ -1,11 +1,6 @@
 package engine;
 
-import engine.Sys;
-import engine.UserCharacterInputComp;
-import engine.UserInput;
-import engine.WorldContainer;
-import engine.character.CharacterInputComp;
-import engine.network.CharacterInputData;
+import engine.network.networkPackets.CharacterInputData;
 
 /**
  * Created by eirik on 15.06.2017.
