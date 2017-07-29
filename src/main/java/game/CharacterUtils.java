@@ -105,6 +105,7 @@ public class CharacterUtils {
         Sound sndPowershot = new Sound("audio/powershot.ogg");
         Sound sndBoom = new Sound ("audio/boom-bang.ogg");
         Sound sndRapidsShot = new Sound("audio/click4.ogg");
+        Sound sndHit = new Sound("audio/laser_hit.ogg");
 
         float[] color1 = {1, 1, 0};
         float[] color2 = {1, 0, 1};
@@ -124,7 +125,7 @@ public class CharacterUtils {
         abHyperbeam.setDamagerValues( wc, 350,900, 1.1f, -256, false);
 
         //puffer
-        MeleeAbility abPuffer = new MeleeAbility(wc, boomSoundIndex, 8, 2, 8, 60*3, new Circle(128f), 0f, sndBoom);
+        MeleeAbility abPuffer = new MeleeAbility(wc, boomSoundIndex, 8, 2, 8, 60*3, new Circle(128f), 0f, sndHit);
         abPuffer.setDamagerValues(wc, 20, 900f, 0.1f, 0f, false);
 
 
