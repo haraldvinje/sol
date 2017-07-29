@@ -55,6 +55,9 @@ public class ClientIngameState extends ClientState {
         if (playing) {
 
             if (!gameThread.isAlive()) {
+                //clear net in
+                client.getTcpPacketIn().clear();
+
                 setGotoState(ClientStates.IDLE);
             }
 
@@ -70,6 +73,9 @@ public class ClientIngameState extends ClientState {
 
             //retrieve client teams
             ClientGameTeams teams = NetworkPregameUtils.packetToClientGameTeams(dataIn);
+
+            //clear net in
+            client.getTcpPacketIn().clear();
 
             //create game
             System.out.println("Got data, creating game");

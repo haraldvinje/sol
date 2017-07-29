@@ -143,6 +143,9 @@ public class ServerIngame {
     }
 
 
+    public ServerGameTeams getTeams() {
+        return teams;
+    }
 
     public void terminate() {
         running = false;

@@ -90,6 +90,14 @@ public class TcpPacketInput {
         return packets;
     }
 
+    public void clear() {
+        //allocate lists for packets
+        int size = packetsWaiting.size();
+        for (int i = 0; i < size; i++) {
+            packetsWaiting.put(i, new LinkedList<>() );
+        }
+    }
+
     public void pollPackets() {
 
         try {

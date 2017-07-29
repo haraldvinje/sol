@@ -7,6 +7,9 @@ import engine.network.NetworkPregamePackets;
 import engine.network.NetworkPregameUtils;
 import game.ClientGameTeams;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by haraldvinje on 06-Jul-17.
  */
@@ -81,8 +84,6 @@ public class ServerGame implements Runnable {
     }
 
 
-
-
     public void update() {
 
         //poll packets for all clients
@@ -91,6 +92,12 @@ public class ServerGame implements Runnable {
         handleCharacterSelect();
 
         handleWaitForClientsIngame();
+    }
+
+    public List<ServerClientHandler> getClients() {
+        synchronized (this) {
+            return Arrays.asList( serverIngame.getTeams().getAllClients() );
+        }
     }
 
     private void handleCharacterSelect() {
@@ -137,9 +144,11 @@ public class ServerGame implements Runnable {
         //check if all clients are ingame
         if (waitingClientsIngame == 0) {
 
+            //clear net in
+            Arrays.asList( teams.getAllClients() ).forEach(client -> client.getTcpPacketIn().clear());
+
             //blocking until game ends
             serverIngame.start();
-            characterSelection.getCharacterIds().clear();
         }
 
     }

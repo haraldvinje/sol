@@ -114,6 +114,9 @@ public class Server {
         //handle game queue, and potentially start new games
         handleGameQueueState();
 
+        //handle games running
+        handleGamesRunning();
+
 
         //update systems to show server status
         wc.updateSystems();
@@ -231,6 +234,14 @@ public class Server {
     }
 
     private void terminateRunningGame(ServerGame game) {
+
+        //put clients in idle state and clears netIn
+        game.getClients().forEach( client -> {
+            client.getTcpPacketIn().clear();
+            idleClients.add(client);
+        });
+
+        //stop game
         Thread gameThread = gamesRunning.remove(game); //retrieve thread and remove entry
 
         game.terminate();
@@ -239,6 +250,7 @@ public class Server {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
     }
 
     private void initWorldContainer() {

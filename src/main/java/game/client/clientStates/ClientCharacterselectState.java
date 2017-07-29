@@ -21,6 +21,7 @@ public class ClientCharacterselectState extends ClientState {
     private int[] characterIconEntities;
 
     private int cursorEntity;
+    private int commitEntity;
 
     private boolean characterCommited;
     private int characterSelected;
@@ -44,6 +45,7 @@ public class ClientCharacterselectState extends ClientState {
         characterCommited = false;
         characterSelected = CharacterUtils.SHRANK;
 
+        wc.deactivateEntity(commitEntity);
 
         try {
             Thread.sleep(500);
@@ -128,10 +130,11 @@ public class ClientCharacterselectState extends ClientState {
 
 
     private void commitCursor() {
-        ColoredMeshComp colMeshComp = (ColoredMeshComp)wc.getComponent(cursorEntity, ColoredMeshComp.class);
-        float[]green = {0f, 1f, 0f};
-        colMeshComp.setMesh(ColoredMeshUtils.createCircleSinglecolor(20, 16, green));
+        PositionComp cursorPosComp = (PositionComp) wc.getComponent(cursorEntity, PositionComp.class);
 
+        wc.activateEntity(commitEntity);
+        PositionComp commitPosComp = (PositionComp) wc.getComponent(commitEntity, PositionComp.class);
+        commitPosComp.setPos(cursorPosComp.getPos());
     }
 
 
@@ -167,5 +170,12 @@ public class ClientCharacterselectState extends ClientState {
         wc.addComponent(cursorEntity, new PositionComp(iconCenterX - characterSpace/2 + 30, iconCenterY + 150));
         float[] red = {1f,0f,0f};
         wc.addComponent(cursorEntity, new ColoredMeshComp(ColoredMeshUtils.createCircleSinglecolor(20, 16, red)));
+
+        commitEntity = wc.createEntity();
+        float[]green = {0f, 1f, 0f};
+        wc.addComponent(commitEntity, new PositionComp(0, 0));
+        wc.addComponent(commitEntity, new ColoredMeshComp(ColoredMeshUtils.createCircleSinglecolor(20, 16, green)));
+
+
     }
 }
