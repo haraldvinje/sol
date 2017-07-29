@@ -17,6 +17,13 @@ public class UserInput {
     public static final int KEY_E = GLFW_KEY_E;
     public static final int KEY_F = GLFW_KEY_F;
 
+    public static final int
+            KEY_LEFT = GLFW_KEY_LEFT,
+            KEY_RIGHT = GLFW_KEY_RIGHT,
+            KEY_UP = GLFW_KEY_UP,
+            KEY_DOWN = GLFW_KEY_DOWN;
+
+
     public static final int KEY_ENTER = GLFW_KEY_ENTER,
                             KEY_ESCAPE = GLFW_KEY_ESCAPE,
                             KEY_SPACE = GLFW_KEY_SPACE,
