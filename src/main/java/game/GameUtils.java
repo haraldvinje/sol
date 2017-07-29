@@ -17,7 +17,7 @@ import engine.network.client.InterpolationSys;
 
 import engine.network.client.*;
 
-import engine.network.server.ServerClientHandler;
+import game.server.ServerClientHandler;
 import engine.network.server.ServerNetworkSys;
 import engine.physics.*;
 import engine.visualEffect.VisualEffectComp;
@@ -37,13 +37,6 @@ public class GameUtils {
             MAP_HEIGHT = 900f;
 
     public static float VIEW_WIDTH = MAP_WIDTH, VIEW_HEIGHT = MAP_HEIGHT;
-
-    public static final int SERVER = 0, CLIENT = 1, OFFLINE = 2;
-    public static int PROGRAM = -1;
-    //public static boolean SERVER_RENDER;
-    public static Socket socket; //set by mainClient args
-
-    public static List<ServerClientHandler> CLIENT_HANDELERS;
 
     public static int[][] startPositionsTeam1, startPositionsTeam2;
 
@@ -82,95 +75,10 @@ public class GameUtils {
 
     }
 
-    public static void assignSystems(WorldContainer wc, Window window, UserInput userInput) {
-        if (PROGRAM == SERVER) {
-            wc.addSystem(new CharacterSys());
-            wc.addSystem(new AbilitySys());
-
-            wc.addSystem(new ServerNetworkSys(CLIENT_HANDELERS)); //takes wc because it allocates icons
-
-            wc.addSystem(new CollisionDetectionSys());
-            wc.addSystem(new HoleResolutionSys());
-            wc.addSystem(new HitboxResolutionSys());
-            wc.addSystem(new DamageResolutionSys());
-            wc.addSystem(new NaturalResolutionSys());
-
-            wc.addSystem(new PhysicsSys());
-
-            wc.addSystem(new ProjectileSys());
-
-            wc.addSystem(new RenderSys(window));
-        }
-
-        else if (PROGRAM == CLIENT){
-            wc.addSystem(new UserCharacterInputSys(userInput));
-
-            wc.addSystem(new ClientNetworkInSys(socket));
-            wc.addSystem(new AbilitySys());
-            wc.addSystem(new PhysicsSys());
-
-            wc.addSystem(new InterpolationSys());
-
-            wc.addSystem(new ProjectileSys());
-
-            wc.addSystem(new ViewControlSys());
-
-            wc.addSystem(new ClientNetworkOutSys(socket, userInput));
-            wc.addSystem(new VisualEffectSys());
-
-            wc.addSystem(new OnScreenSys(wc, 2));
-
-            wc.addSystem(new RenderSys(window));
-        }
-
-        else if (PROGRAM == OFFLINE) {
-            wc.addSystem(new UserCharacterInputSys(userInput));
-            wc.addSystem(new UserInputToCharacterSys());
-            wc.addSystem(new CharacterSys());
-            wc.addSystem(new AbilitySys());
-
-            wc.addSystem(new CollisionDetectionSys());
-            wc.addSystem(new HoleResolutionSys());
-            wc.addSystem(new HitboxResolutionSys());
-            wc.addSystem(new DamageResolutionSys());
-            wc.addSystem(new NaturalResolutionSys());
-
-            wc.addSystem(new PhysicsSys());
-
-            wc.addSystem(new ProjectileSys());
-
-            wc.addSystem(new ViewControlSys());
-            wc.addSystem(new VisualEffectSys());
-
-            wc.addSystem(new OnScreenSys(wc, 2));
-
-            wc.addSystem(new RenderSys(window));
-
-        }
-    }
-
 
 
 
     public static void createMap(WorldContainer wc) {
-
-
-//        //create players
-//        float centerSeparation = 300f;
-//        if (PROGRAM == OFFLINE) {
-//            //createShrank(wc, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
-//            createSchmathias(wc, true, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
-//
-//            createSandbag(wc);
-//        }
-//        else if (PROGRAM == SERVER){
-//            createShrank(wc, true, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
-//            createSchmathias(wc, true, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
-//        }
-//        else if (PROGRAM == CLIENT) {
-//            createShrank(wc, true, MAP_WIDTH / 2 - centerSeparation, MAP_HEIGHT / 2);
-//            createSchmathias(wc, false, MAP_WIDTH / 2 + centerSeparation, MAP_HEIGHT / 2);
-//        }
 
         int[][] startPositionsTeam1 = { {100, 200}, {100, 400}};
         int[][] startPositionsTeam2 = { {1000, 200}, {1000, 400}};
@@ -196,25 +104,25 @@ public class GameUtils {
     }
 
 
-    private static int createSandbag(WorldContainer wc) {
-        if (PROGRAM != OFFLINE) throw new UnsupportedOperationException("Sandbag not implemented for nonoffline use");
-
-        float radius = 32f;
-        int sandbag = wc.createEntity();
-        wc.addComponent(sandbag, new PositionComp(500, 300) );
-        wc.addComponent(sandbag, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sandbag.png", radius*2, radius*2)));
-        wc.addComponent(sandbag, new MeshCenterComp(radius, radius));
-
-        wc.addComponent(sandbag, new PhysicsComp(80, 2.5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
-        wc.addComponent(sandbag, new CollisionComp(new Circle(radius)));
-        wc.addComponent(sandbag, new NaturalResolutionComp());
-
-
-        wc.addComponent(sandbag, new DamageableComp());
-        wc.addComponent(sandbag, new AffectedByHoleComp());
-
-        return sandbag;
-    }
+//    private static int createSandbag(WorldContainer wc) {
+//        if (PROGRAM != OFFLINE) throw new UnsupportedOperationException("Sandbag not implemented for nonoffline use");
+//
+//        float radius = 32f;
+//        int sandbag = wc.createEntity();
+//        wc.addComponent(sandbag, new PositionComp(500, 300) );
+//        wc.addComponent(sandbag, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sandbag.png", radius*2, radius*2)));
+//        wc.addComponent(sandbag, new MeshCenterComp(radius, radius));
+//
+//        wc.addComponent(sandbag, new PhysicsComp(80, 2.5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
+//        wc.addComponent(sandbag, new CollisionComp(new Circle(radius)));
+//        wc.addComponent(sandbag, new NaturalResolutionComp());
+//
+//
+//        wc.addComponent(sandbag, new DamageableComp());
+//        wc.addComponent(sandbag, new AffectedByHoleComp());
+//
+//        return sandbag;
+//    }
 
     private static int createCircleHole(WorldContainer wc, float x, float y, float radius) {
         int hole = wc.createEntity();
@@ -225,12 +133,11 @@ public class GameUtils {
         wc.addComponent(hole, new ColoredMeshComp(ColoredMeshUtils.createCircleSinglecolor(radius, 16, color)));
         //wc.addComponent(hole, new MeshCenterComp(radius, radius));
 
-        if (PROGRAM == SERVER || PROGRAM == OFFLINE) {
-            wc.addComponent(hole, new CollisionComp(new Circle(radius)));
-            //wc.addComponent(hole, new PhysicsComp(500f, 10.0f));
 
-            wc.addComponent(hole, new HoleComp());
-        }
+        wc.addComponent(hole, new CollisionComp(new Circle(radius)));
+        //wc.addComponent(hole, new PhysicsComp(500f, 10.0f));
+
+        wc.addComponent(hole, new HoleComp());
 
         return hole;
     }
@@ -244,12 +151,10 @@ public class GameUtils {
 //        wc.addComponent(hole, new ColoredMeshComp(ColoredMeshUtils.createRectangle(radius, 16, color)));
 //        wc.addComponent(hole, new MeshCenterComp(width/2, height/2));
 
-        if (PROGRAM == SERVER || PROGRAM == OFFLINE) {
-            wc.addComponent(hole, new CollisionComp(new Rectangle(width, height)));
-            //wc.addComponent(hole, new PhysicsComp(500f, 10.0f));
+        wc.addComponent(hole, new CollisionComp(new Rectangle(width, height)));
+        //wc.addComponent(hole, new PhysicsComp(500f, 10.0f));
 
-            wc.addComponent(hole, new HoleComp());
-        }
+        wc.addComponent(hole, new HoleComp());
 
         return hole;
     }
@@ -269,12 +174,10 @@ public class GameUtils {
         wc.addComponent(w, new ColoredMeshComp(ColoredMeshUtils.createRectangle(width, height)));
         wc.addComponent(w, new MeshCenterComp(width/2, height/2)); //physical rectangle is defined with position being the center, while the graphical square is defined in the upper left corner
 
-        if (PROGRAM == SERVER || PROGRAM == OFFLINE) {
-            wc.addComponent(w, new PhysicsComp(0, 1, 1));
-            wc.addComponent(w, new CollisionComp(new Rectangle(width, height)));
-            wc.addComponent(w, new NaturalResolutionComp());
 
-        }
+        wc.addComponent(w, new PhysicsComp(0, 1, 1));
+        wc.addComponent(w, new CollisionComp(new Rectangle(width, height)));
+        wc.addComponent(w, new NaturalResolutionComp());
 
         return w;
     }
