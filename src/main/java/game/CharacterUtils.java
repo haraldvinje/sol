@@ -21,6 +21,8 @@ import engine.physics.*;
 import engine.visualEffect.VisualEffectComp;
 import engine.visualEffect.VisualEffectUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -28,7 +30,7 @@ import java.util.List;
  */
 public class CharacterUtils {
 
-    public static final int SHRANK = 0, SCHMATHIS = 1;
+    public static final int SHRANK = 0, SCHMATHIAS = 1;
 
     private static float hitboxDepth = 1;
 
@@ -86,7 +88,7 @@ public class CharacterUtils {
         switch(characterId) {
             case SHRANK: charEnt = createShrank(wc, controlled, x, y);
                 break;
-            case SCHMATHIS: charEnt = createSchmathias(wc, controlled, x, y);
+            case SCHMATHIAS: charEnt = createSchmathias(wc, controlled, x, y);
                 break;
             default:
                 throw new IllegalArgumentException("no character of id given");
@@ -101,25 +103,35 @@ public class CharacterUtils {
         int proj1Entity = ProjectileUtils.allocateSinglecolorProjectileAbility(wc, 8, color1);
         int proj2Entity = ProjectileUtils.allocateSinglecolorProjectileAbility(wc, 20, color2);
 
+        int rapidShotSoundIndex = 0;
+        int powershotSoundIndex = 1;
+        int boomSoundIndex = 2;
+
         //rapidshot
-        ProjectileAbility abRapidshot = new ProjectileAbility(wc, -1, proj1Entity, 2, 2, 30, 1200, 30 );
+        ProjectileAbility abRapidshot = new ProjectileAbility(wc, rapidShotSoundIndex, proj1Entity, 2, 2, 30, 1200, 30 );
         abRapidshot.setDamagerValues(wc, 100, 180, 0.5f, -128, false);
 
         //hyperbeam3
-        ProjectileAbility abHyperbeam = new ProjectileAbility(wc, 0, proj2Entity, 15, 10, 120, 1500, 120);
+        ProjectileAbility abHyperbeam = new ProjectileAbility(wc, powershotSoundIndex, proj2Entity, 15, 10, 120, 1500, 120);
         abHyperbeam.setDamagerValues( wc, 350,900, 1.1f, -256, false);
 
         //puffer
-        MeleeAbility abPuffer = new MeleeAbility(wc, 0, 8, 2, 8, 60*3, new Circle(128f), 0f);
+        MeleeAbility abPuffer = new MeleeAbility(wc, boomSoundIndex, 8, 2, 8, 60*3, new Circle(128f), 0f);
         abPuffer.setDamagerValues(wc, 20, 900f, 0.1f, 0f, false);
 
         Sound sndPowershot = new Sound("audio/powershot.ogg");
-        Sound sndSii = new Sound("audio/si.ogg");
+        Sound sndBoom = new Sound ("audio/boom-bang.ogg");
+        Sound sndRapidsShot = new Sound("audio/click4.ogg");
+
+       List<Sound> soundList = new ArrayList<Sound>();
+       soundList.add(rapidShotSoundIndex, sndRapidsShot);
+       soundList.add(powershotSoundIndex, sndPowershot);
+       soundList.add(boomSoundIndex, sndBoom);
 
 
         return createCharacter(wc, controlled, x, y, "sol_frank.png", 160f/2f, 512, 256, 180, 130, 32, 1800f,
                 abRapidshot, abHyperbeam, abPuffer,
-                sndPowershot);
+                soundList);
     }
 
     private static int createSchmathias(WorldContainer wc, boolean controlled, float x, float y) {
@@ -235,5 +247,49 @@ public class CharacterUtils {
         return characterEntity;
     }
 
+    private static int createCharacter(WorldContainer wc, boolean controlled, float x, float y, String imagePath, float radiusOnImage, float imageWidth, float imageHeight, float offsetXOnImage, float offsetYOnImage, float radius, float moveAccel, Ability ab1, Ability ab2, Ability ab3, List<Sound> soundList) {
+        int characterEntity = wc.createEntity();
 
+        float scale = radius / radiusOnImage;
+        float width = imageWidth * scale;
+        float height = imageHeight * scale;
+        float offsetX = offsetXOnImage * scale;
+        float offsetY = offsetYOnImage * scale;
+
+        wc.addComponent(characterEntity, new CharacterComp(moveAccel));//1500f));
+        wc.addComponent(characterEntity, new PositionComp(x, y, (float) (characterCount++) / 100f)); //z value is a way to make draw ordering and depth positioning correspond. Else alpha images will appear incorrect.
+        wc.addComponent(characterEntity, new RotationComp());
+
+        wc.addComponent(characterEntity, new TexturedMeshComp(TexturedMeshUtils.createRectangle(imagePath, width, height)));
+        wc.addComponent(characterEntity, new MeshCenterComp(offsetX, offsetY));
+
+        wc.addComponent(characterEntity, new AbilityComp(ab1, ab2, ab3));
+
+        //server and offline
+        wc.addComponent(characterEntity, new PhysicsComp(80, 5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
+        wc.addComponent(characterEntity, new CollisionComp(new Circle(radius)));
+        wc.addComponent(characterEntity, new NaturalResolutionComp());
+
+        wc.addComponent(characterEntity, new AffectedByHoleComp());
+
+        wc.addComponent(characterEntity, new DamageableComp());
+        wc.addComponent(characterEntity, new CharacterInputComp());
+
+        //client
+        wc.addComponent(characterEntity, new InterpolationComp());
+
+        wc.addComponent(characterEntity, new AudioComp(soundList, 1, 100, 2000));
+
+        if (controlled) {
+            wc.addComponent(characterEntity, new UserCharacterInputComp());
+            wc.addComponent(characterEntity, new ViewControlComp(-GameUtils.VIEW_WIDTH / 2f, -GameUtils.VIEW_HEIGHT / 2f));
+            wc.addComponent(characterEntity, new ControlledComp());
+            wc.addComponent(characterEntity, new SoundListenerComp());
+
+        }
+
+
+        return characterEntity;
+
+    }
 }

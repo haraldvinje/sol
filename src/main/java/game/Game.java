@@ -71,7 +71,7 @@ public class Game {
         team1Chars.add(CharacterUtils.SHRANK);
 //        team1Chars.add(CharacterUtils.SHRANK);
 
-        team2Chars.add(CharacterUtils.SCHMATHIS);
+        team2Chars.add(CharacterUtils.SCHMATHIAS);
 
         CharacterUtils.createOfflineCharacters(wc, team1Chars, team2Chars, 0, 0);
     }

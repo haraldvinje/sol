@@ -3,6 +3,7 @@ package game;
 import engine.*;
 import engine.audio.AudioComp;
 import engine.audio.AudioSys;
+import engine.audio.Sound;
 import engine.audio.SoundListenerComp;
 import engine.character.*;
 import engine.combat.DamageResolutionSys;
@@ -269,6 +270,14 @@ public class GameUtils {
         int bg = wc.createEntity();
         wc.addComponent(bg, new PositionComp(0, 0, -0.5f));
         wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", 1600, 900)));
+
+        Sound battlefield = new Sound("audio/meleeBattlefield.ogg");
+        AudioComp audioComp = new AudioComp(battlefield, 1, 500, 600);
+        audioComp.backgroundMusic();
+        audioComp.playSound(0);
+        wc.addComponent(bg, audioComp);
+
+
 
         return bg;
     }
