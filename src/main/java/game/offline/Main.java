@@ -1,4 +1,6 @@
-package game;
+package game.offline;
+
+import game.offline.Game;
 
 public class Main {
 
@@ -12,7 +14,7 @@ public class Main {
 //        serverGame.init();
 //        serverGame.start();
 
-//        ClientGame clientGame = new ClientGame();
+//        ClientIngame clientGame = new ClientIngame();
 //        clientGame.init();
 //        clientGame.start();
 
