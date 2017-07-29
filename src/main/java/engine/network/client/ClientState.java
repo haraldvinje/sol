@@ -3,6 +3,7 @@ package engine.network.client;
 import engine.UserInput;
 import engine.WorldContainer;
 import engine.window.Window;
+import game.client.Client;
 
 /**
  * Created by eirik on 04.07.2017.
@@ -37,11 +38,11 @@ public abstract class ClientState {
     }
 
     public void init() {
-        wc = ClientUtils.createDefaultWorldContainer(window);
+        wc = ClientUtils.createDefaultWorldContainer(window, userInput);
         initialized = true;
     }
 
-    ClientStates popGotoState() {
+    public ClientStates popGotoState() {
         ClientStates s = gotoState;
         gotoState = null;
         return s;

@@ -5,25 +5,20 @@ import engine.Sys;
 import engine.WorldContainer;
 import engine.character.CharacterComp;
 import engine.combat.DamageableComp;
-import engine.combat.DamagerComp;
 import engine.combat.abilities.AbilityComp;
 import engine.combat.abilities.HitboxComp;
 import engine.combat.abilities.ProjectileComp;
-import engine.graphics.RenderSys;
-import engine.graphics.text.Font;
-import engine.graphics.text.FontType;
-import engine.graphics.text.TextMesh;
-import engine.graphics.text.TextMeshComp;
 import engine.network.*;
+import engine.network.networkPackets.AbilityStartedData;
+import engine.network.networkPackets.AllCharacterStateData;
+import engine.network.networkPackets.HitDetectedData;
 import engine.visualEffect.VisualEffectComp;
-import game.GameUtils;
-import utils.maths.Vec4;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -35,21 +30,15 @@ public class ClientNetworkInSys implements Sys{
 
     private WorldContainer wc;
 
-    private DataInputStream inputStream;
+    private TcpPacketInput tcpPacketIn;
 
 
-    private int nextPacketType = -1;
+    private LinkedList<AllCharacterStateData> statesPending = new LinkedList<>();
 
 
+    public ClientNetworkInSys(TcpPacketInput tcpPacketIn) {
 
-    public ClientNetworkInSys(Socket socket) {
-
-        try {
-            inputStream = new DataInputStream(socket.getInputStream());
-        }
-        catch (IOException e) {
-            throw new IllegalStateException("An io exception occured while setting up socket\n could not connect to specified host");
-        }
+        this.tcpPacketIn = tcpPacketIn;
 
     }
 
@@ -61,6 +50,9 @@ public class ClientNetworkInSys implements Sys{
 
     @Override
     public void update() {
+        //poll net in
+        tcpPacketIn.pollPackets();
+
         updateGameStateByServer();
     }
 
@@ -76,83 +68,65 @@ public class ClientNetworkInSys implements Sys{
 
     private void updateGameStateByServer() {
 
-        List<AllCharacterStateData> characterStates = new ArrayList<>();
+        //retrieve new packets, they are null if no packet available
 
-        while (true) {
-            if (inBytesAvailable() < Integer.BYTES) {
-                break;
-            }
+        LinkedList<NetworkDataInput> characterStateData = tcpPacketIn.pollAllPackets(NetworkUtils.SERVER_CHARACTER_STATE_ID);
+        NetworkDataInput abilityStartedData = tcpPacketIn.pollPacket(NetworkUtils.SERVER_ABILITY_STARTED_ID);
+        NetworkDataInput hitDetectedData = tcpPacketIn.pollPacket(NetworkUtils.SERVER_HIT_DETECTED_ID);
+        NetworkDataInput projectileDeadData = tcpPacketIn.pollPacket(NetworkUtils.SERVER_PROJECTILE_DEAD_ID);
 
-            if (nextPacketType == -1) {
-                nextPacketType = readNextPacketId();
 
-//                System.out.println("Read new packet id = " + nextPacketType);
-            }
 
-            boolean notEnoughData = false;
+        //for each state data packet, might be 0
+        for (NetworkDataInput data : characterStateData) {
+            //translate packet
+            AllCharacterStateData stateData = NetworkUtils.packetToGameState(data);
 
-            switch (nextPacketType) {
-                case NetworkUtils.SERVER_CHARACTER_STATE_ID:
-
-                    AllCharacterStateData data = readCharacterData();
-                    if (data != null) {
-                        nextPacketType = -1; //read new packet type
-                        characterStates.add(data);
-                    }
-                    else {
-                        notEnoughData = true;
-                    }
-
-                    break;
-
-                case NetworkUtils.SERVER_ABILITY_STARTED_ID:
-
-                    AbilityStartedData abData = readAbilityStarted();
-                    if (abData != null) {
-                        nextPacketType = -1;
-                        applyAbilityStarted(abData);
-                    }
-                    else {
-                        notEnoughData = true;
-                    }
-
-                    break;
-
-                case NetworkUtils.SERVER_HIT_DETECTED_ID:
-
-                    HitDetectedData hitData = readHitDetected();
-                    if (hitData != null) {
-                        nextPacketType = -1;
-                        applyHitDetected(hitData);
-                    }
-                    else {
-                        notEnoughData = true;
-                    }
-                    break;
-
-                case NetworkUtils.SERVER_PROJECTILE_DEAD_ID:
-
-                    ProjectileDeadData projDeadData = readProjectileDead();
-                    if (projDeadData != null) {
-                        nextPacketType = -1;
-                        applyProjectileDead(projDeadData);
-                    }
-                    else {
-                        notEnoughData = true;
-                    }
-                    break;
-
-                default:
-                    throw new IllegalStateException("Got a game packet with unknown identity");
-            }
-
-            if (notEnoughData) break;
-
-            if (characterStates.size() >= 1) {
-                applyCharacterStates(characterStates.get(characterStates.size() - 1));
-            }
+            //add packet to pendingPackets
+            statesPending.add(stateData);
         }
 
+        if (abilityStartedData != null) {
+            //translate data
+            AbilityStartedData data = NetworkUtils.packetToAbilityStarted(abilityStartedData);
+
+            //Handle
+            applyAbilityStarted(data);
+        }
+
+        if (hitDetectedData != null) {
+            //translate
+            HitDetectedData data = NetworkUtils.packetToHitDetected(hitDetectedData);
+
+            //handle
+            applyHitDetected(data);
+        }
+
+        if (projectileDeadData != null) {
+            //translate
+            ProjectileDeadData data = NetworkUtils.packetToProjectileDead(projectileDeadData);
+
+            //handle
+            applyProjectileDead(data);
+        }
+
+        if (!statesPending.isEmpty()) {
+            System.out.println("states pending: " + statesPending.size());
+            //apply last state obtained
+            while(statesPending.size() > 1) {
+                statesPending.poll();
+            }
+            applyCharacterStates(statesPending.poll());
+
+//            //remove too old states
+//            int statesPendingCount = statesPending.size();
+//            for (int i = 1 + NetworkUtils.CLIENT_INPUT_BUFFERING; i < statesPendingCount; i++) {
+//                statesPending.poll();
+//            }
+//
+//            //apply state
+//            applyCharacterStates(statesPending.poll());
+        }
     }
 
 
@@ -239,65 +213,53 @@ public class ClientNetworkInSys implements Sys{
     }
 
 
-    private int readNextPacketId() {
-        try {
-            return inputStream.readInt();
-        }
-        catch(IOException e) {e.printStackTrace(); throw new IllegalStateException();}
-    }
-    private int inBytesAvailable() {
-        try {
-            return inputStream.available();
-        }
-        catch(IOException e) {e.printStackTrace(); throw new IllegalStateException("");}
-    }
 
-    public AllCharacterStateData readCharacterData() {
-        AllCharacterStateData gameState = null;
-
-        int messageBytes = AllCharacterStateData.BYTES;
-
-        if (inBytesAvailable() >= messageBytes) {
-            gameState = NetworkUtils.streamToGameState(inputStream);
-        }
-
-        return gameState;
-    }
-
-    public AbilityStartedData readAbilityStarted() {
-        AbilityStartedData data = null;
-
-        int messageBytes = AbilityStartedData.BYTES;
-
-        if (inBytesAvailable() >= messageBytes) {
-            data = NetworkUtils.streamToAbilityStarted(inputStream);
-        }
-
-        return data;
-    }
-
-    public HitDetectedData readHitDetected() {
-        HitDetectedData data = null;
-
-        int messageBytes = AbilityStartedData.BYTES;
-
-        if (inBytesAvailable() >= messageBytes) {
-            data = NetworkUtils.streamToHitDetected(inputStream);
-        }
-
-        return data;
-    }
-
-
-    public ProjectileDeadData readProjectileDead() {
-        ProjectileDeadData data = null;
-
-        int messageBytes = ProjectileDeadData.BYTES;
-
-        if (inBytesAvailable() >= messageBytes) {
-            data = NetworkUtils.streamToProjectileDead(inputStream);
-        }
-
-        return data;
-    }
+//    public AllCharacterStateData readCharacterData() {
+//        AllCharacterStateData gameState = null;
+//
+//        int messageBytes = AllCharacterStateData.BYTES;
+//
+//        if (inBytesAvailable() >= messageBytes) {
+//            gameState = NetworkUtils.streamToGameState(inputStream);
+//        }
+//
+//        return gameState;
+//    }
+//
+//    public AbilityStartedData readAbilityStarted() {
+//        AbilityStartedData data = null;
+//
+//        int messageBytes = AbilityStartedData.BYTES;
+//
+//        if (inBytesAvailable() >= messageBytes) {
+//            data = NetworkUtils.streamToAbilityStarted(inputStream);
+//        }
+//
+//        return data;
+//    }
+//
+//    public HitDetectedData readHitDetected() {
+//        HitDetectedData data = null;
+//
+//        int messageBytes = AbilityStartedData.BYTES;
+//
+//        if (inBytesAvailable() >= messageBytes) {
+//            data = NetworkUtils.streamToHitDetected(inputStream);
+//        }
+//
+//        return data;
+//    }
+//
+//
+//    public ProjectileDeadData readProjectileDead() {
+//        ProjectileDeadData data = null;
+//
+//        int messageBytes = ProjectileDeadData.BYTES;
+//
+//        if (inBytesAvailable() >= messageBytes) {
+//            data = NetworkUtils.streamToProjectileDead(inputStream);
+//        }
+//
+//        return data;
+//    }
 }

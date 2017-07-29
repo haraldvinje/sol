@@ -17,6 +17,9 @@ public class ViewRenderComp implements Component{
     private List<TextMesh> textMeshes = new ArrayList<>(1);
 
 
+    public ViewRenderComp() {
+
+    }
     public ViewRenderComp(ColoredMesh mesh) {
         colorMeshes.add(mesh);
     }
@@ -47,5 +50,9 @@ public class ViewRenderComp implements Component{
     }
     public TextMesh getTextMesh(int index) {
         return textMeshes.get(index);
+    }
+
+    public void addMesh(TextMesh mesh) {
+        textMeshes.add(mesh);
     }
 }

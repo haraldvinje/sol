@@ -4,13 +4,14 @@ import engine.Sys;
 import engine.UserCharacterInputComp;
 import engine.UserInput;
 import engine.WorldContainer;
-import engine.network.CharacterInputData;
+import engine.network.NetworkDataOutput;
+import engine.network.TcpPacketOutput;
+import engine.network.networkPackets.CharacterInputData;
 import engine.network.NetworkUtils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 /**
  * Created by eirik on 04.07.2017.
@@ -20,21 +21,15 @@ public class ClientNetworkOutSys implements Sys {
 
     private WorldContainer wc;
 
-    private DataOutputStream outputStream;
+    private TcpPacketOutput tcpPacketOut;
 
     private UserInput userInput;
 
 
-    public ClientNetworkOutSys(Socket socket, UserInput userInput) {
-        this.userInput = userInput;
+    public ClientNetworkOutSys(TcpPacketOutput tcpPacketOut, UserInput userInput) {
+        this.tcpPacketOut = tcpPacketOut;
 
-        try {
-            outputStream = new DataOutputStream(socket.getOutputStream());
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Could not get output stream from socket");
-        }
+        this.userInput = userInput;
 
     }
 
@@ -87,8 +82,11 @@ public class ClientNetworkOutSys implements Sys {
     }
 
     public void sendInputData(CharacterInputData id) {
+        //translate data
+        NetworkDataOutput dataOut = NetworkUtils.characterInputToPacket(id);
 
-        NetworkUtils.characterInputToStream(id, outputStream); //protocol
+        //send
+        tcpPacketOut.send(NetworkUtils.CLIENT_CHARACTER_INPUT, dataOut);
     }
 
 

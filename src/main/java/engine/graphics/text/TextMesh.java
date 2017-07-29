@@ -73,9 +73,13 @@ public class TextMesh {
         this.string = string;
         createVertexData(font, string);
     }
-//    public void append(String string) {
-//        //create an append data
-//    }
+    public void appendString(String string) {
+        setString(this.string + string);
+    }
+
+    public void removeStringChars(int count) {
+        setString(this.string.substring(0, this.string.length() - count) );
+    }
 
     private void deleteVertexArraysAndBuffers() {
         VertexArrayUtils.deleteVertexBuffer(indicesId);

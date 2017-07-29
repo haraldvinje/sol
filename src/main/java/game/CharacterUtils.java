@@ -13,13 +13,13 @@ import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
 import engine.combat.abilities.*;
 import engine.graphics.*;
-import engine.graphics.text.TextMeshComp;
 import engine.graphics.view_.ViewControlComp;
 import engine.ControlledComp;
 import engine.network.client.InterpolationComp;
 import engine.physics.*;
 import engine.visualEffect.VisualEffectComp;
 import engine.visualEffect.VisualEffectUtils;
+import game.server.ServerGameTeams;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +30,8 @@ import java.util.List;
  */
 public class CharacterUtils {
 
+
+    public static final int CHARACTER_COUNT = 2;
     public static final int SHRANK = 0, SCHMATHIAS = 1;
 
     private static float hitboxDepth = 1;
@@ -38,16 +40,17 @@ public class CharacterUtils {
 
 
 
-    public static void createOfflineCharacters(WorldContainer wc, List<Integer> team1Characters, List<Integer> team2Characters, int team, int clientCharacterId) {
-        createClientCharacters(wc, team1Characters, team2Characters, team, clientCharacterId);
+    public static void createOfflineCharacters(WorldContainer wc, ClientGameTeams teams) {
+
+        createClientCharacters(wc, teams);
     }
 
-    public static void createClientCharacters(WorldContainer wc, List<Integer> team1Characters, List<Integer> team2Characters, int team, int clientCharacterId) {
+    public static void createClientCharacters(WorldContainer wc, ClientGameTeams teams) {
 
         int i = 0;
-        for (int charEnt : team1Characters) {
+        for (int charEnt : teams.getCharacterIdsOnTeam(0)) {
             boolean controlled = false;
-            if (team == 0 && i == clientCharacterId) {
+            if (teams.getControlCharacterTeam() == 0 && i == teams.getControlCharacterIndex()) {
                 controlled = true;
             }
             createCharacter(charEnt, wc, controlled, GameUtils.startPositionsTeam1[i][0], GameUtils.startPositionsTeam1[i][1]);
@@ -55,9 +58,9 @@ public class CharacterUtils {
             i++;
         }
         i = 0;
-        for (int charEnt : team2Characters) {
+        for (int charEnt : teams.getCharacterIdsOnTeam(1)) {
             boolean controlled = false;
-            if (team == 1 && i == clientCharacterId) {
+            if (teams.getControlCharacterTeam() == 1 && i == teams.getControlCharacterIndex()) {
                 controlled = true;
             }
             createCharacter(charEnt, wc, controlled, GameUtils.startPositionsTeam2[i][0], GameUtils.startPositionsTeam2[i][1]);
@@ -66,16 +69,17 @@ public class CharacterUtils {
         }
     }
 
-    public static void createServerCharacters(WorldContainer wc, List<Integer> team1Characters, List<Integer> team2Character) {
+    public static void createServerCharacters(WorldContainer wc, ServerGameTeams teams) {
         boolean controlled = true;
 
+
         int i = 0;
-        for (int charEnt : team1Characters) {
+        for (int charEnt : teams.getCharacterIdsOnTeam(0)) {
             createCharacter(charEnt, wc, controlled, GameUtils.startPositionsTeam1[i][0], GameUtils.startPositionsTeam1[i][1]);
             i++;
         }
         i = 0;
-        for (int charEnt : team2Character) {
+        for (int charEnt : teams.getCharacterIdsOnTeam(1)) {
             createCharacter(charEnt, wc, controlled, GameUtils.startPositionsTeam2[i][0], GameUtils.startPositionsTeam2[i][1]);
             i++;
         }

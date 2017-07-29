@@ -17,9 +17,18 @@ public class UserInput {
     public static final int KEY_E = GLFW_KEY_E;
     public static final int KEY_F = GLFW_KEY_F;
 
+    public static final int
+            KEY_LEFT = GLFW_KEY_LEFT,
+            KEY_RIGHT = GLFW_KEY_RIGHT,
+            KEY_UP = GLFW_KEY_UP,
+            KEY_DOWN = GLFW_KEY_DOWN;
+
+
     public static final int KEY_ENTER = GLFW_KEY_ENTER,
                             KEY_ESCAPE = GLFW_KEY_ESCAPE,
-                            KEY_SPACE = GLFW_KEY_SPACE;
+                            KEY_SPACE = GLFW_KEY_SPACE,
+                            KEY_PERIOD = GLFW_KEY_PERIOD,
+                            KEY_BACKSPACE = GLFW_KEY_BACKSPACE;
 
 
     public static final int MOUSE_BUTTON_1 = GLFW_MOUSE_BUTTON_1;
@@ -85,5 +94,18 @@ public class UserInput {
     }
     public boolean isKeyboardPressed( int keyCode) {
         return keyPressed[keyCode];
+    }
+
+    public char getNumberPressed() {
+        //luckely, numbers are after each other in ascii encoding
+        int numAsciiMin = '0';
+        int numAsciiMax = '9';
+
+        for (int i = numAsciiMin; i < numAsciiMax+1; i++) {
+            if (isKeyboardPressed(i)) {
+                return (char)i;
+            }
+        }
+        return 0;
     }
 }

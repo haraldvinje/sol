@@ -1,13 +1,15 @@
 import engine.network.*;
+import engine.network.networkPackets.AbilityStartedData;
+import engine.network.networkPackets.AllCharacterStateData;
+import engine.network.networkPackets.CharacterInputData;
+import engine.network.networkPackets.HitDetectedData;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import utils.maths.M;
 
-import java.io.DataOutputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -16,169 +18,125 @@ import java.net.Socket;
  */
 public class NetworkProtocolTest {
 
-    private int port = 7777;
-
-    private ServerSocket serverAcceptSocket;
-    private Socket serverSocket, clientSocket;
-
-    private DataOutputStream serverOut, clientOut;
-    private DataInputStream serverIn, clientIn;
-
-    @Before
-    public void setUp() {
-
-        try {
-            serverAcceptSocket = new ServerSocket(port);
-
-            Thread serverAcceptThread = new Thread( () -> {
-                try {
-                    serverSocket = serverAcceptSocket.accept();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } );
-            serverAcceptThread.start();
-
-
-            Thread.sleep(100);
-
-            clientSocket = new Socket("localhost", port);
-
-            Thread.sleep(100);
-
-            serverAcceptThread.join();
-
-
-            serverOut = new DataOutputStream( serverSocket.getOutputStream() );
-            serverIn = new DataInputStream( serverSocket.getInputStream() );
-
-            clientOut = new DataOutputStream( clientSocket.getOutputStream() );
-            clientIn = new DataInputStream( clientSocket.getInputStream() );
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-    }
 
     @Test
-    public void testConnection() {
-        int serverSend = 4536;
-        int clientSend = 965432;
+    public void testCharacterInput() {
 
-        int serverReceive = 0;
-        int clientReceive = 0;
+        //create data
+        CharacterInputData origDataOut = new CharacterInputData();
 
-        try {
-            serverOut.writeInt(serverSend);
-            clientOut.writeInt(clientSend);
+        origDataOut.setActions(true, false, false);
+        origDataOut.setMovement(false, true, true, false);
+        origDataOut.setAim(largeRandom(), largeRandom());
 
-            Thread.sleep(100);
+        //transfer data from output to input
+        NetworkDataOutput dataOut = NetworkUtils.characterInputToPacket(origDataOut);
+        NetworkDataInput dataIn = new NetworkDataInput(dataOut.getBytes());
 
-            clientReceive = clientIn.readInt();
-            serverReceive = serverIn.readInt();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        //read data
+        CharacterInputData origDataIn = NetworkUtils.packetToCharacterInput(dataIn);
 
 
-        Assert.assertEquals(serverSend, clientReceive);
-        Assert.assertEquals(clientSend, serverReceive);
+        //compare input and output
+        Assert.assertEquals(origDataOut.toString(), origDataIn.toString());
+
     }
 
     @Test
     public void testCharacterState() {
-        try {
 
-            AllCharacterStateData data = new AllCharacterStateData();
-            data.setFrameNumber(10);
-            for (int i = 0; i < NetworkUtils.CHARACTER_NUMB; i++) {
-                data.setX(i, largeRandom());
-                data.setY(i, largeRandom());
-                data.setRotation(i, largeRandom());
-            }
-
-            NetworkUtils.gameStateToStream(data, serverOut);
-
-            Thread.sleep(100);
-
-            AllCharacterStateData receivedData = NetworkUtils.streamToGameState(clientIn);
-
-            System.out.println(data);
-            System.out.println(receivedData);
-            Assert.assertEquals(data.toString(), receivedData.toString());
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        //create data
+        AllCharacterStateData origDataOut = new AllCharacterStateData();
+        origDataOut.setFrameNumber(10);
+        for (int i = 0; i < NetworkUtils.CHARACTER_NUMB; i++) {
+            origDataOut.setX(i, largeRandom());
+            origDataOut.setY(i, largeRandom());
+            origDataOut.setRotation(i, largeRandom());
         }
 
+        //transfer data from output to input
+        NetworkDataOutput dataOut = NetworkUtils.gameStateToPacket(origDataOut);
+        NetworkDataInput dataIn = new NetworkDataInput(dataOut.getBytes());
+
+
+        //read data
+        AllCharacterStateData origDataIn = NetworkUtils.packetToGameState(dataIn);
+
+
+        //compare input and output
+        Assert.assertEquals(origDataOut.toString(), origDataIn.toString());
+
     }
+
     @Test
     public void testAbilityStarted() {
 
-        try {
+        //create data
+        AbilityStartedData origDataOut = new AbilityStartedData();
+        origDataOut.setAbilityId(largeRandomInt());
+        origDataOut.setEntityId(largeRandomInt());
 
-            AbilityStartedData data = new AbilityStartedData();
-            data.setAbilityId(largeRandomInt());
-            data.setEntityId(largeRandomInt());
+        //transfer data from output to input
+        NetworkDataOutput dataOut = NetworkUtils.abilityStartedDataToPacket(origDataOut);
+        NetworkDataInput dataIn = new NetworkDataInput(dataOut.getBytes());
 
-            NetworkUtils.abilityStartedDataToStream(serverOut, data);
 
-            Thread.sleep(100);
+        //read data
+        AbilityStartedData origDataIn = NetworkUtils.packetToAbilityStarted(dataIn);
 
-            AbilityStartedData receivedData = NetworkUtils.streamToAbilityStarted(clientIn);
 
-            System.out.println(data);
-            System.out.println(receivedData);
-            Assert.assertEquals(data.toString(), receivedData.toString());
+        //compare input and output
+        Assert.assertEquals(origDataOut.toString(), origDataIn.toString());
 
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
+
     @Test
     public void testHitDetected() {
-        try {
 
-            HitDetectedData data = new HitDetectedData();
-            data.setEntityDamageable(largeRandomInt());
-            data.setDamageTaken(largeRandom());
 
-            NetworkUtils.hitDetectedToStream(serverOut, data);
+        //create data
+        HitDetectedData origDataOut = new HitDetectedData();
+        origDataOut.setEntityDamageable(largeRandomInt());
+        origDataOut.setDamageTaken(largeRandom());
 
-            Thread.sleep(100);
+        //transfer data from output to input
+        NetworkDataOutput dataOut = NetworkUtils.hitDetectedToPacket(origDataOut);
+        NetworkDataInput dataIn = new NetworkDataInput(dataOut.getBytes());
 
-            HitDetectedData receivedData = NetworkUtils.streamToHitDetected(clientIn);
 
-            System.out.println(data);
-            System.out.println(receivedData);
-            Assert.assertEquals(data.toString(), receivedData.toString());
+        //read data
+        HitDetectedData origDataIn = NetworkUtils.packetToHitDetected(dataIn);
 
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 
-    @After
-    public void tearDown() {
-        try {
-            clientSocket.close();
+        //compare input and output
+        Assert.assertEquals(origDataOut.toString(), origDataIn.toString());
 
-            serverAcceptSocket.close();
-            serverSocket.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
     }
+
+    @Test
+    public void testProjectileDead() {
+
+
+        //create data
+        ProjectileDeadData origDataOut = new ProjectileDeadData();
+        origDataOut.setEntityOwnerId(largeRandomInt());
+        origDataOut.setProjectileAbilityId(largeRandomInt());
+
+        //transfer data from output to input
+        NetworkDataOutput dataOut = NetworkUtils.projectileDeadToPacket(origDataOut);
+        NetworkDataInput dataIn = new NetworkDataInput(dataOut.getBytes());
+
+
+        //read data
+        ProjectileDeadData origDataIn = NetworkUtils.packetToProjectileDead(dataIn);
+
+
+        //compare input and output
+        Assert.assertEquals(origDataOut.toString(), origDataIn.toString());
+
+    }
+
 
     private float largeRandom() {
         return M.random() * Integer.MAX_VALUE;
