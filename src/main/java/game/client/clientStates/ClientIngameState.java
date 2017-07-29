@@ -4,14 +4,13 @@ import engine.PositionComp;
 import engine.WorldContainer;
 import engine.graphics.ColoredMeshComp;
 import engine.graphics.ColoredMeshUtils;
-import engine.network.client.Client;
+import engine.network.NetworkDataInput;
+import engine.network.NetworkPregamePackets;
+import engine.network.NetworkPregameUtils;
 import engine.network.client.ClientState;
-import game.ClientGame;
-
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import engine.network.client.ClientStates;
+import game.client.ClientGame;
+import game.ClientGameTeams;
 
 /**
  * Created by eirik on 04.07.2017.
@@ -21,6 +20,8 @@ public class ClientIngameState extends ClientState {
 
     private Thread gameThread;
     private ClientGame game;
+
+    private boolean playing;
 
 
     @Override
@@ -38,11 +39,43 @@ public class ClientIngameState extends ClientState {
             e.printStackTrace();
         }
 
-        createGame();
+        playing = false;
+
+        //tell server that we are ingame
+        client.getTcpPacketOut().sendEmpty(NetworkPregamePackets.INGAME_CLIENT_READY);
+
+        //wait for server to respond with initial team data
+
     }
 
     @Override
     public void onUpdate() {
+
+
+        if (playing) {
+
+            if (!gameThread.isAlive()) {
+                setGotoState(ClientStates.IDLE);
+            }
+
+            return;
+        }
+
+        //poll net if not in game
+        client.getTcpPacketIn().pollPackets();
+
+        //check if we got data from server
+        NetworkDataInput dataIn = client.getTcpPacketIn().pollPacket(NetworkPregamePackets.INGAME_SERVER_CLIENT_GAME_TEAMS);
+        if (dataIn != null) {
+
+            //retrieve client teams
+            ClientGameTeams teams = NetworkPregameUtils.packetToClientGameTeams(dataIn);
+
+            //create game
+            System.out.println("Got data, creating game");
+            createGame(teams);
+            playing = true;
+        }
 
     }
 
@@ -51,30 +84,14 @@ public class ClientIngameState extends ClientState {
         terminateGame();
     }
 
-    private void createGame() {
-
-        List<Integer> friendlyCharacters = new ArrayList<>();
-        List<Integer> enemyCharacters = new ArrayList<>();
-        int team = 0;
-
-        try {
-             DataInputStream in = new DataInputStream(client.getSocketInputStream());
-
-             team = in.readInt();
-             friendlyCharacters.add( in.readInt() );
-             enemyCharacters.add( in.readInt() );
-        }
-
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-
+    private void createGame(ClientGameTeams teams) {
         game = new ClientGame(client.getSocket());
-        game.init(null, null, friendlyCharacters, enemyCharacters, team, 0);
+        game.init(null, null, teams);
         gameThread = new Thread(game);
 
         gameThread.start();
     }
+
     private void terminateGame() {
         game.terminate();
 

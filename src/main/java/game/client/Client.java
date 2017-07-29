@@ -3,12 +3,13 @@ package engine.network.client;
 import engine.*;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
+import engine.network.NetworkDataInput;
+import engine.network.NetworkDataOutput;
+import engine.network.TcpPacketInput;
+import engine.network.TcpPacketOutput;
 import engine.network.client.clientStates.*;
 import engine.window.Window;
 
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.EnumMap;
@@ -27,6 +28,11 @@ public class Client {
 
     private String hostname;
     private Socket socket = null;
+
+    private TcpPacketOutput tcpPacketOut;
+    private TcpPacketInput tcpPacketIn;
+//    private NetworkDataInput netInStream;
+//    private NetworkDataOutput netOutStream;
 
     private Window window;
     private UserInput userInput;
@@ -49,31 +55,28 @@ public class Client {
     public void setSocket(Socket socket) {
         if (this.socket == null) {
             this.socket = socket;
+
+            try {
+                tcpPacketIn = new TcpPacketInput( socket.getInputStream() );
+                tcpPacketOut = new TcpPacketOutput( socket.getOutputStream() );
+
+            } catch (IOException e) {
+               throw new RuntimeException(e);
+            }
         }
         else throw new IllegalStateException("Trying to set socket after it is already set");
     }
+
 
     public Socket getSocket() {
         return socket;
     }
 
-    public DataInputStream getSocketInputStream(){
-        try{
-           return new DataInputStream(socket.getInputStream());
-        }
-        catch(IOException e){
-            throw new IllegalStateException("");
-        }
+    public TcpPacketInput getTcpPacketIn(){
+        return tcpPacketIn;
     }
-
-
-    public DataOutputStream getSocketOutputStream(){
-        try{
-            return new DataOutputStream(socket.getOutputStream());
-        }
-        catch(IOException e){
-            throw new IllegalStateException("");
-        }
+    public TcpPacketOutput getTcpPacketOut(){
+        return tcpPacketOut;
     }
 
     public void terminate() {
@@ -155,6 +158,11 @@ public class Client {
 
     public void update() {
         window.pollEvents();
+
+        //poll packets to make them available for read
+        if (tcpPacketIn != null && currentState != states.get( ClientStates.INGAME ) ) {
+            tcpPacketIn.pollPackets();
+        }
 
         //update according to state
         currentState.onUpdate();

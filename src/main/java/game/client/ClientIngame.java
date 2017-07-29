@@ -1,19 +1,17 @@
-package game;
+package game.client;
 
 import engine.UserInput;
 import engine.WorldContainer;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
-import engine.network.NetworkUtils;
-import engine.network.client.Client;
+import engine.network.TcpPacketInput;
+import engine.network.TcpPacketOutput;
 import engine.window.Window;
+import game.CharacterUtils;
+import game.ClientGameTeams;
+import game.GameUtils;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by eirik on 22.06.2017.
@@ -40,9 +38,10 @@ public class ClientGame implements Runnable{
 
 
 
-    private List<Integer> friendlyCharacters, enemyCharacters;
-    private int clientCharacterId;
-    private int team;
+    private ClientGameTeams teams;
+//    private List<Integer> friendlyCharacters, enemyCharacters;
+//    private int clientCharacterId;
+//    private int team;
 
 
 
@@ -53,12 +52,9 @@ public class ClientGame implements Runnable{
     }
 
 
-    public void init(DataInputStream inputStream, DataOutputStream outputStream, List<Integer> team1Characters, List<Integer> team2Characters, int team, int clientCharacterId) {
+    public void init(TcpPacketInput tcpPacketIn, TcpPacketOutput tcpPacketOut, ClientGameTeams teams) {
 
-        this.friendlyCharacters = team1Characters;
-        this.enemyCharacters = team2Characters;
-        this.clientCharacterId = clientCharacterId;
-        this.team = team;
+        this.teams = teams;
 
         wc = new WorldContainer(GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
@@ -81,19 +77,14 @@ public class ClientGame implements Runnable{
     public void run() {
 
         System.out.println("Running client");
-        window = new Window("Client   SIIII");
+        window = new Window(0.5f, 0.5f, "Client   SIIII");
         userInput = new UserInput(window, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
         GameUtils.assignComponentTypes(wc);
 
         GameUtils.createMap(wc);
 
-        //create characters
-//        ArrayList<Integer> team1Chars = new ArrayList<>();
-//        ArrayList<Integer> team2Chars = new ArrayList<>();
-//        team1Chars.add(0);
-//        team2Chars.add(1);
-        CharacterUtils.createClientCharacters(wc, friendlyCharacters, enemyCharacters, team, clientCharacterId);
+        CharacterUtils.createClientCharacters(wc, teams);
 
 
 

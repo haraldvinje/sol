@@ -16,6 +16,10 @@ public class ServerClientHandler {
 
 
     private Socket socket;
+
+    private TcpPacketInput tcpPacketIn;
+    private TcpPacketOutput tcpPacketOut;
+
     private DataInputStream inputStream;
     private DataOutputStream outputStream;
 
@@ -28,13 +32,6 @@ public class ServerClientHandler {
     //private LinkedList
 
 
-    public void sendInt(int i) {
-        try {
-            outputStream.writeInt(i);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public ServerClientHandler(Socket clientSocket) {
 
@@ -43,20 +40,56 @@ public class ServerClientHandler {
             inputStream = new DataInputStream(socket.getInputStream());
             outputStream = new DataOutputStream(socket.getOutputStream());
 
+            tcpPacketIn = new TcpPacketInput(socket.getInputStream());
+            tcpPacketOut = new TcpPacketOutput(socket.getOutputStream());
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         inputData = new LinkedList<>();
 
-//        //set up recieve thread
-//        inputThread = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//            }
-//        }
+    }
 
+    public TcpPacketInput getTcpPacketIn() {
+        return tcpPacketIn;
+    }
+
+    public TcpPacketOutput getTcpPacketOut() {
+        return tcpPacketOut;
+    }
+
+    public void sendEmptyPacket(int packetId){
+        tcpPacketOut.sendEmpty(packetId);
+    }
+
+    public int available() {
+        try {
+            return inputStream.available();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean intAvailable(int count) {
+        return available() >= Integer.BYTES * count;
+    }
+
+    public void sendInt(int i) {
+        try {
+            outputStream.writeInt(i);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int readInt() {
+        try {
+            return inputStream.readInt();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -101,23 +134,7 @@ public class ServerClientHandler {
 
 
 
-    public boolean sendClientStateId(int id){
-        try{
-            System.out.println("Sending id: " + id + " to " + outputStream.toString());
-            outputStream.writeInt(id);
-        }
 
-
-        catch (SocketException e) {
-            return false;
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return true;
-
-    }
 
 
     public int getCharacterSelectedData(){

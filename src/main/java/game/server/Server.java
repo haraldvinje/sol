@@ -7,11 +7,13 @@ import engine.WorldContainer;
 import engine.graphics.*;
 import engine.graphics.text.TextMeshComp;
 import engine.graphics.view_.ViewControlComp;
+import engine.network.NetworkPregamePackets;
 import engine.network.NetworkUtils;
 import engine.network.client.ClientStateUtils;
 import engine.network.client.ClientStates;
 import engine.window.Window;
 import game.ServerGame;
+import game.ServerGameTeams;
 import game.ServerInGame;
 
 import java.util.*;
@@ -24,14 +26,6 @@ public class Server {
     private static final float FRAME_INTERVAL = 1.0f/60.0f;
 
 
-
-    private ServerConnectionInput connectionInput;
-    private Thread serverConnectionInputThread;
-
-    private LinkedList<Integer> allocatedClientIcons = new LinkedList<>();
-    private Map<ServerClientHandler, Integer> activeClientIcons = new HashMap<>();
-
-
     private Window window;
     private UserInput userInput;
 
@@ -39,9 +33,24 @@ public class Server {
 
     private long lastTime;
 
+    //clinet connection listener
+    private ServerConnectionInput connectionInput;
+    private Thread serverConnectionInputThread;
 
-    private LinkedList<ServerClientHandler> clientsWaiting = new LinkedList<>();
+    //clients connected icons
+    private LinkedList<Integer> allocatedClientIcons = new LinkedList<>();
+    private Map<ServerClientHandler, Integer> activeClientIcons = new HashMap<>();
 
+    //all connected clients
+    private List<ServerClientHandler> connectedClients = new ArrayList<>();
+
+    //idle clients
+    private List<ServerClientHandler> idleClients = new ArrayList<>();
+
+    //game queue
+    private LinkedList<ServerClientHandler> gameQueue = new LinkedList<>();
+
+    //games running
     private Map<ServerGame, Thread> gamesRunning = new HashMap<>();
 
 
@@ -97,23 +106,92 @@ public class Server {
 
     public void update() {
 
-        checkNewConnections(); //adds panding connections
+        //poll window events
+        window.pollEvents();
 
-        if (clientsWaiting.size() >= 2) {
 
-            System.out.println("Two Clients Waiting");
-            createGame(clientsWaiting.pop(), clientsWaiting.pop());
+        //add pending connections to server state
+        handleNewConnections();
+
+        //handle clients that want to enter game queue
+        handleIdleState();
+
+        //handle game queue, and potentially start new games
+        handleGameQueueState();
+
+
+        //update systems to show server status
+        wc.updateSystems();
+    }
+
+    private void handleNewConnections() {
+        if (connectionInput.hasConnectedClients()) {
+
+            System.out.println("New client connected");
+            ServerClientHandler clientHandler = connectionInput.getConnectedClient();
+
+            //put new client in list of clients and in the idle state
+            connectedClients.add(clientHandler);
+            idleClients.add(clientHandler);
+
+//            activateClientIcon(clientHandler);
+        }
+    }
+
+    private void handleIdleState() {
+        idleClients.forEach(c -> c.getTcpPacketIn().pollPackets());
+
+
+        //check if anyone wants to enter game queue
+        Iterator<ServerClientHandler> it = idleClients.iterator();
+
+        while(it.hasNext()) {
+            ServerClientHandler client = it.next();
+
+            if (client.getTcpPacketIn().removeIfHasPacket(NetworkPregamePackets.QUEUE_CLIENT_REQUEST_QUEUE)) {
+                //remove from idle state and put into queue state
+                it.remove();
+                gameQueue.add(client);
+
+                //let client know that it is put in queue
+                client.getTcpPacketOut().sendEmpty(NetworkPregamePackets.QUEUE_SERVER_PUT_IN_QUEUE);
+
+            }
+        }
+    }
+
+    private void handleGameQueueState() {
+        gameQueue.forEach(c -> c.getTcpPacketIn().pollPackets());
+
+
+        //check if there are enough clients waiting to start a game
+        if (gameQueue.size() >= 2) {
+
+            System.out.println("At least two clients in game queue, starting game");
+
+            //retrieve clients
+            ServerClientHandler client1 = gameQueue.pop();
+            ServerClientHandler client2 = gameQueue.pop();
+
+            //let clients know that they are about to start game
+            client1.getTcpPacketOut().sendEmpty(NetworkPregamePackets.QUEUE_SERVER_GOTO_CHARACTERSELECT);
+            client2.getTcpPacketOut().sendEmpty(NetworkPregamePackets.QUEUE_SERVER_GOTO_CHARACTERSELECT);
+
+            //datastructure to hold clients
+            ServerGameTeams teams = new ServerGameTeams(client1, client2);
+
+            createGame( teams );
         }
 
+
+    }
+
+    public void handleGamesRunning() {
         for (ServerGame game : gamesRunning.keySet()) {
             if (game.isShouldTerminate()) {
                 terminateRunningGame(game);
             }
         }
-
-        window.pollEvents();
-
-        wc.updateSystems();
     }
 
     public void terminate() {
@@ -135,36 +213,16 @@ public class Server {
         Window.terminateGLFW();
     }
 
-    private void createGame(ServerClientHandler client1, ServerClientHandler client2) {
+    private void createGame(ServerGameTeams teams) {
+
 
         ServerGame game = new ServerGame();
-
-
-        ServerClientHandler[] clients = {client1, client2};
-        ArrayList<ServerClientHandler> clientList = new ArrayList<>( Arrays.asList(clients) );
-
-
-        client1.sendClientStateId(ClientStateUtils.CHOOSING_CHARACTER);
-        client2.sendClientStateId(ClientStateUtils.CHOOSING_CHARACTER);
-
-        game.init(clientList);
-
-
+        game.init(teams);
 
         Thread gameThread = new Thread(game);
-
         gamesRunning.put(game, gameThread);
 
         gameThread.start();
-//
-//        client1.sendInt(0); //team number
-//        client1.sendInt(0); //team 1 char
-//        client1.sendInt(1); //team 2 char
-//
-//        client2.sendInt(1); //team number
-//        client2.sendInt(0); //team 1 char
-//        client2.sendInt(1); //team 2 char
-
     }
 
     private void terminateAllRunningGames() {
@@ -203,15 +261,7 @@ public class Server {
     }
 
 
-    private void checkNewConnections() {
-        if (connectionInput.hasConnectedClients()) {
-            System.out.println("Retrieving new connection. clientWaitng="+clientsWaiting.size());
-            ServerClientHandler clientHandler = connectionInput.getConnectedClient();
-            clientsWaiting.add(clientHandler);
 
-            activateClientIcon(clientHandler);
-        }
-    }
 
     private void activateClientIcon(ServerClientHandler clientHandeler) {
         if (allocatedClientIcons.isEmpty()) return;

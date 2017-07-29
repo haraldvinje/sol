@@ -88,7 +88,7 @@ public class ClientConnectingState extends ClientState {
             if (connected == 1) {
                 //we have connected
 
-                setGotoState(ClientStates.WAITING_GAME);
+                setGotoState(ClientStates.IDLE);
             }
             setEntityString(connectingTextEntity, "");
 
