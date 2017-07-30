@@ -27,6 +27,9 @@ public class WorldContainer {
 
     //a maping from entities to its components
     private Map<Integer, ArrayList< Class<? extends Component> >> entityComponents = new HashMap<>();
+    //a mapping from entities to their names
+    private Map< Integer, String > entityNames = new HashMap<>();
+
 
     private List<Sys> systems = new ArrayList<>();
 
@@ -83,15 +86,29 @@ public class WorldContainer {
 
     //----------ENTITY HANDLING
 
-    public int createEntity() {
+    public String getEntityName(int entity) {
+        return entityNames.get(entity);
+    }
+    public void setEntityName(int entity, String name) {
+        entityNames.put(entity, name);
+    }
+
+    public int createEntity(String name) {
         //retrieve unique id
         int e = retrieveEntityId();
 
         //create entry in entity-compType map
         entityComponents.put(e, new ArrayList<>());
 
+        //create entry in name map
+        setEntityName(e, name);
+
         return e;
     }
+    public int createEntity() {
+        return createEntity("");
+    }
+
     /**
      * Use with caution. Better to deactivate than to destroy if a similar entity is used again
      * @param entity
@@ -282,6 +299,9 @@ public class WorldContainer {
         if (c == null) throw new IllegalStateException("No component of the given type is assigned to the given entity, type="+compType);
         return c;
     }
+    public <T extends Component> T getComponent(int entity, Class<? extends Component> compType, boolean b) {
+        return (T) getComponent(entity, compType);
+    }
     public Component getInactiveComponent(int entity, Class<? extends Component> compType) {
         Component c = getInactiveComponentsOfType(compType).get(entity);
         if (c == null) throw new IllegalStateException("No component of the given type is assigned to the given entity, type="+compType);
@@ -307,23 +327,71 @@ public class WorldContainer {
     }
 
 
-    public String entityToString(int entity) {
-        String entStr = "[Entity "+entity+": components={";
-        for (Class<? extends Component> compType : entityComponents.get(entity)) {
-            entStr += compType.getSimpleName() + "=" + hasComponent(entity, compType) + ", ";
+    //--------STUFF TO STRING + PRINTS
+
+    public String systemsToString() {
+        String s =
+                "/////////////////\n"+
+                "//// Systems ////\n";
+        for (Sys sys : systems) {
+            s += sys.getClass().getSimpleName() + "\n";
         }
-        entStr += "}]";
-        return entStr;
+        return s;
+    }
+
+    public String componentToString(int entity, Class<? extends Component> compType) {
+        String compTypeName = compType.getSimpleName();
+        if (hasComponent(entity, compType)) {
+            //If comp is active
+            return "\t\t" + String.format("%-30s",compTypeName) + "instance: " + getComponent(entity, compType) + "\n";
+        }
+        else {
+            //if com is inactive
+            return "\t\t/inactive/ " + String.format("%-30s",compTypeName) + "instance: " + getInactiveComponent(entity, compType) + "\n";
+        }
+    }
+    public String entityToString(int entity) {
+        String entityName = getEntityName(entity);
+        String firstLineStr = "[ "+entity + "   " + (entityName.isEmpty()? "___": entityName)+" entity" + "]\n";
+        String activeCompsStr = "";
+        String inactiveCompsStr = "";
+
+        for (Class<? extends Component> compType : entityComponents.get(entity)) {
+            if (hasComponent(entity, compType)) {
+                activeCompsStr += componentToString(entity, compType);
+            }
+            else {
+                inactiveCompsStr += componentToString(entity, compType);
+            }
+        }
+        return firstLineStr + activeCompsStr + inactiveCompsStr;
     }
 
     public String entitiesToString() {
-        String s = "";
+        String s =
+                "//////////////////\n"+
+                "//// Entities ////\n";
         for (int entity : entityComponents.keySet()) {
             s += entityToString(entity) + "\n";
         }
         return s;
     }
 
+    public void printEntities() {
+        System.out.println(entitiesToString());
+    }
+
+    @Override
+    public String toString() {
+        String s =
+                "/////////////////////////////////////////////////\n"+
+                "////////// The mighty World Container! //////////\n"+
+                "\n"+
+                systemsToString()+
+                "\n"+
+                entitiesToString();
+        return s;
+    }
 }
 
 
