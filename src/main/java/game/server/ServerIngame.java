@@ -86,7 +86,7 @@ public class ServerIngame {
 
 
         //create entities
-        GameUtils.createMap(wc);
+        GameUtils.createLargeMap(wc);
         CharacterUtils.createServerCharacters(wc, teams);
 
 

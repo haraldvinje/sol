@@ -3,7 +3,9 @@ package game.offline;
 
 import engine.*;
 
+import engine.audio.AudioComp;
 import engine.audio.AudioMaster;
+import engine.audio.Sound;
 import engine.graphics.*;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
@@ -32,6 +34,9 @@ public class Game {
 
     private ColoredMesh vao;
 
+    private AudioComp backgroundAudioComp;
+
+
     private long lastTime;
 
     private WorldContainer wc;
@@ -50,11 +55,12 @@ public class Game {
 
         GameUtils.assignComponentTypes(wc);
 
-        GameUtils.createMap(wc);
+        GameUtils.createLargeMap(wc);
 
         int[][] characterIds = {
                 {CharacterUtils.BRAIL},
                 {CharacterUtils.SHRANK}
+
         };
 
         ClientGameTeams teams = new ClientGameTeams(characterIds, 1, 0);
@@ -76,6 +82,18 @@ public class Game {
      * blocking while the game runs
      */
     public void start() {
+
+        Sound battlefield = new Sound("audio/meleeBattlefield.ogg");
+        backgroundAudioComp = new AudioComp(battlefield, 1, 500, 600);
+        backgroundAudioComp.backgroundMusic();
+        backgroundAudioComp.playSound(0);
+
+        Sound readyGo = new Sound("audio/readyGo.ogg");
+        AudioComp audioComp = new AudioComp(readyGo, 1,600,600);
+        audioComp.backgroundSound();
+        audioComp.playSound(0);
+
+
         lastTime = System.nanoTime();
 
         float timeSinceUpdate = 0;

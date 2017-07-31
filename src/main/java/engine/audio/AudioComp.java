@@ -106,6 +106,14 @@ public class AudioComp implements Component {
         alSourcef(sourcePointer, AL_GAIN, 0.5f);
     }
 
+    public void backgroundSound(){
+        alSourcei( sourcePointer, AL_SOURCE_RELATIVE, AL_TRUE );
+
+        alSourcef( sourcePointer, AL_ROLLOFF_FACTOR, 0.0f );
+
+        alSourcef(sourcePointer, AL_GAIN, 0.5f);
+    }
+
 //    public void addSound(String filename){
 //        addSound(new Sound(filename));
 //    }
