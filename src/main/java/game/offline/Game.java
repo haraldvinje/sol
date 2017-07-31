@@ -58,11 +58,12 @@ public class Game {
         GameUtils.createLargeMap(wc);
 
         int[][] characterIds = {
-                {CharacterUtils.SHRANK},
-                {CharacterUtils.SCHMATHIAS}
+                {CharacterUtils.BRAIL},
+                {CharacterUtils.SHRANK}
+
         };
 
-        ClientGameTeams teams = new ClientGameTeams(characterIds, 0, 0);
+        ClientGameTeams teams = new ClientGameTeams(characterIds, 1, 0);
 
         List<Integer> charEntities = CharacterUtils.createOfflineCharacters(wc, teams);
 

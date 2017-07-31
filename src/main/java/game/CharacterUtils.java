@@ -289,6 +289,8 @@ public class CharacterUtils {
 
         wc.addComponent(characterEntity, new AudioComp(soundList, 1, 100, 2000));
 
+        wc.addComponent(characterEntity, new VisualEffectComp(VisualEffectUtils.createFalloutEffect()));
+
         if (controlled) {
             wc.addComponent(characterEntity, new UserCharacterInputComp());
             wc.addComponent(characterEntity, new ViewControlComp(-GameUtils.VIEW_WIDTH / 2f, -GameUtils.VIEW_HEIGHT / 2f));

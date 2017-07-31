@@ -11,13 +11,14 @@ public class NetworkPregamePackets {
             QUEUE_CLIENT_REQUEST_QUEUE = 30,
             QUEUE_SERVER_PUT_IN_QUEUE = 31,
             QUEUE_SERVER_GOTO_CHARACTERSELECT = 32,
+            QUEUE_CLIENT_EXIT = 33,
 
 
-            CHARSELECT_CLIENT_CHOSE_CHARACTER = 33,
-            CHARSELECT_SERVER_GOTO_GAME = 34,
+            CHARSELECT_CLIENT_CHOSE_CHARACTER = 34,
+            CHARSELECT_SERVER_GOTO_GAME = 35,
 
-            INGAME_CLIENT_READY = 35,
-            INGAME_SERVER_CLIENT_GAME_TEAMS = 36
+            INGAME_CLIENT_READY = 36,
+            INGAME_SERVER_CLIENT_GAME_TEAMS = 37
 
 
 //            //packet sizes

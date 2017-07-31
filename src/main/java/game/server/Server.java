@@ -5,11 +5,17 @@ import engine.RotationComp;
 import engine.UserInput;
 import engine.WorldContainer;
 import engine.graphics.*;
+import engine.graphics.text.Font;
+import engine.graphics.text.FontType;
+import engine.graphics.text.TextMesh;
 import engine.graphics.text.TextMeshComp;
 import engine.graphics.view_.ViewControlComp;
 import engine.network.NetworkPregamePackets;
 import engine.network.NetworkUtils;
+import engine.network.TcpPacketInput;
+import engine.network.client.ClientUtils;
 import engine.window.Window;
+import utils.maths.Vec4;
 
 import java.util.*;
 
@@ -36,6 +42,9 @@ public class Server {
     private LinkedList<Integer> allocatedClientIcons = new LinkedList<>();
     private Map<ServerClientHandler, Integer> activeClientIcons = new HashMap<>();
 
+    //texts to print info
+    private int infoTextEntity;
+
     //all connected clients
     private List<ServerClientHandler> connectedClients = new ArrayList<>();
 
@@ -54,8 +63,12 @@ public class Server {
         window = new Window(0.3f, 0.3f, "D1n-only Server SII");
         userInput = new UserInput(window, 1, 1);
 
+        //load stuff
+        Font.loadFonts(FontType.BROADWAY);
+
         wc = new WorldContainer();
         initWorldContainer();
+        createInitialEntities();
 
 
         //create connection listener
@@ -69,6 +82,14 @@ public class Server {
         for (int i = 0; i < NetworkUtils.CHARACTER_NUMB*3; i++) {
             allocatedClientIcons.add( allocateClientIcon(wc, iconStartX+iconRadius*2*i, iconStartY, iconRadius) );
         }
+    }
+
+    private void createInitialEntities() {
+        infoTextEntity = wc.createEntity("info text");
+        wc.addComponent(infoTextEntity, new PositionComp(10, 10));
+        wc.addComponent(infoTextEntity, new TextMeshComp(new TextMesh(
+                "", Font.getDefaultFont(), 24, new Vec4(1,1,1,1)
+        )));
     }
 
     public void start() {
@@ -94,6 +115,7 @@ public class Server {
                 break;
         }
 
+
         terminate();
 
     }
@@ -117,6 +139,13 @@ public class Server {
         //handle games running
         handleGamesRunning();
 
+        //print state
+        String s = "Server\n"+
+                "Clients connected: " + connectedClients.size() + "\n"+
+                "Clients idle: " + idleClients.size() + "\n"+
+                "Clients in queue: " + gameQueue.size() + "\n"+
+                "Games running: " + gamesRunning.size() + "\n";
+        ((TextMeshComp) wc.getComponent(infoTextEntity, TextMeshComp.class)).getTextMesh().setString(s);
 
         //update systems to show server status
         wc.updateSystems();
@@ -146,7 +175,14 @@ public class Server {
         while(it.hasNext()) {
             ServerClientHandler client = it.next();
 
-            if (client.getTcpPacketIn().removeIfHasPacket(NetworkPregamePackets.QUEUE_CLIENT_REQUEST_QUEUE)) {
+            TcpPacketInput tcpPacketIn = client.getTcpPacketIn();
+
+            //check if client disconnected
+            if (tcpPacketIn.isRemoteSocketClosed()) {
+                System.err.println("Remote socket is closed :(");
+            }
+
+            if (tcpPacketIn.removeIfHasPacket(NetworkPregamePackets.QUEUE_CLIENT_REQUEST_QUEUE)) {
                 //remove from idle state and put into queue state
                 it.remove();
                 gameQueue.add(client);
@@ -159,7 +195,21 @@ public class Server {
     }
 
     private void handleGameQueueState() {
-        gameQueue.forEach(c -> c.getTcpPacketIn().pollPackets());
+        Iterator<ServerClientHandler> it = gameQueue.iterator();
+        while(it.hasNext()) {
+            ServerClientHandler client = it.next();
+
+            TcpPacketInput tcpPacketIn = client.getTcpPacketIn();
+
+            //pollPackets
+            tcpPacketIn.pollPackets();
+
+            //check if a client wants to exit queue, then move it to idle
+            if (tcpPacketIn.removeIfHasPacket(NetworkPregamePackets.QUEUE_CLIENT_EXIT) ) {
+                it.remove();
+                idleClients.add(client);
+            }
+        }
 
 
         //check if there are enough clients waiting to start a game
@@ -258,6 +308,7 @@ public class Server {
         wc.assignComponentType(RotationComp.class);
         wc.assignComponentType(ColoredMeshComp.class);
         wc.assignComponentType(TexturedMeshComp.class);
+        wc.assignComponentType(TextMeshComp.class);
         wc.assignComponentType(MeshCenterComp.class);
         wc.assignComponentType(ViewControlComp.class);
         wc.assignComponentType(TextMeshComp.class);

@@ -33,7 +33,7 @@ public class TextMesh {
         this.font = font;
         this.size = size;
         this.string = string;
-        this.color = color;
+        this.color = new Vec4(color);
         this.offsetX = offsetX;
         this.offsetY = offsetY;
 

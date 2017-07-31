@@ -88,6 +88,12 @@ public class RenderSys implements Sys {
             renderTexturedMesh(entity, texturedMeshComp.getMesh(), viewTransform, projectionTransform);
         });
 
+        //draw text meshes in the world
+        wc.entitiesOfComponentTypeStream(TextMeshComp.class).forEach( entity -> {
+            TextMeshComp textMeshComp = (TextMeshComp)wc.getComponent(entity, TextMeshComp.class);
+            renderTextMesh(entity, textMeshComp.getTextMesh(), viewTransform, projectionTransform);
+        });
+
 
         //draw effects in the world
         VisualEffectSys.forEachActiveParticle(p -> {
@@ -152,6 +158,13 @@ public class RenderSys implements Sys {
         Mat4 modelTransform = composeModelTransform(imageCenterTranslation, translation, scale, rotation);
 
         renderTexturedMesh(mesh, modelTransform, viewTransform, projectionTransform);
+    }
+
+    //text rendering by entity
+    private void renderTextMesh(int entity, TextMesh mesh, Mat4 viewTransform, Mat4 projectionTransform) {
+        Mat4 modelTransform = retrieveModelTransform(entity);
+
+        renderTextMesh(mesh, mesh.getColor(), modelTransform, viewTransform, projectionTransform);
     }
 
 

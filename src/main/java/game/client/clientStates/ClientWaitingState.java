@@ -2,16 +2,11 @@ package game.client.clientStates;
 
 import engine.PositionComp;
 import engine.WorldContainer;
-import engine.graphics.ColoredMeshComp;
-import engine.graphics.ColoredMeshUtils;
-import engine.graphics.MeshCenterComp;
 import engine.graphics.ViewRenderComp;
 import engine.graphics.text.Font;
 import engine.graphics.text.TextMesh;
 import engine.network.*;
 import engine.network.client.*;
-import game.client.Client;
-import utils.maths.Vec4;
 
 /**
  * Created by eirik on 04.07.2017.
@@ -21,8 +16,13 @@ public class ClientWaitingState extends ClientState {
     private boolean inServerQueue;
 
 
+    private int exitQueueButtonEntity;
+
+    private String exitQueueString = "Exit queue";
+
     private int queueTextEntity;
-    private String queueString = "In queue";
+    private String preQueueString = "Requesting game queue";
+    private String queueString = "In game queue";
 
 
 //    private boolean ready = false;
@@ -43,7 +43,7 @@ public class ClientWaitingState extends ClientState {
 
 //        nextMessageId = -1;
         inServerQueue = false;
-        ClientUtils.setEntityString(wc, queueTextEntity, "");
+        ClientUtils.setEntityString(wc, queueTextEntity, preQueueString);
 
         //tell server that we want to go into queue
         sendGotoQueue();
@@ -134,20 +134,36 @@ public class ClientWaitingState extends ClientState {
         return true;
     }
 
+    private void exitQueue() {
+        client.getTcpPacketOut().sendEmpty(NetworkPregamePackets.QUEUE_CLIENT_EXIT);
+        setGotoState(ClientStates.IDLE);
+    }
+
 
     private void createInitialEntities(WorldContainer wc) {
-        float width = Client.CLIENT_WIDTH/2;
-        float height = Client.CLIENT_HEIGHT/6;
-
-        int rect = wc.createEntity();
-        wc.addComponent(rect, new PositionComp(Client.CLIENT_WIDTH/2f, Client.CLIENT_HEIGHT/2f));
-        wc.addComponent(rect, new ColoredMeshComp(ColoredMeshUtils.createRectangle(width, height) ));
-        wc.addComponent(rect, new MeshCenterComp(width/2f, height/2f));
+//        float width = Client.CLIENT_WIDTH/2;
+//        float height = Client.CLIENT_HEIGHT/6;
+//
+////        int rect = wc.createEntity();
+////        wc.addComponent(rect, new PositionComp(Client.CLIENT_WIDTH/2f, Client.CLIENT_HEIGHT/2f));
+////        wc.addComponent(rect, new ColoredMeshComp(ColoredMeshUtils.createRectangle(width, height) ));
+////        wc.addComponent(rect, new MeshCenterComp(width/2f, height/2f));
 
 
         //create queue text
         queueTextEntity = wc.createEntity();
-        wc.addComponent(queueTextEntity, new PositionComp(400, 100));
-        wc.addComponent(queueTextEntity, new ViewRenderComp(new TextMesh("", Font.getDefaultFont(), 52, new Vec4(1,1,1,1))));
+        wc.addComponent(queueTextEntity, new PositionComp(ClientUtils.titleLeft, ClientUtils.titleTop));
+        wc.addComponent(queueTextEntity, new ViewRenderComp(
+                new TextMesh("", Font.getDefaultFont(), ClientUtils.titleTextSize, ClientUtils.titleTextColor ))
+        );
+
+        //create exit queue button
+        exitQueueButtonEntity = ClientUtils.createButton(wc, ClientUtils.buttonsLeft, ClientUtils.buttonsTop, ClientUtils.buttonWidth, ClientUtils.buttonHeight,
+                new TextMesh(exitQueueString, Font.getDefaultFont(), ClientUtils.buttonTextSize, ClientUtils.buttonTextColor),
+                null,
+                (b, a) -> exitQueue(),
+                null, null
+        );
     }
+
 }

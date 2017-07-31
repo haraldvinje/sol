@@ -99,7 +99,7 @@ public class GameUtils {
         float spaceY = 50;
 
         Vec4 dmgTextColor = new Vec4(1, 0, 0, 1);
-        float dmgTextSize = 128;
+        float dmgTextSize = 64;
 
         GameDataComp dataComp = new GameDataComp();
 
@@ -124,7 +124,7 @@ public class GameUtils {
         //create game end text entity and store in data comp
         int endGameTextEntity = wc.createEntity("game end text");
         wc.addComponent(endGameTextEntity, new PositionComp(300, 300 ));
-        wc.addComponent(endGameTextEntity, new ViewRenderComp(new TextMesh("", Font.getFont(FontType.BROADWAY), dmgTextSize, dmgTextColor)));
+        wc.addComponent(endGameTextEntity, new ViewRenderComp(new TextMesh("", Font.getFont(FontType.BROADWAY), 128, dmgTextColor)));
         dataComp.gameEndTextEntity = endGameTextEntity;
 
         //Create actual game data entity

@@ -6,7 +6,6 @@ import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
 import engine.graphics.text.TextMesh;
 import engine.network.client.*;
-import utils.maths.Vec4;
 
 /**
  * Created by eirik on 04.07.2017.
@@ -21,8 +20,6 @@ public class ClientIdleState extends ClientState {
     private int[] buttons = new int[buttonTexts.length];
     private OnButtonAction[] buttonReleaseActions;
 
-    private float buttonsLeft = 400, buttonsTop = 450;
-    private float buttonWidth = 500, buttonHeight = 60, buttonVertSpace = 10;
 
     private String welcomeString = "You are connected!";
     private String connectedString = "WELCOME";
@@ -77,18 +74,22 @@ public class ClientIdleState extends ClientState {
     }
 
     private void createInitialEntities() {
+
         welcomeTextEntity = wc.createEntity();
-        wc.addComponent(welcomeTextEntity, new PositionComp(400, 100));
-        wc.addComponent(welcomeTextEntity, new ViewRenderComp(new TextMesh("", Font.getFont(FontType.BROADWAY), 64, new Vec4(0.8f, 1f, 0.8f, 1f))));
+        wc.addComponent(welcomeTextEntity, new PositionComp(ClientUtils.titleLeft, 100));
+        wc.addComponent(welcomeTextEntity, new ViewRenderComp(new TextMesh("", Font.getFont(FontType.BROADWAY), 64, ClientUtils.titleTextColor) ));
 
         connectedTextEntity = wc.createEntity();
-        wc.addComponent(connectedTextEntity, new PositionComp(400, 300));
-        wc.addComponent(connectedTextEntity, new ViewRenderComp(new TextMesh("", Font.getFont(FontType.BROADWAY), 72, new Vec4(0.8f, 1f, 0.8f, 1f))));
+        wc.addComponent(connectedTextEntity, new PositionComp(ClientUtils.titleLeft, ClientUtils.titleTop));
+        wc.addComponent(connectedTextEntity, new ViewRenderComp(new TextMesh("", Font.getFont(FontType.BROADWAY), ClientUtils.titleTextSize, ClientUtils.titleTextColor)));
+
+
 
         for (int i = 0; i < buttons.length; i++) {
             buttons[i] = ClientUtils.createButton(wc,
-                    buttonsLeft, buttonsTop+ i*(buttonHeight+buttonVertSpace), buttonWidth, buttonHeight,
-                    new TextMesh(buttonTexts[i], Font.getDefaultFont(), 54, new Vec4(0.9f, 0.9f, 0.9f, 1f)),
+                    ClientUtils.buttonsLeft, ClientUtils.buttonsTop+ i*(ClientUtils.buttonHeight+ClientUtils.buttonVertSpace),
+                    ClientUtils.buttonWidth, ClientUtils.buttonHeight,
+                    new TextMesh(buttonTexts[i], Font.getDefaultFont(), ClientUtils.buttonTextSize, ClientUtils.buttonTextColor),
                     null, buttonReleaseActions[i], null, null
             );
         }

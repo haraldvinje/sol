@@ -7,11 +7,27 @@ import engine.graphics.text.TextMeshComp;
 import engine.graphics.view_.View;
 import engine.window.Window;
 import game.client.Client;
+import utils.maths.Vec4;
 
 /**
  * Created by eirik on 04.07.2017.
  */
 public class ClientUtils {
+
+    //title attributes
+    public static final float
+            titleLeft = 400, titleTop = 300,
+            titleTextSize = 72;
+    public static final Vec4 titleTextColor = new Vec4(0.8f, 1f, 0.8f, 1f);
+
+
+    //menu button attributes
+    public static final float
+            buttonsLeft = 400, buttonsTop = 450,
+            buttonWidth = 500, buttonHeight = 60,
+            buttonVertSpace = 10,
+            buttonTextSize = 54;
+    public static final Vec4 buttonTextColor = new Vec4(0.9f, 0.9f, 0.9f, 1f);
 
     /**
      * WorldContainer initialized with client default component types and systems

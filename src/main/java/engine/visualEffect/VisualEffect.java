@@ -4,6 +4,7 @@ import engine.graphics.ColoredMesh;
 import engine.graphics.ColoredMeshUtils;
 import utils.maths.M;
 import utils.maths.Vec2;
+import utils.maths.Vec4;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,9 +23,14 @@ public class VisualEffect {
     private float attrLifetime;
     private float attrEffectAngle;
 
-//    private float attrRadiusMin, attrRadiusMax;
+
+    //attributes per particle
+    private Vec4 attrColorMax, attrColorMin;
+    private float attrRadiusMin, attrRadiusMax;
+    private float attrLifetimeMin;
     private float attrSpeedMin, attrSpeedMax;
     private float attrAngleCenter, attrAngleSpread;
+
 
 
     private List<Particle> particles = new ArrayList<>();
@@ -33,8 +39,15 @@ public class VisualEffect {
     private float lifetime;
 
 
-    public VisualEffect(int particleCount, float lifetime, float speedMin, float speedMax, float angleCenter, float angleSpread) {
+    public VisualEffect(int particleCount, Vec4 colorMax, Vec4 colorMin, float radiusMax, float radiusMin, float lifetime, float lifetimeMin, float speedMin, float speedMax, float angleCenter, float angleSpread) {
+        this.attrColorMax = colorMax;
+        this.attrColorMin = colorMin;
+
+        this.attrRadiusMax = radiusMax;
+        this.attrRadiusMin = radiusMin;
+
         this.attrLifetime = lifetime;
+        this.attrLifetimeMin = lifetimeMin;
         this.attrParticleCount = particleCount;
 
         this.attrSpeedMin = speedMin;
@@ -50,8 +63,13 @@ public class VisualEffect {
 
     private void createParticles(int count) {
         for (int i = 0; i < count; i++) {
-            float[] color = {1, 0, 0};
-            ColoredMesh mesh = ColoredMeshUtils.createCircleSinglecolor(6, 8, color);
+            float r = M.random();
+            float[] color = {
+                    attrColorMin.x + r*(attrColorMax.x - attrColorMin.x),
+                    attrColorMin.y + r*(attrColorMax.y - attrColorMin.y),
+                    attrColorMin.z + r*(attrColorMax.z - attrColorMin.z)};
+            float radius = attrRadiusMin + M.random() * (attrRadiusMax - attrRadiusMin);
+            ColoredMesh mesh = ColoredMeshUtils.createCircleSinglecolor(radius, 8 + (int)(radius/10), color);
 
             Particle p = new Particle(mesh);
             particles.add(p);
@@ -62,7 +80,7 @@ public class VisualEffect {
         for (Particle p : particles) {
             p.activate();
 
-            p.setLifetime(attrLifetime);
+            p.setLifetime(attrLifetime - M.random() * (attrLifetime-attrLifetimeMin));
 
             p.setPos(pos);
             Vec2 vel = Vec2.newLenDir((attrSpeedMax-attrSpeedMin)* M.random()+attrSpeedMin,
