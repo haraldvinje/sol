@@ -81,7 +81,7 @@ run {
 
 
 task createFatOfflineJar(type: Jar) {
-    ext.jarTypeInfo = ["-offline", "game.Main"]
+    ext.jarTypeInfo = ["-offline", "game.offline.Main"]
 
     manifest {
         attributes 'Implementation-Title': 'Gradle Jar File Example',
@@ -95,7 +95,7 @@ task createFatOfflineJar(type: Jar) {
 }
 
 task createFatServerJar(type: Jar) {
-    ext.jarTypeInfo = ["-server","game.MainServer"]
+    ext.jarTypeInfo = ["-server","game.server.MainServer"]
 
     manifest {
         attributes 'Implementation-Title': 'Gradle Jar File Example',
@@ -109,7 +109,7 @@ task createFatServerJar(type: Jar) {
 }
 
 task createFatClientJar(type: Jar) {
-    ext.jarTypeInfo = ["-client","game.MainClient"]
+    ext.jarTypeInfo = ["-client","game.client.MainClient"]
 
     manifest {
         attributes 'Implementation-Title': 'Gradle Jar File Example',

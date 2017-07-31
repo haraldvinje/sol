@@ -130,7 +130,7 @@ public class GameUtils {
 //    }
 
     private static int createCircleHole(WorldContainer wc, float x, float y, float radius) {
-        int hole = wc.createEntity();
+        int hole = wc.createEntity("circle hole");
         float[] color = {0.0f, 0.0f, 0.0f};
 
         wc.addComponent(hole, new PositionComp(x, y));
@@ -148,7 +148,7 @@ public class GameUtils {
     }
 
     private static int createRectangleHoleInvisible(WorldContainer wc, float x, float y, float width, float height) {
-        int hole = wc.createEntity();
+        int hole = wc.createEntity("rectangle hole");
         float[] color = {0.0f, 0.0f, 0.0f};
 
         wc.addComponent(hole, new PositionComp(x, y));
@@ -165,7 +165,7 @@ public class GameUtils {
     }
 
     private static int createBackground(WorldContainer wc) {
-        int bg = wc.createEntity();
+        int bg = wc.createEntity("background");
         wc.addComponent(bg, new PositionComp(0, 0, -0.5f));
         wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", 1600, 900)));
 
@@ -173,7 +173,7 @@ public class GameUtils {
     }
 
     private static int createWall(WorldContainer wc, float x, float y, float width, float height) {
-        int w = wc.createEntity();
+        int w = wc.createEntity("wall");
         wc.addComponent(w, new PositionComp(x, y));
 
         wc.addComponent(w, new ColoredMeshComp(ColoredMeshUtils.createRectangle(width, height)));

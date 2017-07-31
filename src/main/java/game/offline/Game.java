@@ -69,6 +69,7 @@ public class Game {
 
 
         System.out.println("HEELLLLLOOOOO");
+        System.out.println(wc);
     }
 
 

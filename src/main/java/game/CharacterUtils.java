@@ -180,16 +180,16 @@ public class CharacterUtils {
 
         //lightForce
         MeleeAbility abFrogpunch = new MeleeAbility(wc, ab1CharSnd, 6, 6, 6, 30, new Circle(64f),64.0f, null);
-        abFrogpunch.setDamagerValues(wc, 200, 800, 0.9f, -48f, false);
+        abFrogpunch.setDamagerValues(wc, 100, 600, 0.9f, 400f, true);
 
         //chagger
         int chaggProjectile = ProjectileUtils.allocateSinglecolorProjectileAbility(wc, 64f, purple,null); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
-        ProjectileAbility abHook = new ProjectileAbility(wc, ab2CharSnd, chaggProjectile, 20, 6, 50, 650, 30);
-        abHook.setDamagerValues(wc, 200f, 400, 0.6f, -100, false);
+        ProjectileAbility abHook = new ProjectileAbility(wc, ab2CharSnd, chaggProjectile, 10, 6, 120, 650, 30);
+        abHook.setDamagerValues(wc, 150, 400, 0.8f, 64, false);
 
-        //scatter
-        MeleeAbility abMeteorpunch = new MeleeAbility(wc, ab3CharSnd, 10, 3, 7, 60, new Circle(96), 128, null);
-        abMeteorpunch.setDamagerValues(wc, 100, 800, 0.5f, 0, true);
+        //merge
+        MeleeAbility abMeteorpunch = new MeleeAbility(wc, ab3CharSnd, 10, 6, 4, 60, new Circle(160), 128, null);
+        abMeteorpunch.setDamagerValues(wc, 20, 800, 0.4f, 0, true);
 
         List<Sound> sounds = new ArrayList<>();
         sounds.add( snd1 );
@@ -225,7 +225,7 @@ public class CharacterUtils {
 
 
     public static int allocateHitboxEntity(WorldContainer wc, Circle shape, Sound onHitSound){
-        int e = wc.createEntity();
+        int e = wc.createEntity("melee hitbox");
 
         wc.addComponent(e, new PositionComp(0, 0, hitboxDepth));
         wc.addInactiveComponent(e, new RotationComp());
@@ -252,7 +252,7 @@ public class CharacterUtils {
 
 
     private static int createCharacter(WorldContainer wc, boolean controlled, float x, float y, String imagePath, float radiusOnImage, float imageWidth, float imageHeight, float offsetXOnImage, float offsetYOnImage, float radius, float moveAccel, Ability ab1, Ability ab2, Ability ab3, List<Sound> soundList) {
-        int characterEntity = wc.createEntity();
+        int characterEntity = wc.createEntity("character");
 
         float scale = radius / radiusOnImage;
         float width = imageWidth * scale;

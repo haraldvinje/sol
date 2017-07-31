@@ -7,10 +7,10 @@ public class MainClient {
 
     public static void main(String[] args) {
 
-        if (args.length != 1) {
-            System.err.println("Give the server host name as input when executing");
-            return;
-        }
+//        if (args.length != 1) {
+//            System.err.println("Give the server host name as input when executing");
+//            return;
+//        }
 
 //        Socket socket = null;
 //        try {
@@ -39,7 +39,7 @@ public class MainClient {
 //        cg.init(null, null, friendlyCharacters, enemyCharacters, team, 0);
 //        cg.run();
 
-        Client client = new Client(args[0]);
+        Client client = new Client("");
         client.init();
         client.start();
     }
