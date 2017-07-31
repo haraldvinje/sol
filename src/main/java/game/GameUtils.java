@@ -30,6 +30,7 @@ import engine.physics.*;
 import engine.visualEffect.VisualEffectComp;
 import engine.visualEffect.VisualEffectSys;
 import engine.window.Window;
+import utils.maths.Vec2;
 import utils.maths.Vec4;
 
 import java.net.Socket;
@@ -43,6 +44,10 @@ public class GameUtils {
 
     public static float MAP_WIDTH = 1600f,
             MAP_HEIGHT = 900f;
+
+    public static float LARGE_MAP_WIDTH = 3200f;
+
+    public static float LARGE_MAP_HEIGHT = 1800f;
 
     public static float VIEW_WIDTH = MAP_WIDTH, VIEW_HEIGHT = MAP_HEIGHT;
 
@@ -157,13 +162,35 @@ public class GameUtils {
 
 
     public static void createLargeMap(WorldContainer wc){
-        float scale = 2f;
+        float scale = 1.53819724112859619852985173896f;
 
-        createBackgroundScale(wc, 2*scale);
+        createBackgroundScale(wc, scale);
+
+        int startX = (int)LARGE_MAP_WIDTH/4;
+
+        int centerY = (int)LARGE_MAP_HEIGHT/2;
 
 
-        int[][] startPositionsTeam1 = { {200, 600}, {100, 400}};
-        int[][] startPositionsTeam2 = { {2000, 400}, {1000, 400}};
+        int startX2 = 3*startX;
+
+
+        double team1StartX = 250;
+        double team1StartY1 = 800;
+        double team1StartY2 = 1000;
+        double team2StartX = 2950;
+        double team2StartY1 = team1StartY1;
+        double team2StartY2 = team1StartY2;
+
+        int t1SX = (int) Math.floor(team1StartX*scale);
+        int t1SY1 = (int) Math.floor(team1StartY1*scale);
+        int t1SY2 = (int) Math.floor(team1StartY2*scale);
+        int t2SX = (int) Math.floor(team2StartX*scale);
+        int t2SY1 = t1SY1;
+        int t2SY2 = t1SY2;
+
+
+        int[][] startPositionsTeam1 = { {t1SX, t1SY1}, {t1SX, t1SY2}};
+        int[][] startPositionsTeam2 = { {t2SX, t2SY1}, {t2SX, t2SY2}};
         GameUtils.startPositionsTeam1 = startPositionsTeam1;
         GameUtils.startPositionsTeam2 = startPositionsTeam2;
 
@@ -192,11 +219,11 @@ public class GameUtils {
         //circular holes first on the left side
         float circHoleRadius = 300;
         createCircleHole(wc, 400*scale, 230*scale, circHoleRadius*scale);
-        createCircleHole(wc, 400*scale, (2*(MAP_HEIGHT)-230)*scale, circHoleRadius*scale);
+        createCircleHole(wc, 400*scale, (LARGE_MAP_HEIGHT-230)*scale, circHoleRadius*scale);
 
         //circular holes on the right side
         createCircleHole(wc, 2800*scale, 230*scale, circHoleRadius*scale);
-        createCircleHole(wc, 2800*scale, (2*(MAP_HEIGHT)-230)*scale, circHoleRadius*scale);
+        createCircleHole(wc, 2800*scale, (LARGE_MAP_HEIGHT-230)*scale, circHoleRadius*scale);
 
         //creating rectangle holes
         float h1Thickness = 400;
@@ -217,35 +244,32 @@ public class GameUtils {
 
 
         float c1WallRadius = 200f;
-        float circleWallsSeperation = 300;
-        createCircleWall(wc, 2*(MAP_WIDTH / 2 - circleWallsSeperation)*scale, 2*(MAP_HEIGHT/2)*scale, c1WallRadius*scale);
-        createCircleWall(wc, 2*(MAP_WIDTH / 2 + circleWallsSeperation)*scale, 2*(MAP_HEIGHT/2)*scale, c1WallRadius*scale);
+        float circleWallsSeperation = 600;
+        createCircleWall(wc, (LARGE_MAP_WIDTH / 2 - circleWallsSeperation)*scale, (LARGE_MAP_HEIGHT/2)*scale, c1WallRadius*scale);
+        createCircleWall(wc, (LARGE_MAP_WIDTH / 2 + circleWallsSeperation)*scale, (LARGE_MAP_HEIGHT/2)*scale, c1WallRadius*scale);
 
 
 
         //creating walls and holes in center
-        float centerSep = 180f;
-        createRectangleHole(wc, 2*(MAP_WIDTH / 2 - centerSep)*scale, 1150*scale, 500*scale, 100*scale );
-        createRectangleHole(wc, 2*(MAP_WIDTH / 2 + centerSep)*scale, 1150*scale, 500*scale, 100*scale );
-        createWall(wc, 2*(MAP_WIDTH/2)*scale, 650*scale, 300*scale, 100*scale);
+        float centerSep = 360f;
+        createRectangleHole(wc, (LARGE_MAP_WIDTH / 2 - centerSep)*scale, 1150*scale, 500*scale, 100*scale );
+        createRectangleHole(wc, (LARGE_MAP_WIDTH / 2 + centerSep)*scale, 1150*scale, 500*scale, 100*scale );
+        createWall(wc, (LARGE_MAP_WIDTH/2)*scale, 650*scale, 300*scale, 100*scale);
 
 
 
-        createWall(wc, 2*(MAP_WIDTH/2)*scale, 230*scale, 600*scale, 100*scale);
-        float cSep = 300f;
-        createRectangleHole(wc, 2*(MAP_WIDTH / 2 - cSep)*scale, 230*scale, 600*scale, 100*scale );
-        createRectangleHole(wc, 2*(MAP_WIDTH / 2 + cSep)*scale, 230*scale, 600*scale, 100*scale );
+        createWall(wc, (LARGE_MAP_WIDTH/2)*scale, 230*scale, 600*scale, 100*scale);
+        float cSep = 600f;
+        createRectangleHole(wc, (LARGE_MAP_WIDTH / 2 - cSep)*scale, 230*scale, 600*scale, 100*scale );
+        createRectangleHole(wc, (LARGE_MAP_WIDTH / 2 + cSep)*scale, 230*scale, 600*scale, 100*scale );
 
 
 
-        createRectangleHole(wc, 2*(MAP_WIDTH/2)*scale, (2*(MAP_HEIGHT)-230)*scale, 600*scale, 100*scale);
-        float cSepp = 300f;
-        createWall(wc, 2*(MAP_WIDTH / 2 - cSepp)*scale, (2*(MAP_HEIGHT)-230)*scale, 600*scale, 100*scale );
-        createWall(wc, 2*(MAP_WIDTH / 2 + cSepp)*scale, (2*(MAP_HEIGHT)-230)*scale, 600*scale, 100*scale );
+        createRectangleHole(wc, (LARGE_MAP_WIDTH/2)*scale, (LARGE_MAP_HEIGHT-230)*scale, 600*scale, 100*scale);
+        float cSepp = 600f;
+        createWall(wc, (LARGE_MAP_WIDTH / 2 - cSepp)*scale, (LARGE_MAP_HEIGHT-230)*scale, 600*scale, 100*scale );
+        createWall(wc, (LARGE_MAP_WIDTH / 2 + cSepp)*scale, (LARGE_MAP_HEIGHT-230)*scale, 600*scale, 100*scale );
 
-        MAP_WIDTH*=2*scale;
-
-        MAP_HEIGHT*=2*scale;
 
 
      /*   createRectangleHoleInvisible(wc, MAP_WIDTH/2, wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
@@ -336,11 +360,13 @@ public class GameUtils {
     private static int createBackgroundScale(WorldContainer wc, float scale) {
         int bg = wc.createEntity();
         wc.addComponent(bg, new PositionComp(0, 0, -0.5f));
-        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", scale*1600
-                , scale*900)));
+        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", scale*LARGE_MAP_WIDTH
+                , scale*LARGE_MAP_HEIGHT)));
 
         return bg;
     }
+
+
 
     private static int createWall(WorldContainer wc, float x, float y, float width, float height) {
         int w = wc.createEntity("wall");
