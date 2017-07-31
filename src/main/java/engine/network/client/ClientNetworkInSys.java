@@ -10,6 +10,7 @@ import engine.combat.abilities.ProjectileComp;
 import engine.network.*;
 import engine.network.networkPackets.*;
 import engine.visualEffect.VisualEffectComp;
+import utils.maths.Vec2;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -114,7 +115,14 @@ public class ClientNetworkInSys implements Sys{
             EntityDeadData data = NetworkUtils.packetToEntityDead( entityDeadData );
 
             //handle
+            //create effect
+            Vec2 effPos = ( (PositionComp) wc.getComponent(data.entityId, PositionComp.class) ).getPos();
+            ( (VisualEffectComp)wc.getComponent(data.entityId, VisualEffectComp.class) ).startEffect(0, effPos);
             System.out.println("Entity died: " + data.entityId);
+
+            //reset damage
+            ( (DamageableComp)wc.getComponent(data.entityId, DamageableComp.class) ).reset();
+
         }
 
         if (gameOverData != null) {
