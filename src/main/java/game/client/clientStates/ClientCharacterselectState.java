@@ -47,11 +47,6 @@ public class ClientCharacterselectState extends ClientState {
 
         wc.deactivateEntity(commitEntity);
 
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -184,7 +179,7 @@ public class ClientCharacterselectState extends ClientState {
 
         commitEntity = wc.createEntity();
         float[]green = {0f, 1f, 0f};
-        wc.addComponent(commitEntity, new PositionComp(0, 0));
+        wc.addComponent(commitEntity, new PositionComp(0, 0, 0.1f));
         wc.addComponent(commitEntity, new ColoredMeshComp(ColoredMeshUtils.createCircleSinglecolor(20, 16, green)));
 
 
