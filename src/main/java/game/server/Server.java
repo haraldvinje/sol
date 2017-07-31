@@ -175,7 +175,14 @@ public class Server {
         while(it.hasNext()) {
             ServerClientHandler client = it.next();
 
-            if (client.getTcpPacketIn().removeIfHasPacket(NetworkPregamePackets.QUEUE_CLIENT_REQUEST_QUEUE)) {
+            TcpPacketInput tcpPacketIn = client.getTcpPacketIn();
+
+            //check if client disconnected
+            if (tcpPacketIn.isRemoteSocketClosed()) {
+                System.err.println("Remote socket is closed :(");
+            }
+
+            if (tcpPacketIn.removeIfHasPacket(NetworkPregamePackets.QUEUE_CLIENT_REQUEST_QUEUE)) {
                 //remove from idle state and put into queue state
                 it.remove();
                 gameQueue.add(client);
