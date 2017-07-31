@@ -146,20 +146,20 @@ public class ClientNetworkInSys implements Sys{
 
         //apply character states
         if (!statesPending.isEmpty()) {
-            //apply last state obtained
-            while(statesPending.size() > 1) {
-                statesPending.poll();
-            }
-            applyCharacterStates(statesPending.poll());
-
-//            //remove too old states
-//            int statesPendingCount = statesPending.size();
-//            for (int i = 1 + NetworkUtils.CLIENT_INPUT_BUFFERING; i < statesPendingCount; i++) {
+//            //apply last state obtained
+//            while(statesPending.size() > 1) {
 //                statesPending.poll();
 //            }
-//
-//            //apply state
 //            applyCharacterStates(statesPending.poll());
+
+            //remove too old states
+            int statesPendingCount = statesPending.size();
+            for (int i = 1 + NetworkUtils.CLIENT_INPUT_BUFFERING; i < statesPendingCount; i++) {
+                statesPending.poll();
+            }
+
+            //apply state
+            applyCharacterStates(statesPending.poll());
         }
     }
 
