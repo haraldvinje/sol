@@ -37,7 +37,7 @@ import java.util.List;
 public class GameUtils {
 
 
-    public static final float MAP_WIDTH = 1600f,
+    public static float MAP_WIDTH = 1600f,
             MAP_HEIGHT = 900f;
 
     public static float VIEW_WIDTH = MAP_WIDTH, VIEW_HEIGHT = MAP_HEIGHT;
@@ -109,6 +109,120 @@ public class GameUtils {
     }
 
 
+
+    public static void createLargeMap(WorldContainer wc){
+        float scale = 2f;
+
+        createBackgroundScale(wc, 2*scale);
+
+
+        int[][] startPositionsTeam1 = { {200, 600}, {100, 400}};
+        int[][] startPositionsTeam2 = { {2000, 400}, {1000, 400}};
+        GameUtils.startPositionsTeam1 = startPositionsTeam1;
+        GameUtils.startPositionsTeam2 = startPositionsTeam2;
+
+        //create walls for new map. First walls in the base of each competitor
+        float w1Thickness = 400;
+        float w1Height = 100f;
+        float w2Thickness = 100f;
+        float w2Height = 400f;
+        float w3Thickness = w1Thickness;
+        float w3Height = w1Height;
+
+        //walls on left side
+        createWall(wc, 200*scale, 650*scale, w1Thickness*scale, w1Height*scale);
+        createWall(wc, 50*scale, 900*scale, w2Thickness*scale, w2Height*scale);
+        createWall(wc, 200*scale, 1150*scale, w3Thickness*scale, w3Height*scale);
+
+        //walls on right side
+        createWall(wc, 3000*scale, 650*scale, w1Thickness*scale, w1Height*scale);
+        createWall(wc, 3150*scale, 900*scale, w2Thickness*scale, w2Height*scale);
+        createWall(wc, 3000*scale, 1150*scale, w3Thickness*scale, w3Height*scale);
+
+
+
+        //creating holes
+
+        //circular holes first on the left side
+        float circHoleRadius = 300;
+        createCircleHole(wc, 400*scale, 230*scale, circHoleRadius*scale);
+        createCircleHole(wc, 400*scale, (2*(MAP_HEIGHT)-230)*scale, circHoleRadius*scale);
+
+        //circular holes on the right side
+        createCircleHole(wc, 2800*scale, 230*scale, circHoleRadius*scale);
+        createCircleHole(wc, 2800*scale, (2*(MAP_HEIGHT)-230)*scale, circHoleRadius*scale);
+
+        //creating rectangle holes
+        float h1Thickness = 400;
+        float h1Height = 600;
+
+        float h2Thickness = h1Thickness;
+        float h2Height = h1Height;
+
+
+        //first on left side
+        createRectangleHole(wc, 200*scale, 300*scale, h1Thickness*scale, h1Height*scale);
+        createRectangleHole(wc, 200*scale, 1500*scale, h2Thickness*scale, h2Height*scale);
+
+        //rectangle holes on right side
+        createRectangleHole(wc, 3000*scale, 300*scale, h1Thickness*scale, h1Height*scale);
+        createRectangleHole(wc, 3000*scale, 1500*scale, h2Thickness*scale, h2Height*scale);
+
+
+
+        float c1WallRadius = 200f;
+        float circleWallsSeperation = 300;
+        createCircleWall(wc, 2*(MAP_WIDTH / 2 - circleWallsSeperation)*scale, 2*(MAP_HEIGHT/2)*scale, c1WallRadius*scale);
+        createCircleWall(wc, 2*(MAP_WIDTH / 2 + circleWallsSeperation)*scale, 2*(MAP_HEIGHT/2)*scale, c1WallRadius*scale);
+
+
+
+        //creating walls and holes in center
+        float centerSep = 180f;
+        createRectangleHole(wc, 2*(MAP_WIDTH / 2 - centerSep)*scale, 1150*scale, 500*scale, 100*scale );
+        createRectangleHole(wc, 2*(MAP_WIDTH / 2 + centerSep)*scale, 1150*scale, 500*scale, 100*scale );
+        createWall(wc, 2*(MAP_WIDTH/2)*scale, 650*scale, 300*scale, 100*scale);
+
+
+
+        createWall(wc, 2*(MAP_WIDTH/2)*scale, 230*scale, 600*scale, 100*scale);
+        float cSep = 300f;
+        createRectangleHole(wc, 2*(MAP_WIDTH / 2 - cSep)*scale, 230*scale, 600*scale, 100*scale );
+        createRectangleHole(wc, 2*(MAP_WIDTH / 2 + cSep)*scale, 230*scale, 600*scale, 100*scale );
+
+
+
+        createRectangleHole(wc, 2*(MAP_WIDTH/2)*scale, (2*(MAP_HEIGHT)-230)*scale, 600*scale, 100*scale);
+        float cSepp = 300f;
+        createWall(wc, 2*(MAP_WIDTH / 2 - cSepp)*scale, (2*(MAP_HEIGHT)-230)*scale, 600*scale, 100*scale );
+        createWall(wc, 2*(MAP_WIDTH / 2 + cSepp)*scale, (2*(MAP_HEIGHT)-230)*scale, 600*scale, 100*scale );
+
+        MAP_WIDTH*=2*scale;
+
+        MAP_HEIGHT*=2*scale;
+
+
+     /*   createRectangleHoleInvisible(wc, MAP_WIDTH/2, wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
+        createRectangleHoleInvisible(wc, MAP_WIDTH/2, MAP_HEIGHT-wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);*/
+
+
+/*
+        //create walls
+        float wallThickness = 64f;
+        createWall(wc, wallThickness/2, MAP_HEIGHT/2, wallThickness, MAP_HEIGHT);
+        createWall(wc, MAP_WIDTH-wallThickness/2, MAP_HEIGHT/2, wallThickness, MAP_HEIGHT);
+//        createWall(wc, MAP_WIDTH/2, wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
+//        createWall(wc, MAP_WIDTH/2, MAP_HEIGHT-wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
+        //create holes
+        createRectangleHoleInvisible(wc, MAP_WIDTH/2, wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
+        createRectangleHoleInvisible(wc, MAP_WIDTH/2, MAP_HEIGHT-wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
+        createCircleHole(wc, MAP_WIDTH/2, MAP_HEIGHT/2, 48f);
+        */
+
+        //create background
+    }
+
+
 //    private static int createSandbag(WorldContainer wc) {
 //        if (PROGRAM != OFFLINE) throw new UnsupportedOperationException("Sandbag not implemented for nonoffline use");
 //
@@ -172,6 +286,16 @@ public class GameUtils {
         return bg;
     }
 
+
+    private static int createBackgroundScale(WorldContainer wc, float scale) {
+        int bg = wc.createEntity();
+        wc.addComponent(bg, new PositionComp(0, 0, -0.5f));
+        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", scale*1600
+                , scale*900)));
+
+        return bg;
+    }
+
     private static int createWall(WorldContainer wc, float x, float y, float width, float height) {
         int w = wc.createEntity("wall");
         wc.addComponent(w, new PositionComp(x, y));
@@ -223,4 +347,38 @@ public class GameUtils {
 //        wc.addComponent(characterEntity, new UserCharacterInputComp());
 //
 //    }
+
+    private static int createCircleWall(WorldContainer wc, float x, float y, float radius) {
+        int w = wc.createEntity();
+        wc.addComponent(w, new PositionComp(x, y));
+
+        wc.addComponent(w, new ColoredMeshComp(ColoredMeshUtils.createCircleMulticolor(radius, 32)));
+
+        wc.addComponent(w, new PhysicsComp(0, 1, 1));
+        wc.addComponent(w, new CollisionComp(new Circle(radius)));
+        wc.addComponent(w, new NaturalResolutionComp());
+
+
+
+        return w;
+    }
+
+    private static int createRectangleHole(WorldContainer wc, float x, float y, float width, float height) {
+        int hole = wc.createEntity();
+        float[] color = {0.0f, 0.0f, 0.0f};
+
+        wc.addComponent(hole, new PositionComp(x, y));
+
+        wc.addComponent(hole, new ColoredMeshComp(ColoredMeshUtils.createRectangleSingleColor(width, height, color)));
+        wc.addComponent(hole, new MeshCenterComp(width/2, height/2)); //physical rectangle is defined with position being the center, while the graphical square is defined in the upper left corner
+
+        wc.addComponent(hole, new CollisionComp(new Rectangle(width, height)));
+            //wc.addComponent(hole, new PhysicsComp(500f, 10.0f));
+
+        wc.addComponent(hole, new HoleComp());
+
+
+        return hole;
+    }
+
 }

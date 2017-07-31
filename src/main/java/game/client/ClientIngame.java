@@ -82,7 +82,7 @@ public class ClientIngame implements Runnable{
 
         GameUtils.assignComponentTypes(wc);
 
-        GameUtils.createMap(wc);
+        GameUtils.createLargeMap(wc);
         CharacterUtils.createClientCharacters(wc, teams);
 
         //do this afte rbecaus of onscreen sys wich creates entities..
@@ -98,6 +98,11 @@ public class ClientIngame implements Runnable{
         backgroundAudioComp = new AudioComp(battlefield, 1, 500, 600);
         backgroundAudioComp.backgroundMusic();
         backgroundAudioComp.playSound(0);
+
+        Sound readyGo = new Sound("audio/readyGo.ogg");
+        AudioComp audioComp = new AudioComp(readyGo, 1,600,600);
+        audioComp.backgroundSound();
+        audioComp.playSound(0);
 
 
         //game loop
