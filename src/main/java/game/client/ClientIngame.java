@@ -17,6 +17,7 @@ import game.GameUtils;
 import game.SysUtils;
 
 import java.net.Socket;
+import java.util.List;
 
 /**
  * Created by eirik on 22.06.2017.
@@ -70,7 +71,7 @@ public class ClientIngame implements Runnable{
     @Override
     public void run() {
 
-        window = new Window("Client    Siiiii");
+        window = new Window(0.5f, 0.5f,"Client    Siiiii");
         userInput = new UserInput(window, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
 
@@ -84,6 +85,10 @@ public class ClientIngame implements Runnable{
 
         GameUtils.createLargeMap(wc);
         CharacterUtils.createClientCharacters(wc, teams);
+
+        List<Integer> charEntIds = CharacterUtils.createClientCharacters(wc, teams);
+
+        GameUtils.createGameData(wc, teams, charEntIds);
 
         //do this afte rbecaus of onscreen sys wich creates entities..
         SysUtils.addClientSystems(wc, window, userInput, tcpPacketIn, tcpPacketOut);

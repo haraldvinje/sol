@@ -16,6 +16,8 @@ import game.ClientGameTeams;
 import game.GameUtils;
 import game.SysUtils;
 
+import java.util.List;
+
 /**
  * Created by eirik on 13.06.2017.
  */
@@ -62,7 +64,9 @@ public class Game {
 
         ClientGameTeams teams = new ClientGameTeams(characterIds, 0, 0);
 
-        CharacterUtils.createOfflineCharacters(wc, teams);
+        List<Integer> charEntities = CharacterUtils.createOfflineCharacters(wc, teams);
+
+        GameUtils.createGameData(wc, teams, charEntities);
 
 
         SysUtils.addOfflineSystems(wc, window, userInput);

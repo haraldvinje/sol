@@ -1,8 +1,6 @@
 package engine.network.client;
 
-import engine.PositionComp;
-import engine.Sys;
-import engine.WorldContainer;
+import engine.*;
 import engine.audio.AudioComp;
 import engine.character.CharacterComp;
 import engine.combat.DamageableComp;
@@ -10,9 +8,7 @@ import engine.combat.abilities.AbilityComp;
 import engine.combat.abilities.HitboxComp;
 import engine.combat.abilities.ProjectileComp;
 import engine.network.*;
-import engine.network.networkPackets.AbilityStartedData;
-import engine.network.networkPackets.AllCharacterStateData;
-import engine.network.networkPackets.HitDetectedData;
+import engine.network.networkPackets.*;
 import engine.visualEffect.VisualEffectComp;
 
 import java.io.DataInputStream;
@@ -75,6 +71,8 @@ public class ClientNetworkInSys implements Sys{
         NetworkDataInput abilityStartedData = tcpPacketIn.pollPacket(NetworkUtils.SERVER_ABILITY_STARTED_ID);
         NetworkDataInput hitDetectedData = tcpPacketIn.pollPacket(NetworkUtils.SERVER_HIT_DETECTED_ID);
         NetworkDataInput projectileDeadData = tcpPacketIn.pollPacket(NetworkUtils.SERVER_PROJECTILE_DEAD_ID);
+        NetworkDataInput entityDeadData = tcpPacketIn.pollPacket(NetworkUtils.SERVER_CHARACTER_DEAD_ID);
+        NetworkDataInput gameOverData = tcpPacketIn.pollPacket(NetworkUtils.SERVER_GAME_OVER_ID);
 
 
 
@@ -111,8 +109,35 @@ public class ClientNetworkInSys implements Sys{
             applyProjectileDead(data);
         }
 
+        if (entityDeadData != null) {
+            //translate
+            EntityDeadData data = NetworkUtils.packetToEntityDead( entityDeadData );
+
+            //handle
+            System.out.println("Entity died: " + data.entityId);
+        }
+
+        if (gameOverData != null) {
+            //translate
+            GameOverData data = NetworkUtils.packetToGameOver( gameOverData );
+
+            //handle
+            //write to gameDataComp
+
+            //if the entity lost is controlled by client, lost
+            boolean won = !(wc.hasComponent(data.charEntityLost, ControlledComp.class));
+
+            wc.entitiesOfComponentTypeStream(GameDataComp.class).forEach(entity -> {
+                GameDataComp dataComp = (GameDataComp) wc.getComponent(entity, GameDataComp.class);
+                dataComp.endGameRequest = true;
+                dataComp.gameWon = won;
+            });
+            System.out.println("Game over: " + data.charEntityLost);
+        }
+
+
+        //apply character states
         if (!statesPending.isEmpty()) {
-            System.out.println("states pending: " + statesPending.size());
             //apply last state obtained
             while(statesPending.size() > 1) {
                 statesPending.poll();
