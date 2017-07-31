@@ -17,6 +17,7 @@ import game.GameUtils;
 import game.SysUtils;
 
 import java.net.Socket;
+import java.util.List;
 
 /**
  * Created by eirik on 22.06.2017.
@@ -82,8 +83,12 @@ public class ClientIngame implements Runnable{
 
         GameUtils.assignComponentTypes(wc);
 
-        GameUtils.createMap(wc);
+        GameUtils.createLargeMap(wc);
         CharacterUtils.createClientCharacters(wc, teams);
+
+//        List<Integer> charEntIds = CharacterUtils.createClientCharacters(wc, teams);
+//
+//        GameUtils.createGameData(wc, teams, charEntIds);
 
         //do this afte rbecaus of onscreen sys wich creates entities..
         SysUtils.addClientSystems(wc, window, userInput, tcpPacketIn, tcpPacketOut);
@@ -98,6 +103,11 @@ public class ClientIngame implements Runnable{
         backgroundAudioComp = new AudioComp(battlefield, 1, 500, 600);
         backgroundAudioComp.backgroundMusic();
         backgroundAudioComp.playSound(0);
+
+        Sound readyGo = new Sound("audio/readyGo.ogg");
+        AudioComp audioComp = new AudioComp(readyGo, 1,600,600);
+        audioComp.backgroundSound();
+        audioComp.playSound(0);
 
 
         //game loop

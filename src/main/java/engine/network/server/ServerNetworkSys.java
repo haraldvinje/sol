@@ -12,6 +12,7 @@ import engine.combat.abilities.HitboxComp;
 import engine.combat.abilities.ProjectileComp;
 import engine.network.*;
 import engine.network.networkPackets.*;
+import engine.physics.AffectedByHoleComp;
 import game.server.ServerClientHandler;
 
 import java.util.*;
@@ -93,6 +94,10 @@ public class ServerNetworkSys implements Sys {
         retrieveHitsDetected().forEach(hitsDetected -> sendHitDetected(hitsDetected) );
 
         retrieveDeadProjectiles().forEach(deadProj -> sendProjectileDead(deadProj) );
+
+        retrieveDeadEntities().forEach(deadEntity -> sendEntityDead(deadEntity));
+
+        retrieveGameOver().forEach(gameOver -> sendGameOver(gameOver));
     }
 
 
@@ -169,10 +174,34 @@ public class ServerNetworkSys implements Sys {
         return projectileData;
     }
 
+
     private List<EntityDeadData> retrieveDeadEntities() {
-        return null;
+        List<EntityDeadData> deadEntities = new ArrayList<>();
+
+        wc.entitiesOfComponentTypeStream(CharacterComp.class).forEach( entity -> {
+            AffectedByHoleComp affholeComp = (AffectedByHoleComp) wc.getComponent(entity, AffectedByHoleComp.class);
+
+            if (affholeComp.isHoleAffectedFlag()) {
+                deadEntities.add( new EntityDeadData( entity ) );
+            }
+        });
+
+        return deadEntities;
     }
 
+    private List<GameOverData> retrieveGameOver() {
+        List<GameOverData> gameOver = new ArrayList<>();
+
+        wc.entitiesOfComponentTypeStream(CharacterComp.class).forEach(entity -> {
+            CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
+
+            if (charComp.getRespawnCount() >= 3) {
+                gameOver.add( new GameOverData(entity) );
+            }
+        });
+
+        return gameOver;
+    }
 
     public void sendCharacterData(AllCharacterStateData gameState) {
         clientHandlers.forEach(client -> client.sendCharacterData(gameState));
@@ -187,7 +216,24 @@ public class ServerNetworkSys implements Sys {
     private void sendProjectileDead(ProjectileDeadData projDeadData) {
         clientHandlers.forEach(client -> client.sendProjectileDead(projDeadData));
     }
+    private void sendEntityDead(EntityDeadData data) {
+        //create packet
+        NetworkDataOutput out = NetworkUtils.entityDeadToPacket(data);
 
+        //send packet to all clients
+        clientHandlers.forEach(client -> {
+            client.getTcpPacketOut().send(NetworkUtils.SERVER_CHARACTER_DEAD_ID, out);
+        });
+    }
+    private void sendGameOver(GameOverData data) {
+        //create network packet
+        NetworkDataOutput out = NetworkUtils.gameOverToPacket(data);
+
+        //send packet to all clients
+        clientHandlers.forEach(client -> {
+            client.getTcpPacketOut().send(NetworkUtils.SERVER_GAME_OVER_ID, out);
+        });
+    }
 
 
 

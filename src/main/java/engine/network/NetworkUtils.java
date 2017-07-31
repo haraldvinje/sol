@@ -1,9 +1,6 @@
 package engine.network;
 
-import engine.network.networkPackets.AbilityStartedData;
-import engine.network.networkPackets.AllCharacterStateData;
-import engine.network.networkPackets.CharacterInputData;
-import engine.network.networkPackets.HitDetectedData;
+import engine.network.networkPackets.*;
 import utils.maths.M;
 
 import java.io.DataInputStream;
@@ -36,8 +33,9 @@ public class NetworkUtils {
             SERVER_HIT_DETECTED_ID = 2,
             SERVER_CHARACTER_DEAD_ID = 3,
             SERVER_PROJECTILE_DEAD_ID = 4,
+            SERVER_GAME_OVER_ID = 5,
 
-            CLIENT_CHARACTER_INPUT = 5;
+            CLIENT_CHARACTER_INPUT = 6;
 
 
     public static NetworkDataOutput gameStateToPacket(AllCharacterStateData stateData) {
@@ -168,6 +166,37 @@ public class NetworkUtils {
         return data;
     }
 
+    public static NetworkDataOutput entityDeadToPacket(EntityDeadData data) {
+        NetworkDataOutput out = new NetworkDataOutput();
+
+        out.writeInt(data.entityId);
+
+        return out;
+    }
+
+    public static EntityDeadData packetToEntityDead(NetworkDataInput in) {
+        EntityDeadData data = new EntityDeadData();
+
+        data.entityId = in.readInt();
+
+        return data;
+    }
+
+    public static NetworkDataOutput gameOverToPacket(GameOverData data) {
+        NetworkDataOutput out = new NetworkDataOutput();
+
+        out.writeInt(data.charEntityLost);
+
+        return out;
+    }
+
+    public static GameOverData packetToGameOver(NetworkDataInput in) {
+        GameOverData data = new GameOverData();
+
+        data.charEntityLost = in.readInt();
+
+        return data;
+    }
 
 //
 //    public static boolean sendClientStateId(int id, DataOutputStream outputStream) {

@@ -91,7 +91,7 @@ public class CharacterSys implements Sys {
     private void checkHoleAffected(int charNumb, PositionComp posComp, PhysicsComp physComp, CharacterComp charComp, DamageableComp dmgablComp, AffectedByHoleComp affholeComp) {
         if (affholeComp.isHoleAffectedFlag()) {
 
-            Vec2 respawnPos = (charNumb == 0)? new Vec2(GameUtils.MAP_WIDTH/4f, GameUtils.MAP_HEIGHT/2f) : new Vec2(GameUtils.MAP_WIDTH*3f/4f, GameUtils.MAP_HEIGHT/2f);
+            Vec2 respawnPos = (charNumb == 0)? new Vec2(GameUtils.startPositionsTeam1[0][0], GameUtils.startPositionsTeam1[0][1]) : new Vec2(GameUtils.startPositionsTeam2[0][0], GameUtils.startPositionsTeam2[0][1]);
 
             dmgablComp.reset();
             physComp.reset();

@@ -40,12 +40,13 @@ public class CharacterUtils {
 
 
 
-    public static void createOfflineCharacters(WorldContainer wc, ClientGameTeams teams) {
+    public static List<Integer> createOfflineCharacters(WorldContainer wc, ClientGameTeams teams) {
 
-        createClientCharacters(wc, teams);
+        return createClientCharacters(wc, teams);
     }
 
-    public static void createClientCharacters(WorldContainer wc, ClientGameTeams teams) {
+    public static List<Integer> createClientCharacters(WorldContainer wc, ClientGameTeams teams) {
+        List<Integer> charEntIds = new ArrayList<>();
 
         int i = 0;
         for (int charEnt : teams.getCharacterIdsOnTeam(0)) {
@@ -53,7 +54,8 @@ public class CharacterUtils {
             if (teams.getControlCharacterTeam() == 0 && i == teams.getControlCharacterIndex()) {
                 controlled = true;
             }
-            createCharacter(charEnt, wc, controlled, GameUtils.startPositionsTeam1[i][0], GameUtils.startPositionsTeam1[i][1]);
+            int e = createCharacter(charEnt, wc, controlled, GameUtils.startPositionsTeam1[i][0], GameUtils.startPositionsTeam1[i][1]);
+            charEntIds.add(e);
 
             i++;
         }
@@ -63,10 +65,13 @@ public class CharacterUtils {
             if (teams.getControlCharacterTeam() == 1 && i == teams.getControlCharacterIndex()) {
                 controlled = true;
             }
-            createCharacter(charEnt, wc, controlled, GameUtils.startPositionsTeam2[i][0], GameUtils.startPositionsTeam2[i][1]);
+            int e = createCharacter(charEnt, wc, controlled, GameUtils.startPositionsTeam2[i][0], GameUtils.startPositionsTeam2[i][1]);
+            charEntIds.add(e);
 
             i++;
         }
+
+        return charEntIds;
     }
 
     public static void createServerCharacters(WorldContainer wc, ServerGameTeams teams) {

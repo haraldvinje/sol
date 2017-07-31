@@ -14,6 +14,7 @@ import utils.maths.Vec4;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by eirik on 09.07.2017.
@@ -24,25 +25,34 @@ public class OnScreenSys implements Sys{
     private WorldContainer wc;
 
 
-    private int botBarEnt;
-    private List<Integer> damageTexts = new ArrayList<>();
+//    private int botBarEnt;
+//    private List<Integer> damageTexts = new ArrayList<>();
+//    private int gameEndTextEntity;
+
+    private String wictoryString = "Wictory :)";
+    private String defeatString = "Defeat :(";
+    private Vec4 wictoryColor = new Vec4(0, 1, 0, 1);
+    private Vec4 defeatColor = new Vec4(1, 0, 0, 1);
 
 
     public OnScreenSys(WorldContainer wc, int characterCount) {
 
-        //create bottom bar
-        //botBarEnt = createBotBarEnt(wc);
-
-        //create character damage displays
-        int halfCharCount = characterCount /2;
-        Vec4 textColor = new Vec4(0.9f, 0, 0, 1);
-        for (int i = 0; i < characterCount; i++) {
-
-            float x = i < halfCharCount ? 100 : wc.getView().getWidth() - 200;
-            float y = wc.getView().getHeight()-200 + 64f * (i % halfCharCount);
-            int textEnt = createTextEntty(wc, "0", 64, x, y, textColor);
-            damageTexts.add( textEnt );
-        }
+//        //create bottom bar
+//        //botBarEnt = createBotBarEnt(wc);
+//
+//        //create character damage displays
+//        int halfCharCount = characterCount /2;
+//        Vec4 textColor = new Vec4(0.9f, 0, 0, 1);
+//        for (int i = 0; i < characterCount; i++) {
+//
+//            float x = i < halfCharCount ? 100 : wc.getView().getWidth() - 200;
+//            float y = wc.getView().getHeight()-200 + 64f * (i % halfCharCount);
+//            int textEnt = createTextEntity(wc, "0", 64, x, y, textColor);
+//            damageTexts.add( textEnt );
+//        }
+//
+//        //create game end text
+//        gameEndTextEntity = createTextEntity(wc, "", 128, 300, 300, new Vec4() );
     }
 
     @Override
@@ -54,10 +64,35 @@ public class OnScreenSys implements Sys{
     public void update() {
 
         int charNumb = 0;
-        for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class)) {
-            DamageableComp dmgableComp = (DamageableComp)wc.getComponent(entity, DamageableComp.class);
+        for (int entity : wc.getEntitiesWithComponentType(GameDataComp.class)) {
+            GameDataComp dataComp = (GameDataComp) wc.getComponent(entity, GameDataComp.class);
 
-            setTextString(damageTexts.get(charNumb), Integer.toString((int)dmgableComp.getDamage()));
+            //render damage taken text
+            for (Map.Entry<Integer, Integer> entry : dataComp.charDamageTextEntities.entrySet()) {
+                int charEnt = entry.getKey();
+                int textEnt = entry.getValue();
+                DamageableComp charDmgableComp = (DamageableComp)wc.getComponent(charEnt, DamageableComp.class);
+                ViewRenderComp textViewrendComp = (ViewRenderComp) wc.getComponent(textEnt, ViewRenderComp.class);
+
+                textViewrendComp.getTextMesh(0).setString( String.format("%.0f", charDmgableComp.getDamage() ) );
+            }
+
+            //render game end text
+            if (dataComp.endGameRequest) {
+                ViewRenderComp gameendViewrendComp = (ViewRenderComp) wc.getComponent(dataComp.gameEndTextEntity, ViewRenderComp.class);
+                TextMesh textMesh = gameendViewrendComp.getTextMesh(0);
+
+                if (dataComp.gameWon) {
+                    textMesh.setString(String.format("%s",wictoryString));
+                    textMesh.setColor(wictoryColor);
+                }
+                else {
+                    textMesh.setString(String.format("%s",defeatString) );
+                    textMesh.setColor(defeatColor);
+                }
+            }
+
+//            setTextString(damageTexts.get(charNumb), Integer.toString((int)dmgableComp.getDamage()));
 
             charNumb++;
         }
@@ -68,14 +103,14 @@ public class OnScreenSys implements Sys{
 
     }
 
-
-    private int createTextEntty(WorldContainer wc, String s, float size, float x, float y, Vec4 color) {
+    private int createTextEntity(WorldContainer wc,  String s, float size, float x, float y, Vec4 color) {
         int t = wc.createEntity();
         wc.addComponent(t, new PositionComp(x, y));
         wc.addComponent(t, new ViewRenderComp( new TextMesh( s, Font.getFont(FontType.BROADWAY),size, color) ) );
 
         return t;
     }
+
 
     private void setTextString(int entity, String s) {
         ViewRenderComp viewrendComp = (ViewRenderComp) wc.getComponent(entity, ViewRenderComp.class);

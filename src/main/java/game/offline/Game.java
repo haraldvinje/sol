@@ -16,6 +16,8 @@ import game.ClientGameTeams;
 import game.GameUtils;
 import game.SysUtils;
 
+import java.util.List;
+
 /**
  * Created by eirik on 13.06.2017.
  */
@@ -53,16 +55,18 @@ public class Game {
 
         GameUtils.assignComponentTypes(wc);
 
-        GameUtils.createMap(wc);
+        GameUtils.createLargeMap(wc);
 
         int[][] characterIds = {
-                {CharacterUtils.BRAIL},
+                {CharacterUtils.SHRANK},
                 {CharacterUtils.SCHMATHIAS}
         };
 
         ClientGameTeams teams = new ClientGameTeams(characterIds, 0, 0);
 
-        CharacterUtils.createOfflineCharacters(wc, teams);
+        List<Integer> charEntities = CharacterUtils.createOfflineCharacters(wc, teams);
+
+        GameUtils.createGameData(wc, teams, charEntities);
 
 
         SysUtils.addOfflineSystems(wc, window, userInput);
@@ -82,6 +86,11 @@ public class Game {
         backgroundAudioComp = new AudioComp(battlefield, 1, 500, 600);
         backgroundAudioComp.backgroundMusic();
         backgroundAudioComp.playSound(0);
+
+        Sound readyGo = new Sound("audio/readyGo.ogg");
+        AudioComp audioComp = new AudioComp(readyGo, 1,600,600);
+        audioComp.backgroundSound();
+        audioComp.playSound(0);
 
 
         lastTime = System.nanoTime();
