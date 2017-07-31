@@ -18,4 +18,11 @@ public class Vec4 {
 		this.w = w;
 	}
 
+	public Vec4(Vec4 vec) {
+		this.x = vec.x;
+		this.y = vec.y;
+		this.z = vec.z;
+		this.w = vec.w;
+	}
+
 }
