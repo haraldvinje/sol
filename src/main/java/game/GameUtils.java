@@ -13,6 +13,9 @@ import engine.combat.abilities.*;
 import engine.graphics.*;
 
 
+import engine.graphics.text.Font;
+import engine.graphics.text.FontType;
+import engine.graphics.text.TextMesh;
 import engine.graphics.text.TextMeshComp;
 import engine.graphics.view_.ViewControlComp;
 import engine.graphics.view_.ViewControlSys;
@@ -27,6 +30,7 @@ import engine.physics.*;
 import engine.visualEffect.VisualEffectComp;
 import engine.visualEffect.VisualEffectSys;
 import engine.window.Window;
+import utils.maths.Vec4;
 
 import java.net.Socket;
 import java.util.List;
@@ -77,11 +81,53 @@ public class GameUtils {
         wc.assignComponentType(ViewRenderComp.class);
         wc.assignComponentType(AudioComp.class);
         wc.assignComponentType(SoundListenerComp.class);
+        wc.assignComponentType(GameDataComp.class);
 
     }
 
 
+    public static int createGameData(WorldContainer wc, ClientGameTeams teams, List<Integer> charEntityIds) {
+        //charEntityIds are assumed to be in same order as team character ids
 
+        float[] teamStartX = {10, GameUtils.VIEW_WIDTH-200};
+        float startY = GameUtils.VIEW_HEIGHT - 300;
+        float spaceY = 50;
+
+        Vec4 dmgTextColor = new Vec4(1, 0, 0, 1);
+        float dmgTextSize = 128;
+
+        GameDataComp dataComp = new GameDataComp();
+
+        //Create damage text entities, and store id in dataComp
+        for (int i = 0; i < teams.getTeamCount();  i++) {
+            float currY = startY;
+            int j = 0;
+            for (int charId : teams.getCharacterIdsOnTeam(i)) {
+
+                //create text entity
+                int t = wc.createEntity("damage text");
+                wc.addComponent(t, new PositionComp(teamStartX[i], currY));
+                wc.addComponent(t, new ViewRenderComp(new TextMesh("0", Font.getFont(FontType.BROADWAY), dmgTextSize, dmgTextColor)));
+
+                dataComp.charDamageTextEntities.put(charEntityIds.get(i+j), t);
+
+                ++j;
+                currY += spaceY;
+            }
+        }
+
+        //create game end text entity and store in data comp
+        int endGameTextEntity = wc.createEntity("game end text");
+        wc.addComponent(endGameTextEntity, new PositionComp(300, 300 ));
+        wc.addComponent(endGameTextEntity, new ViewRenderComp(new TextMesh("", Font.getFont(FontType.BROADWAY), dmgTextSize, dmgTextColor)));
+        dataComp.gameEndTextEntity = endGameTextEntity;
+
+        //Create actual game data entity
+        int gameDataEntity = wc.createEntity("game data");
+        wc.addComponent(gameDataEntity, dataComp);
+
+        return gameDataEntity;
+    }
 
     public static void createMap(WorldContainer wc) {
 

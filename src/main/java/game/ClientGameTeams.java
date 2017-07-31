@@ -33,6 +33,11 @@ public class ClientGameTeams {
         this.characterIds = characterIds;
     }
 
+    public int getTeamCount() {
+        return characterIds.length;
+    }
+
+
     public int getControlCharacterTeam() {
         return controlCharacterTeam;
     }
