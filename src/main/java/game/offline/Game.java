@@ -3,7 +3,9 @@ package game.offline;
 
 import engine.*;
 
+import engine.audio.AudioComp;
 import engine.audio.AudioMaster;
+import engine.audio.Sound;
 import engine.graphics.*;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
@@ -29,6 +31,9 @@ public class Game {
     private UserInput userInput;
 
     private ColoredMesh vao;
+
+    private AudioComp backgroundAudioComp;
+
 
     private long lastTime;
 
@@ -71,6 +76,13 @@ public class Game {
      * blocking while the game runs
      */
     public void start() {
+
+        Sound battlefield = new Sound("audio/meleeBattlefield.ogg");
+        backgroundAudioComp = new AudioComp(battlefield, 1, 500, 600);
+        backgroundAudioComp.backgroundMusic();
+        backgroundAudioComp.playSound(0);
+
+
         lastTime = System.nanoTime();
 
         float timeSinceUpdate = 0;
