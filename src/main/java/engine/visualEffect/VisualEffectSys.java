@@ -70,7 +70,7 @@ public class VisualEffectSys implements Sys{
         while(veComp.hasEffectsToStart()) {
             VisualEffect effect = veComp.popVisualEffect();
 
-            if (effectsRunning.contains( veComp.popVisualEffect() )) {
+            if (effectsRunning.contains( effect )) { //CANGED FROM: veComp.popVisualEffect()
                 effectsRunning.remove(effect);
             }
             effectsRunning.add(effect);
