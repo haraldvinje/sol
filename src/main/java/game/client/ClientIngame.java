@@ -84,7 +84,9 @@ public class ClientIngame implements Runnable{
         GameUtils.assignComponentTypes(wc);
 
         GameUtils.createLargeMap(wc);
-        CharacterUtils.createClientCharacters(wc, teams);
+        List<Integer> charEntIds = CharacterUtils.createClientCharacters(wc, teams);
+        GameUtils.createGameData(wc, teams, charEntIds);
+
 
 //        List<Integer> charEntIds = CharacterUtils.createClientCharacters(wc, teams);
 //
