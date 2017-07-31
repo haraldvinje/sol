@@ -54,10 +54,10 @@ public class Game {
 
         int[][] characterIds = {
                 {CharacterUtils.BRAIL},
-                {CharacterUtils.SCHMATHIAS}
+                {CharacterUtils.SHRANK}
         };
 
-        ClientGameTeams teams = new ClientGameTeams(characterIds, 0, 0);
+        ClientGameTeams teams = new ClientGameTeams(characterIds, 1, 0);
 
         List<Integer> charEntities = CharacterUtils.createOfflineCharacters(wc, teams);
 
