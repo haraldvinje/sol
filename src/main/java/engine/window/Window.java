@@ -59,6 +59,19 @@ public class Window {
         return height;
     }
 
+    public void hide() {
+        glfwHideWindow(windowId);
+    }
+    public void show() {
+        glfwShowWindow(windowId);
+    }
+    public void focus() {
+        glfwFocusWindow(windowId);
+    }
+    public void minimize() {
+        glfwIconifyWindow(windowId);
+    }
+
     public void initGLFW() {
         if (!glfwInit()) {
             throw new IllegalStateException("Could not initialize GLFW!");
