@@ -1,9 +1,6 @@
 package game;
 
-import engine.PositionComp;
-import engine.RotationComp;
-import engine.UserCharacterInputComp;
-import engine.WorldContainer;
+import engine.*;
 import engine.audio.AudioComp;
 import engine.audio.Sound;
 import engine.audio.SoundListenerComp;
@@ -14,7 +11,6 @@ import engine.combat.DamagerComp;
 import engine.combat.abilities.*;
 import engine.graphics.*;
 import engine.graphics.view_.ViewControlComp;
-import engine.ControlledComp;
 import engine.network.client.InterpolationComp;
 import engine.physics.*;
 import engine.visualEffect.VisualEffectComp;
@@ -33,6 +29,7 @@ public class CharacterUtils {
 
     public static final int CHARACTER_COUNT = 3;
     public static final int SHRANK = 0, SCHMATHIAS = 1, BRAIL = 2;
+    public static final String[] CHARACTER_NAMES = {"Shrank", "Schmathias", "Brail"};
 
     private static float hitboxDepth = 1;
 
@@ -40,66 +37,66 @@ public class CharacterUtils {
 
 
 
-    public static List<Integer> createOfflineCharacters(WorldContainer wc, ClientGameTeams teams) {
+    public static int[][] createOfflineCharacters(WorldContainer wc, ClientGameTeams teams) {
 
         return createClientCharacters(wc, teams);
     }
 
-    public static List<Integer> createClientCharacters(WorldContainer wc, ClientGameTeams teams) {
-        List<Integer> charEntIds = new ArrayList<>();
+    public static int[][] createClientCharacters(WorldContainer wc, ClientGameTeams teams) {
+        int[][] charEntIds = new int[teams.getTeamCount()][];
 
-        int i = 0;
-        for (int charEnt : teams.getCharacterIdsOnTeam(0)) {
-            boolean controlled = false;
-            if (teams.getControlCharacterTeam() == 0 && i == teams.getControlCharacterIndex()) {
-                controlled = true;
+        for (int j = 0; j < teams.getTeamCount(); j++) {
+            charEntIds[j] = new int[teams.getCharacterIdsOnTeam(j).length];
+
+            int i = 0;
+            for (int charEnt : teams.getCharacterIdsOnTeam(j)) {
+                boolean controlled = false;
+                if (teams.getControlCharacterTeam() == j && i == teams.getControlCharacterIndex()) {
+                    controlled = true;
+                }
+
+                int e = createCharacter(charEnt, wc, controlled, j, i, GameUtils.teamStartPos[j][i].x, GameUtils.teamStartPos[j][i].y);
+
+                charEntIds[j][i] = e;
+
+                i++;
             }
-            int e = createCharacter(charEnt, wc, controlled, GameUtils.startPositionsTeam1[i][0], GameUtils.startPositionsTeam1[i][1]);
-            charEntIds.add(e);
-
-            i++;
-        }
-        i = 0;
-        for (int charEnt : teams.getCharacterIdsOnTeam(1)) {
-            boolean controlled = false;
-            if (teams.getControlCharacterTeam() == 1 && i == teams.getControlCharacterIndex()) {
-                controlled = true;
-            }
-            int e = createCharacter(charEnt, wc, controlled, GameUtils.startPositionsTeam2[i][0], GameUtils.startPositionsTeam2[i][1]);
-            charEntIds.add(e);
-
-            i++;
         }
 
         return charEntIds;
     }
 
-    public static void createServerCharacters(WorldContainer wc, ServerGameTeams teams) {
+    public static int[][] createServerCharacters(WorldContainer wc, ServerGameTeams teams) {
         boolean controlled = true;
 
+        int[][] charEntIds = new int[teams.getTeamCount()][];
 
-        int i = 0;
-        for (int charEnt : teams.getCharacterIdsOnTeam(0)) {
-            createCharacter(charEnt, wc, controlled, GameUtils.startPositionsTeam1[i][0], GameUtils.startPositionsTeam1[i][1]);
-            i++;
+        for (int j = 0; j < teams.getTeamCount(); j++) {
+            charEntIds[j] = new int[teams.getCharacterIdsOnTeam(j).length];
+
+            int i = 0;
+            for (int charEnt : teams.getCharacterIdsOnTeam( j )) {
+
+                int e = createCharacter(charEnt, wc, controlled, j, i, GameUtils.teamStartPos[j][i].x, GameUtils.teamStartPos[j][i].y);
+                charEntIds[j][i] = e;
+
+                i++;
+            }
         }
-        i = 0;
-        for (int charEnt : teams.getCharacterIdsOnTeam(1)) {
-            createCharacter(charEnt, wc, controlled, GameUtils.startPositionsTeam2[i][0], GameUtils.startPositionsTeam2[i][1]);
-            i++;
-        }
+
+        return charEntIds;
     }
 
 
-    private static int createCharacter(int characterId, WorldContainer wc, boolean controlled, float x, float y) {
+    private static int createCharacter(int characterId, WorldContainer wc, boolean controlled, int team, int idOnTeam, float x, float y) {
         int charEnt;
 
         switch(characterId) {
-            case SHRANK: charEnt = createShrank(wc, controlled, x, y);
+            case SHRANK: charEnt = createShrank(wc, controlled, team, idOnTeam, x, y);
                 break;
-            case SCHMATHIAS: charEnt = createSchmathias(wc, controlled, x, y);
+            case SCHMATHIAS: charEnt = createSchmathias(wc, controlled, team, idOnTeam, x, y);
                 break;
-            case BRAIL: charEnt = createBrail(wc, controlled, x, y);
+            case BRAIL: charEnt = createBrail(wc, controlled, team, idOnTeam, x, y);
                 break;
             default:
                 throw new IllegalArgumentException("no character of id given");
@@ -108,7 +105,7 @@ public class CharacterUtils {
         return charEnt;
     }
 
-    private static int createShrank(WorldContainer wc, boolean controlled, float x, float y) {
+    private static int createShrank(WorldContainer wc, boolean controlled, int team, int idOnTeam, float x, float y) {
         Sound sndPowershot = new Sound("audio/powershot.ogg");
         Sound sndBoom = new Sound ("audio/boom-bang.ogg");
         Sound sndRapidsShot = new Sound("audio/click4.ogg");
@@ -142,12 +139,12 @@ public class CharacterUtils {
        soundList.add(boomSoundIndex, sndBoom);
 
 
-        return createCharacter(wc, controlled, x, y, "sol_frank.png", 160f/2f, 512, 256, 180, 130, 32, 1800f,
+        return createCharacter(wc, controlled, team, idOnTeam, x, y, "sol_frank.png", 160f/2f, 512, 256, 180, 130, 32, 1800f,
                 abRapidshot, abHyperbeam, abPuffer,
                 soundList);
     }
 
-    private static int createSchmathias(WorldContainer wc, boolean controlled, float x, float y) {
+    private static int createSchmathias(WorldContainer wc, boolean controlled, int team, int idOnTeam, float x, float y) {
 
         //frogpunch
         int suhSoundIndex = 0;
@@ -168,11 +165,11 @@ public class CharacterUtils {
         sounds.add(suhSoundIndex, new Sound("audio/si.ogg") );
 
 
-        return createCharacter(wc, controlled, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
+        return createCharacter(wc, controlled, team, idOnTeam, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
                 abFrogpunch, abHook, abMeteorpunch, sounds);
     }
 
-    private static int createBrail(WorldContainer wc, boolean controlled, float x, float y) {
+    private static int createBrail(WorldContainer wc, boolean controlled, int team, int idOnTeam, float x, float y) {
         Sound snd1 = new Sound("audio/click4.ogg");
         Sound snd2 = new Sound("audio/laser02.ogg");
         Sound snd3 = new Sound("audio/snabbe.ogg");
@@ -201,11 +198,11 @@ public class CharacterUtils {
         sounds.add( snd2 );
         sounds.add( snd3 );
 
-        return createCharacter(wc, controlled, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
+        return createCharacter(wc, controlled, team, idOnTeam, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
                 abFrogpunch, abHook, abMeteorpunch, sounds);
     }
 
-    private static int createShitface(WorldContainer wc, boolean controlled, float x, float y) {
+    private static int createShitface(WorldContainer wc, boolean controlled, int team, int idOnTeam, float x, float y) {
 
         //frogpunch
         MeleeAbility abFrogpunch = new MeleeAbility(wc, -1, 3, 5, 3, 20, new Circle(64f),48.0f, null);
@@ -224,7 +221,7 @@ public class CharacterUtils {
         List<Sound> sounds = new ArrayList<Sound>();
         sounds.add( new Sound("audio/si.ogg") );
 
-        return createCharacter(wc, controlled, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
+        return createCharacter(wc, controlled, team, idOnTeam, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
                 abFrogpunch, abHook, abMeteorpunch, sounds );
     }
 
@@ -256,7 +253,7 @@ public class CharacterUtils {
 
 
 
-    private static int createCharacter(WorldContainer wc, boolean controlled, float x, float y, String imagePath, float radiusOnImage, float imageWidth, float imageHeight, float offsetXOnImage, float offsetYOnImage, float radius, float moveAccel, Ability ab1, Ability ab2, Ability ab3, List<Sound> soundList) {
+    private static int createCharacter(WorldContainer wc, boolean controlled, int team, int idOnTeam, float x, float y, String imagePath, float radiusOnImage, float imageWidth, float imageHeight, float offsetXOnImage, float offsetYOnImage, float radius, float moveAccel, Ability ab1, Ability ab2, Ability ab3, List<Sound> soundList) {
         int characterEntity = wc.createEntity("character");
 
         float scale = radius / radiusOnImage;
@@ -273,6 +270,8 @@ public class CharacterUtils {
         wc.addComponent(characterEntity, new MeshCenterComp(offsetX, offsetY));
 
         wc.addComponent(characterEntity, new AbilityComp(ab1, ab2, ab3));
+
+        wc.addComponent(characterEntity, new TeamComp(team, idOnTeam));
 
         //server and offline
         wc.addComponent(characterEntity, new PhysicsComp(80, 5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
