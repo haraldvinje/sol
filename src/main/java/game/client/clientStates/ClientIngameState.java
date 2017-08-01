@@ -33,11 +33,6 @@ public class ClientIngameState extends ClientState {
 
     @Override
     public void onEnter() {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         playing = false;
 
@@ -55,10 +50,24 @@ public class ClientIngameState extends ClientState {
         if (playing) {
 
             if (!gameThread.isAlive()) {
+
+                //game ended
+
                 //clear net in
                 client.getTcpPacketIn().clear();
 
+                //show client window
+                window.show();
+                window.focus();
+
+                //goto idle state
                 setGotoState(ClientStates.IDLE);
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
 
             return;
@@ -77,10 +86,14 @@ public class ClientIngameState extends ClientState {
             //clear net in
             client.getTcpPacketIn().clear();
 
+            //when going to game
+            playing = true;
+            window.hide();
+
             //create game
             System.out.println("Got data, creating game");
             createGame(teams);
-            playing = true;
+
         }
 
     }
