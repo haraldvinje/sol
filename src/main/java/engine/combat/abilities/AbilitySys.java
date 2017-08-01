@@ -91,7 +91,7 @@ public class AbilitySys implements Sys {
                 if (ability.isRequestingExecution()) {
 
                     startExecution(abComp, ability);
-                    AudioComp ac = (AudioComp)wc.getComponent(entity, AudioComp.class);
+//                    AudioComp ac = (AudioComp)wc.getComponent(entity, AudioComp.class);
 
                 }
             }
