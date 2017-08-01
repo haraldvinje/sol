@@ -43,7 +43,7 @@ public class Server {
     private Map<ServerClientHandler, Integer> activeClientIcons = new HashMap<>();
 
     //texts to print info
-    private int infoTextEntity;
+    private int infoTextEntity1, infoTextEntity2;
 
     //all connected clients
     private List<ServerClientHandler> connectedClients = new ArrayList<>();
@@ -51,8 +51,9 @@ public class Server {
     //idle clients
     private List<ServerClientHandler> idleClients = new ArrayList<>();
 
-    //game queue
-    private LinkedList<ServerClientHandler> gameQueue = new LinkedList<>();
+    //game queues
+    private LinkedList<ServerClientHandler> gameQueue1v1 = new LinkedList<>();
+    private LinkedList<ServerClientHandler> gameQueue2v2 = new LinkedList<>();
 
     //games running
     private Map<ServerGame, Thread> gamesRunning = new HashMap<>();
@@ -79,16 +80,21 @@ public class Server {
         //allocate client icons
         float iconStartX = 100, iconStartY = 100;
         float iconRadius = 64;
-        for (int i = 0; i < NetworkUtils.CHARACTER_NUMB*3; i++) {
+        for (int i = 0; i < NetworkUtils.CHARACTER_COUNT*3; i++) {
             allocatedClientIcons.add( allocateClientIcon(wc, iconStartX+iconRadius*2*i, iconStartY, iconRadius) );
         }
     }
 
     private void createInitialEntities() {
-        infoTextEntity = wc.createEntity("info text");
-        wc.addComponent(infoTextEntity, new PositionComp(10, 10));
-        wc.addComponent(infoTextEntity, new TextMeshComp(new TextMesh(
-                "", Font.getDefaultFont(), 24, new Vec4(1,1,1,1)
+        infoTextEntity1 = wc.createEntity("info text");
+        wc.addComponent(infoTextEntity1, new PositionComp(10, 10));
+        wc.addComponent(infoTextEntity1, new TextMeshComp(new TextMesh(
+                "", Font.getDefaultFont(), 64, new Vec4(1,0.6f,1,1)
+        )));
+        infoTextEntity2 = wc.createEntity("info text");
+        wc.addComponent(infoTextEntity2, new PositionComp(10, 250));
+        wc.addComponent(infoTextEntity2, new TextMeshComp(new TextMesh(
+                "", Font.getDefaultFont(), 64, new Vec4(1,0.6f,1,1)
         )));
     }
 
@@ -140,12 +146,18 @@ public class Server {
         handleGamesRunning();
 
         //print state
-        String s = "Server\n"+
-                "Clients connected: " + connectedClients.size() + "\n"+
-                "Clients idle: " + idleClients.size() + "\n"+
-                "Clients in queue: " + gameQueue.size() + "\n"+
-                "Games running: " + gamesRunning.size() + "\n";
-        ((TextMeshComp) wc.getComponent(infoTextEntity, TextMeshComp.class)).getTextMesh().setString(s);
+        StringBuilder sb1 = new StringBuilder(64);
+        StringBuilder sb2 = new StringBuilder(64);
+        sb1.append("Server\n");
+        sb1.append("Clients connected: " + connectedClients.size() + "\n");
+        sb1.append("Clients idle: " + idleClients.size() + "\n");
+        sb2.append("Clients in 1v1 queue: " + gameQueue1v1.size() + "\n");
+        sb2.append("Clients in 2v2 queue: " + gameQueue2v2.size() + "\n");
+        sb2.append("Games running: " + gamesRunning.size() + "\n");
+
+        ((TextMeshComp) wc.getComponent(infoTextEntity1, TextMeshComp.class)).getTextMesh().setString( sb1.toString() );
+        ((TextMeshComp) wc.getComponent(infoTextEntity2, TextMeshComp.class)).getTextMesh().setString( sb2.toString() );
+
 
         //update systems to show server status
         wc.updateSystems();
@@ -166,7 +178,10 @@ public class Server {
     }
 
     private void handleIdleState() {
-        idleClients.forEach(c -> c.getTcpPacketIn().pollPackets());
+        idleClients.forEach(c -> {
+            boolean packetPolled = c.getTcpPacketIn().pollPackets();
+            if (packetPolled) System.out.println(c.getTcpPacketIn());
+        });
 
 
         //check if anyone wants to enter game queue
@@ -182,44 +197,64 @@ public class Server {
                 System.err.println("Remote socket is closed :(");
             }
 
-            if (tcpPacketIn.removeIfHasPacket(NetworkPregamePackets.QUEUE_CLIENT_REQUEST_QUEUE)) {
+            //handle game queue requests, 1v1 and 2v2
+            LinkedList<ServerClientHandler> queue = null;
+
+            if (tcpPacketIn.removeIfHasPacket(NetworkPregamePackets.QUEUE_CLIENT_REQUEST_QUEUE_1V1)) {
+
+                queue = gameQueue1v1;
+            }
+            else if(tcpPacketIn.removeIfHasPacket(NetworkPregamePackets.QUEUE_CLIENT_REQUEST_QUEUE_2V2)) {
+
+                queue = gameQueue2v2;
+            }
+
+            if (queue != null) {
                 //remove from idle state and put into queue state
                 it.remove();
-                gameQueue.add(client);
+                queue.add(client);
 
                 //let client know that it is put in queue
                 client.getTcpPacketOut().sendEmpty(NetworkPregamePackets.QUEUE_SERVER_PUT_IN_QUEUE);
-
             }
         }
     }
 
     private void handleGameQueueState() {
-        Iterator<ServerClientHandler> it = gameQueue.iterator();
-        while(it.hasNext()) {
-            ServerClientHandler client = it.next();
+        List< LinkedList<ServerClientHandler> > gameQueues = new ArrayList<>();
+        gameQueues.add(gameQueue1v1);   gameQueues.add(gameQueue2v2);
 
-            TcpPacketInput tcpPacketIn = client.getTcpPacketIn();
+        //poll net input and handle queue exit for all game queues
+        for (LinkedList<ServerClientHandler> gameQueue : gameQueues) {
 
-            //pollPackets
-            tcpPacketIn.pollPackets();
+            Iterator<ServerClientHandler> it = gameQueue.iterator();
+            while (it.hasNext()) {
+                ServerClientHandler client = it.next();
 
-            //check if a client wants to exit queue, then move it to idle
-            if (tcpPacketIn.removeIfHasPacket(NetworkPregamePackets.QUEUE_CLIENT_EXIT) ) {
-                it.remove();
-                idleClients.add(client);
+                TcpPacketInput tcpPacketIn = client.getTcpPacketIn();
+
+                //pollPackets
+                boolean packetPolled = tcpPacketIn.pollPackets();
+                if (packetPolled) System.out.println(tcpPacketIn);
+
+                //check if a client wants to exit queue, then move it to idle
+                if (tcpPacketIn.removeIfHasPacket(NetworkPregamePackets.QUEUE_CLIENT_EXIT)) {
+                    it.remove();
+                    idleClients.add(client);
+                }
             }
         }
 
-
         //check if there are enough clients waiting to start a game
-        if (gameQueue.size() >= 2) {
+
+        //1v1 queue
+        if (gameQueue1v1.size() >= 2) {
 
             System.out.println("At least two clients in game queue, starting game");
 
             //retrieve clients
-            ServerClientHandler client1 = gameQueue.pop();
-            ServerClientHandler client2 = gameQueue.pop();
+            ServerClientHandler client1 = gameQueue1v1.pop();
+            ServerClientHandler client2 = gameQueue1v1.pop();
 
             //let clients know that they are about to start game
             client1.getTcpPacketOut().sendEmpty(NetworkPregamePackets.QUEUE_SERVER_GOTO_CHARACTERSELECT);
@@ -231,7 +266,28 @@ public class Server {
             createGame( teams );
         }
 
+        //2v2 queue
+        if (gameQueue2v2.size() >= 4) {
 
+            System.out.println("At least two clients in game queue, starting game");
+
+            //retrieve clients
+            ServerClientHandler client1 = gameQueue2v2.pop();
+            ServerClientHandler client2 = gameQueue2v2.pop();
+            ServerClientHandler client3 = gameQueue2v2.pop();
+            ServerClientHandler client4 = gameQueue2v2.pop();
+
+            //let clients know that they are about to start game
+            client1.getTcpPacketOut().sendEmpty(NetworkPregamePackets.QUEUE_SERVER_GOTO_CHARACTERSELECT);
+            client2.getTcpPacketOut().sendEmpty(NetworkPregamePackets.QUEUE_SERVER_GOTO_CHARACTERSELECT);
+            client3.getTcpPacketOut().sendEmpty(NetworkPregamePackets.QUEUE_SERVER_GOTO_CHARACTERSELECT);
+            client4.getTcpPacketOut().sendEmpty(NetworkPregamePackets.QUEUE_SERVER_GOTO_CHARACTERSELECT);
+
+            //datastructure to hold clients
+            ServerGameTeams teams = new ServerGameTeams(client1, client2, client3, client4);
+
+            createGame( teams );
+        }
     }
 
     public void handleGamesRunning() {

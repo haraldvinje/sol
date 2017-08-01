@@ -61,7 +61,7 @@ public class ClientIngame implements Runnable{
     }
 
 
-    public void terminate() {
+    public synchronized void terminate() {
         running = false;
     }
 
@@ -71,9 +71,11 @@ public class ClientIngame implements Runnable{
     @Override
     public void run() {
 
-        window = new Window("Client    Siiiii");
+        window = new Window(0.4f,"Client    Siiiii");
         userInput = new UserInput(window, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
+        //make sure window has focus
+        window.focus();
 
         //load stuff
         Font.loadFonts(FontType.BROADWAY);
@@ -83,8 +85,18 @@ public class ClientIngame implements Runnable{
 
         GameUtils.assignComponentTypes(wc);
 
-        GameUtils.createLargeMap(wc);
-        List<Integer> charEntIds = CharacterUtils.createClientCharacters(wc, teams);
+        //create map
+        if (teams.getTotalCharacterCount() <= 2) {
+            GameUtils.createMap(wc);
+        }
+        else if (teams.getTotalCharacterCount() <= 4) {
+            GameUtils.createLargeMap(wc);
+        }
+        else {
+            throw new IllegalStateException("Dont know what map to use for " + teams.getTotalCharacterCount() + " clients");
+        }
+
+        int[][] charEntIds = CharacterUtils.createClientCharacters(wc, teams);
         GameUtils.createGameData(wc, teams, charEntIds);
 
 

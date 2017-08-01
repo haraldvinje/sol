@@ -30,10 +30,12 @@ import engine.physics.*;
 import engine.visualEffect.VisualEffectComp;
 import engine.visualEffect.VisualEffectSys;
 import engine.window.Window;
+import utils.maths.M;
 import utils.maths.Vec2;
 import utils.maths.Vec4;
 
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -51,7 +53,7 @@ public class GameUtils {
 
     public static float VIEW_WIDTH = MAP_WIDTH, VIEW_HEIGHT = MAP_HEIGHT;
 
-    public static int[][] startPositionsTeam1, startPositionsTeam2;
+    public static Vec2[][] teamStartPos;
 
 
 
@@ -87,11 +89,12 @@ public class GameUtils {
         wc.assignComponentType(AudioComp.class);
         wc.assignComponentType(SoundListenerComp.class);
         wc.assignComponentType(GameDataComp.class);
+        wc.assignComponentType(TeamComp.class);
 
     }
 
 
-    public static int createGameData(WorldContainer wc, ClientGameTeams teams, List<Integer> charEntityIds) {
+    public static int createGameData(WorldContainer wc, ClientGameTeams teams, int[][] charEntityIds) {
         //charEntityIds are assumed to be in same order as team character ids
 
         float[] teamStartX = {10, GameUtils.VIEW_WIDTH-200};
@@ -114,7 +117,8 @@ public class GameUtils {
                 wc.addComponent(t, new PositionComp(teamStartX[i], currY));
                 wc.addComponent(t, new ViewRenderComp(new TextMesh("0", Font.getFont(FontType.BROADWAY), dmgTextSize, dmgTextColor)));
 
-                dataComp.charDamageTextEntities.put(charEntityIds.get(i+j), t);
+                //map character entity id to text entity id
+                dataComp.charDamageTextEntities.put(charEntityIds[i][j], t);
 
                 ++j;
                 currY += spaceY;
@@ -136,10 +140,11 @@ public class GameUtils {
 
     public static void createMap(WorldContainer wc) {
 
-        int[][] startPositionsTeam1 = { {100, 200}, {100, 400}};
-        int[][] startPositionsTeam2 = { {1000, 200}, {1000, 400}};
-        GameUtils.startPositionsTeam1 = startPositionsTeam1;
-        GameUtils.startPositionsTeam2 = startPositionsTeam2;
+        Vec2[][] startPositions = {
+                { new Vec2(100, 200), new Vec2(100, 400) },
+                { new Vec2(1000, 200), new Vec2(1000, 400) }
+        };
+        GameUtils.teamStartPos = startPositions;
 
         //create background
         createBackground(wc);
@@ -173,26 +178,23 @@ public class GameUtils {
 
         int startX2 = 3*startX;
 
+        Vec2[][] startPositions = {
+                //team1
+                { new Vec2(250, 800), new Vec2(250, 1000) },
 
-        double team1StartX = 250;
-        double team1StartY1 = 800;
-        double team1StartY2 = 1000;
-        double team2StartX = 2950;
-        double team2StartY1 = team1StartY1;
-        double team2StartY2 = team1StartY2;
+                //team2
+                { new Vec2(2950, 800), new Vec2(2950, 1000) }
+        };
 
-        int t1SX = (int) Math.floor(team1StartX*scale);
-        int t1SY1 = (int) Math.floor(team1StartY1*scale);
-        int t1SY2 = (int) Math.floor(team1StartY2*scale);
-        int t2SX = (int) Math.floor(team2StartX*scale);
-        int t2SY1 = t1SY1;
-        int t2SY2 = t1SY2;
+        //scale positions
+        Arrays.stream(startPositions).forEach( teamPositions -> {
+                Arrays.stream(teamPositions).forEach( pos -> {
+                    pos.setAs( pos.scale(scale) );
+                });
+        });
+        //set positions for use
+        GameUtils.teamStartPos = startPositions;
 
-
-        int[][] startPositionsTeam1 = { {t1SX, t1SY1}, {t1SX, t1SY2}};
-        int[][] startPositionsTeam2 = { {t2SX, t2SY1}, {t2SX, t2SY2}};
-        GameUtils.startPositionsTeam1 = startPositionsTeam1;
-        GameUtils.startPositionsTeam2 = startPositionsTeam2;
 
         //create walls for new map. First walls in the base of each competitor
         float w1Thickness = 400;

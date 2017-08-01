@@ -5,6 +5,7 @@ import engine.graphics.ViewRenderComp;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
 import engine.graphics.text.TextMesh;
+import engine.network.NetworkPregamePackets;
 import engine.network.client.*;
 
 /**
@@ -16,8 +17,8 @@ public class ClientIdleState extends ClientState {
     private int welcomeTextEntity;
     private int connectedTextEntity;
 
-    private String[] buttonTexts = {"Play", "About the game"};
-    private int[] buttons = new int[buttonTexts.length];
+    private String[] buttonTexts;
+    private int[] buttons;
     private OnButtonAction[] buttonReleaseActions;
 
 
@@ -33,11 +34,26 @@ public class ClientIdleState extends ClientState {
     public void init() {
         super.init();
 
+        String[] bt = {"Play 1v1", "Play 2v2", "About the game"};
         OnButtonAction[] ba = {
-                (action, entity) -> setGotoState(ClientStates.WAITING_GAME),
+                //Play 1v1
+                (action, entity) -> {
+                    setGotoState(ClientStates.WAITING_GAME);
+                    //send packet to goto queue
+                    client.getTcpPacketOut().sendEmpty(NetworkPregamePackets.QUEUE_CLIENT_REQUEST_QUEUE_1V1);
+                },
+                //Play 2v2
+                (action, entity) -> {
+                    setGotoState(ClientStates.WAITING_GAME);
+                    //send packet to goto queue
+                    client.getTcpPacketOut().sendEmpty(NetworkPregamePackets.QUEUE_CLIENT_REQUEST_QUEUE_2V2);
+                },
+                //About the game
                 (action, entity) -> System.out.println("Should now goto character state")
         };
         buttonReleaseActions = ba;
+        buttonTexts = bt;
+        buttons = new int[bt.length];
 
         createInitialEntities();
     }
@@ -84,7 +100,7 @@ public class ClientIdleState extends ClientState {
         wc.addComponent(connectedTextEntity, new ViewRenderComp(new TextMesh("", Font.getFont(FontType.BROADWAY), ClientUtils.titleTextSize, ClientUtils.titleTextColor)));
 
 
-
+        //create menu buttons
         for (int i = 0; i < buttons.length; i++) {
             buttons[i] = ClientUtils.createButton(wc,
                     ClientUtils.buttonsLeft, ClientUtils.buttonsTop+ i*(ClientUtils.buttonHeight+ClientUtils.buttonVertSpace),
@@ -92,7 +108,9 @@ public class ClientIdleState extends ClientState {
                     new TextMesh(buttonTexts[i], Font.getDefaultFont(), ClientUtils.buttonTextSize, ClientUtils.buttonTextColor),
                     null, buttonReleaseActions[i], null, null
             );
+
         }
+
     }
 
 }

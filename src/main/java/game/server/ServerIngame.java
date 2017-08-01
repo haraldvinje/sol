@@ -86,7 +86,17 @@ public class ServerIngame {
 
 
         //create entities
-        GameUtils.createLargeMap(wc);
+        //create map
+        if (teams.getTotalClientCount() <= 2) {
+            GameUtils.createMap(wc);
+        }
+        else if (teams.getTotalClientCount() <= 4) {
+            GameUtils.createLargeMap(wc);
+        }
+        else {
+            throw new IllegalStateException("Dont know what map to use for " + teams.getTotalClientCount() + " clients");
+        }
+
         CharacterUtils.createServerCharacters(wc, teams);
 
 

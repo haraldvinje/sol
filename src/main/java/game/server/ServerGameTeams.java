@@ -40,12 +40,36 @@ public class ServerGameTeams {
         putClientOnTeam(1, 0, client2);
     }
 
+    /**
+     * Put two first clients on team1, two last on team2
+     * @param client1team1
+     * @param client2team1
+     * @param client1team2
+     * @param client2team2
+     */
+    public ServerGameTeams(ServerClientHandler client1team1, ServerClientHandler client2team1,
+                           ServerClientHandler client1team2, ServerClientHandler client2team2) {
+        this(2, 2, 2);
+        //team 1
+        putClientOnTeam(0, 0, client1team1);
+        putClientOnTeam(0, 1, client2team1);
+        //team 2
+        putClientOnTeam(1, 0, client1team2);
+        putClientOnTeam(1, 1, client2team2);
+
+    }
+
+
     public int getTotalClientCount() {
         int count = 0;
         for (int i = 0; i < teamCount; i++) {
             count += clients[i].length;
         }
         return count;
+    }
+
+    public int getTeamCount() {
+        return clients.length;
     }
 
     public boolean hasCharacterSelectionRemaining() {
