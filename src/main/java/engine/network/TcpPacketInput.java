@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 /**
  *Reads packets sendt over tcp by TcpPacketOutput,
@@ -98,7 +99,8 @@ public class TcpPacketInput {
         }
     }
 
-    public void pollPackets() {
+    public boolean pollPackets() {
+        boolean polledPackets = false;
 
         try {
             while(true) {
@@ -121,6 +123,7 @@ public class TcpPacketInput {
                 if (nextPacketSize != -1 && in.available() >= nextPacketSize) {
 
                     storeDataInPacket(nextPacketSize);
+                    polledPackets = true;
 
                     //tell that the last packet is finished reading
                     nextPacketSize = -1;
@@ -136,6 +139,8 @@ public class TcpPacketInput {
             remoteSocketClosed = true;
             System.err.println("Trying to read bytes, but remote socket closed");
         }
+
+        return polledPackets;
     }
 
     /**
@@ -161,5 +166,22 @@ public class TcpPacketInput {
 
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(100);
+        sb.append("Packets pending in TcpPacketInput:\n");
+        for (Map.Entry<Integer, LinkedList<NetworkDataInput> > entry: packetsWaiting.entrySet()) {
+            int packetId = entry.getKey();
+            LinkedList<NetworkDataInput> packetsPending = entry.getValue();
+
+            if (!packetsPending.isEmpty()) {
+                sb.append(packetId);
+                sb.append(" count: ");
+                sb.append(packetsPending.size());
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
+    }
 
 }
