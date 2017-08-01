@@ -91,7 +91,16 @@ public class RenderSys implements Sys {
         //draw text meshes in the world
         wc.entitiesOfComponentTypeStream(TextMeshComp.class).forEach( entity -> {
             TextMeshComp textMeshComp = (TextMeshComp)wc.getComponent(entity, TextMeshComp.class);
-            renderTextMesh(entity, textMeshComp.getTextMesh(), viewTransform, projectionTransform);
+
+            TextMesh textMesh = textMeshComp.getTextMesh();
+
+            Mat4 modelTransform = retrieveModelTransform(entity);
+
+            float textScale = textMesh.getSize() / textMesh.getFont().getFontSize();
+            Mat4 modelScale = Mat4.scale(new Vec3(textScale, textScale, 1f));
+            Mat4 textModelTransform = modelTransform.multiply( modelScale );
+
+            renderTextMesh(textMesh, textMesh.getColor(), textModelTransform, viewTransform, projectionTransform);
         });
 
 
