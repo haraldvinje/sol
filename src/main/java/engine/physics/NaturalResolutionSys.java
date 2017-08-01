@@ -32,9 +32,9 @@ public class NaturalResolutionSys implements Sys {
         Set<Integer> collisionEntitiesSet = worldContainer.getEntitiesWithComponentType(CollisionComp.class);
         //TODO: assuming that all entities with collisioncomp also have velocitycomp. Write test for this later
 
-        for (int entity: collisionEntitiesSet) {
-            CollisionComp collisionComp = (CollisionComp) worldContainer.getComponent(entity, CollisionComp.class);
-        }
+//        for (int entity: collisionEntitiesSet) {
+//            CollisionComp collisionComp = (CollisionComp) worldContainer.getComponent(entity, CollisionComp.class);
+//        }
         for (int entity: collisionEntitiesSet){
             CollisionComp collisionComp = (CollisionComp) worldContainer.getComponent(entity, CollisionComp.class);
 
