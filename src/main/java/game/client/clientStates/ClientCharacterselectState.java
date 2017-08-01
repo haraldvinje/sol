@@ -4,8 +4,11 @@ import engine.PositionComp;
 import engine.UserInput;
 import engine.WorldContainer;
 import engine.graphics.*;
+import engine.graphics.text.Font;
+import engine.graphics.text.TextMesh;
 import engine.network.NetworkDataOutput;
 import engine.network.NetworkPregamePackets;
+import engine.network.client.ClientUtils;
 import game.client.Client;
 import engine.network.client.ClientState;
 import engine.network.client.ClientStates;
@@ -93,11 +96,6 @@ public class ClientCharacterselectState extends ClientState {
             commitCursor();
         }
 
-        try {
-            Thread.sleep(400);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     private void handleCursorPosition() {
@@ -146,13 +144,28 @@ public class ClientCharacterselectState extends ClientState {
     }
 
 
-
     private void createInitialEntities(WorldContainer wc) {
 //        this.characterSpace = 128;
 //        this.iconCenterX = Client.CLIENT_WIDTH/2;
 //        this.iconCenterY = Client.CLIENT_HEIGHT/2;
 
         //create character icons
+
+        //create character buttons
+        int[] buttons = new int[CharacterUtils.CHARACTER_COUNT];
+        for (int i = 0; i < CharacterUtils.CHARACTER_COUNT; i++) {
+            final int ii = i;
+            buttons[i] = ClientUtils.createButton(wc,
+                    ClientUtils.buttonsLeft, ClientUtils.buttonsTop+ i*(ClientUtils.buttonHeight+ClientUtils.buttonVertSpace),
+                    ClientUtils.buttonWidth, ClientUtils.buttonHeight,
+
+                    new TextMesh(CharacterUtils.CHARACTER_NAMES[i], Font.getDefaultFont(), ClientUtils.buttonTextSize, ClientUtils.buttonTextColor),
+                    null,
+                    (e, a) -> characterSelected = ii,
+                    null, null
+            );
+        }
+
         int shrankIcon = wc.createEntity();
         wc.addComponent(shrankIcon, new PositionComp(iconCenterX - characterSpace/2, iconCenterY));
         wc.addComponent(shrankIcon, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sol_frank.png", 100, 100)));
@@ -181,7 +194,6 @@ public class ClientCharacterselectState extends ClientState {
         float[]green = {0f, 1f, 0f};
         wc.addComponent(commitEntity, new PositionComp(0, 0, 0.1f));
         wc.addComponent(commitEntity, new ColoredMeshComp(ColoredMeshUtils.createCircleSinglecolor(20, 16, green)));
-
 
     }
 }
