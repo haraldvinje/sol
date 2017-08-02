@@ -19,6 +19,8 @@ import engine.window.Window;
 import utils.maths.Vec4;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Created by eirik on 29.06.2017.
@@ -54,7 +56,7 @@ public class Server {
     private LinkedList<ServerClientHandler> gameQueue2v2 = new LinkedList<>();
 
     //games running
-    private Map<ServerGame, Thread> gamesRunning = new HashMap<>();
+    private ConcurrentMap<ServerGame, Thread> gamesRunning = new ConcurrentHashMap<>();
 
 
 
@@ -319,6 +321,7 @@ public class Server {
     }
 
     public void handleGamesRunning() {
+//        for (int i = 0; i < gamesRunning.size(); i++) {
         for (ServerGame game : gamesRunning.keySet()) {
 
             //check if games should close
