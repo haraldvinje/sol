@@ -23,15 +23,7 @@ public class VisualEffectSys implements Sys{
 
     private WorldContainer wc;
 
-    private static List<VisualEffect> effectsRunning = new ArrayList<>();
-    private LinkedList<VisualEffect> removeEffects = new LinkedList<>();
 
-    private Mat4 viewTransform, projectionTransform;
-
-
-    public static void forEachActiveParticle(Consumer<? super Particle> consumer) {
-        effectsRunning.forEach(e -> e.activeParticleStream().forEach(consumer));
-    }
 
     @Override
     public void setWorldContainer(WorldContainer wc) {
@@ -40,10 +32,6 @@ public class VisualEffectSys implements Sys{
 
     @Override
     public void update() {
-        //get view
-        View view = wc.getView();
-        viewTransform = view.getViewTransform();
-        projectionTransform = view.getProjectionTransform();
 
         //get new effects to run
         for (int entity : wc.getEntitiesWithComponentType(VisualEffectComp.class)) {
@@ -52,13 +40,6 @@ public class VisualEffectSys implements Sys{
             updateVisualEffectComp(entity, veComp);
         }
 
-        //actually update effects
-        effectsRunning.forEach(ve -> {
-
-            updateVisualEffect(ve);
-        });
-
-        removeEffects();
     }
 
     @Override
@@ -67,31 +48,58 @@ public class VisualEffectSys implements Sys{
     }
 
     private void updateVisualEffectComp(int entity, VisualEffectComp  veComp) {
-        while(veComp.hasEffectsToStart()) {
-            VisualEffect effect = veComp.popVisualEffect();
+        //accept new effect requests
+        if (veComp.requestEffectId != -1) {
+            //abort older effects
+            if (veComp.runningEffectId != -1) {
+                //remove old effect
+                veComp.effects.get(veComp.runningEffectId).endEffect();
 
-            if (effectsRunning.contains( effect )) { //CANGED FROM: veComp.popVisualEffect()
-                effectsRunning.remove(effect);
+                System.err.println("Removing old effect\nrequesting effect: " + veComp.requestEffectId
+                +"\nrunning effect: "+veComp.runningEffectId);
             }
-            effectsRunning.add(effect);
+
+            //set new effect to the current
+            veComp.runningEffectId = veComp.requestEffectId;
+            veComp.requestEffectId = -1;
+
+            //actually start effect
+            veComp.startEffect(veComp.runningEffectId, veComp.requestEffectPos);
         }
+
+        //return if there are no running effects
+        if (veComp.runningEffectId == -1) return;
+
+        //update the currently running effect
+        VisualEffect runningEffect = veComp.effects.get(veComp.runningEffectId);
+
+        //update visual effect by progressing particles
+        //if it returns false, the effect is over
+        if ( !updateVisualEffect(runningEffect) ){
+            veComp.runningEffectId = -1;
+        }
+
     }
 
 
-    private void updateVisualEffect(VisualEffect effect) {
-        effect.activeParticleStream().forEach(p -> {
-
-            updateParticle(p);
-
-        });
-
-//        System.out.println("Visual effect lifetime= "+effect.getLifetime());
-
+    private boolean updateVisualEffect(VisualEffect effect) {
+        //end effect if it times out
         effect.decrementLifetime();
         if (effect.getLifetime() <= 0) {
             effect.endEffect();
-            removeEffects.add(effect);
+
+            //return false to indicate that effect is over
+            return false;
+//            removeEffects.add(effect);
         }
+
+        //update each particle
+        effect.activeParticleStream().forEach(p -> {
+            updateParticle(p);
+        });
+
+//        System.out.println("Visual effect lifetime= "+effect.getLifetime());
+        return true;
     }
 
     private void updateParticle(Particle p) {
@@ -105,23 +113,4 @@ public class VisualEffectSys implements Sys{
         }
     }
 
-
-
-    private void removeEffects() {
-        while( !removeEffects.isEmpty()) {
-
-            effectsRunning.remove(removeEffects.poll());
-        }
-    }
-
-    public Stream<VisualEffect> visualEffectStream() {
-        return effectsRunning.stream();
-    }
-    public Stream<VisualEffect> activeVisualEffectStream() {
-        return effectsRunning.stream().filter(ve -> ve.isActive());
-    }
-
-//    public void forEachActiveParticle(Consumer<? super Particle> predicate) {
-//        activeVisualEffectStream().forEach(ve -> ve.activeParticleStream().forEach(predicate));
-//    }
 }

@@ -6,6 +6,8 @@ import engine.RotationComp;
 import engine.Sys;
 import engine.WorldContainer;
 import engine.graphics.text.*;
+import engine.visualEffect.VisualEffect;
+import engine.visualEffect.VisualEffectComp;
 import engine.visualEffect.VisualEffectSys;
 import engine.window.Window;
 import org.lwjgl.opengl.GL11;
@@ -105,9 +107,19 @@ public class RenderSys implements Sys {
 
 
         //draw effects in the world
-        VisualEffectSys.forEachActiveParticle(p -> {
-            Mat4 translateTransform = Mat4.translate( new Vec3(p.getPos(), 1) );
-            renderColoredMesh(p.getMesh(), translateTransform, viewTransform, projectionTransform);
+//        VisualEffectSys.forEachActiveParticle(p -> {
+        wc.entitiesOfComponentTypeStream(VisualEffectComp.class).forEach(entity -> {
+            VisualEffectComp viseffComp = (VisualEffectComp) wc.getComponent(entity, VisualEffectComp.class);
+
+            //render if there is a running effect
+            if (viseffComp.runningEffectId != -1) {
+                VisualEffect runningEffect = viseffComp.effects.get(viseffComp.runningEffectId);
+
+                runningEffect.activeParticleStream().forEach(p -> {
+                    Mat4 translateTransform = Mat4.translate(new Vec3(p.getPos(), 1));
+                    renderColoredMesh(p.getMesh(), translateTransform, viewTransform, projectionTransform);
+                });
+            }
         });
 
 
@@ -143,6 +155,7 @@ public class RenderSys implements Sys {
 
     @Override
     public void terminate() {
+        glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
     }
 
