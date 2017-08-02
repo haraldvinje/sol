@@ -58,14 +58,14 @@ public class Game {
         GameUtils.createLargeMap(wc);
 
         int[][] characterIds = {
-                {CharacterUtils.BRAIL},
-                {CharacterUtils.SHRANK}
+                {CharacterUtils.BRAIL, CharacterUtils.SHRANK},
+                {CharacterUtils.SHRANK, CharacterUtils.SHRANK}
 
         };
 
         ClientGameTeams teams = new ClientGameTeams(characterIds, 1, 0);
 
-        List<Integer> charEntities = CharacterUtils.createOfflineCharacters(wc, teams);
+        int[][] charEntities = CharacterUtils.createOfflineCharacters(wc, teams);
 
         GameUtils.createGameData(wc, teams, charEntities);
 
@@ -113,10 +113,15 @@ public class Game {
                 break;
         }
 
-        window.close();
+        onTerminate();
 
     }
 
+    private void onTerminate() {
+        wc.terminate();
+
+        window.close();
+    }
 
 
     public void update() {

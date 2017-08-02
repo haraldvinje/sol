@@ -49,7 +49,9 @@ public class ClientNetworkInSys implements Sys{
     @Override
     public void update() {
         //poll net in
-        tcpPacketIn.pollPackets();
+        boolean polledPackets = tcpPacketIn.pollPackets();
+//        if (polledPackets) System.out.println(tcpPacketIn);
+
 
         updateGameStateByServer();
     }
@@ -115,13 +117,7 @@ public class ClientNetworkInSys implements Sys{
             EntityDeadData data = NetworkUtils.packetToEntityDead( entityDeadData );
 
             //handle
-            //create effect
-            Vec2 effPos = ( (PositionComp) wc.getComponent(data.entityId, PositionComp.class) ).getPos();
-            ( (VisualEffectComp)wc.getComponent(data.entityId, VisualEffectComp.class) ).startEffect(0, effPos);
-            System.out.println("Entity died: " + data.entityId);
-
-            //reset damage
-            ( (DamageableComp)wc.getComponent(data.entityId, DamageableComp.class) ).reset();
+            applyEntityDead(data);
 
         }
 
@@ -130,17 +126,7 @@ public class ClientNetworkInSys implements Sys{
             GameOverData data = NetworkUtils.packetToGameOver( gameOverData );
 
             //handle
-            //write to gameDataComp
-
-            //if the entity lost is controlled by client, lost
-            boolean won = !(wc.hasComponent(data.charEntityLost, ControlledComp.class));
-
-            wc.entitiesOfComponentTypeStream(GameDataComp.class).forEach(entity -> {
-                GameDataComp dataComp = (GameDataComp) wc.getComponent(entity, GameDataComp.class);
-                dataComp.endGameRequest = true;
-                dataComp.gameWon = won;
-            });
-            System.out.println("Game over: " + data.charEntityLost);
+            applyGameOver(data);
         }
 
 
@@ -173,7 +159,7 @@ public class ClientNetworkInSys implements Sys{
         //update each character according to state received
         int entityNumb = 0;
         for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class)) {
-            if (entityNumb >= NetworkUtils.CHARACTER_NUMB) throw new IllegalStateException("applying game state to more characters than supported by network system");
+//            if (entityNumb >= NetworkUtils.CHARACTER_NUMB) throw new IllegalStateException("applying game state to more characters than supported by network system");
 
             //Give new character state to interpolation component
             InterpolationComp interpComp = (InterpolationComp)wc.getComponent(entity, InterpolationComp.class);
@@ -210,7 +196,7 @@ public class ClientNetworkInSys implements Sys{
 
         dmgableComp.applyDamage(damageTaken);
 
-        dmgerVisefComp.startEffect(0, dmgablPosComp.getPos());
+        dmgerVisefComp.requestEffect(0, dmgablPosComp.getPos());
 
         if (wc.hasComponent(entityDamager, AudioComp.class)) {
             AudioComp dmgerAudioComp = (AudioComp) wc.getComponent(entityDamager, AudioComp.class);
@@ -243,7 +229,35 @@ public class ClientNetworkInSys implements Sys{
 
     }
 
+    public void applyEntityDead(EntityDeadData data) {
+        //create effect
+        Vec2 effPos = ( (PositionComp) wc.getComponent(data.entityId, PositionComp.class) ).getPos();
+        ( (VisualEffectComp)wc.getComponent(data.entityId, VisualEffectComp.class) ).requestEffect(0, effPos);
+        System.out.println("Entity died: " + data.entityId);
 
+        //reset damage
+        ( (DamageableComp)wc.getComponent(data.entityId, DamageableComp.class) ).reset();
+    }
+
+    public void applyGameOver(GameOverData data) {
+        //write to gameDataComp
+
+        //if the entity lost is on the same team as the controlled entity, print that we lost
+
+        int lostEntityTeam = ((TeamComp)wc.getComponent(data.charEntityLost, TeamComp.class)).team;
+        int controlledEntityTeam = -1;
+        for (int controlledEntity : wc.getEntitiesWithComponentType(ControlledComp.class)) {
+            controlledEntityTeam = ((TeamComp)wc.getComponent(controlledEntity, TeamComp.class)).team;
+        }
+        boolean won = controlledEntityTeam != lostEntityTeam;
+
+        wc.entitiesOfComponentTypeStream(GameDataComp.class).forEach(entity -> {
+            GameDataComp dataComp = (GameDataComp) wc.getComponent(entity, GameDataComp.class);
+            dataComp.endGameRequest = true;
+            dataComp.gameWon = won;
+        });
+        System.out.println("Game over: " + data.charEntityLost);
+    }
 
 //    public AllCharacterStateData readCharacterData() {
 //        AllCharacterStateData gameState = null;

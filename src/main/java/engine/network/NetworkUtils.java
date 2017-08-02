@@ -14,7 +14,7 @@ import java.net.SocketException;
 public class NetworkUtils {
 
     public static final int PORT_NUMBER = 7779;
-    public static final int CHARACTER_NUMB = 2;
+    public static int CHARACTER_COUNT = 4;
     //public static final String HOST_NAME
 
     //network smoothening attributes
@@ -50,7 +50,7 @@ public class NetworkUtils {
 
         out.writeInt(stateData.getFrameNumber()); //write frame number
 
-        for (int i = 0; i < NetworkUtils.CHARACTER_NUMB; i++) {
+        for (int i = 0; i < NetworkUtils.CHARACTER_COUNT; i++) {
             out.writeFloat(stateData.getX(i));
             out.writeFloat(stateData.getY(i));
             out.writeFloat(stateData.getRotation(i));
@@ -64,7 +64,7 @@ public class NetworkUtils {
 
         state.setFrameNumber(in.readInt()); //read frame number
 
-        for (int i = 0; i < NetworkUtils.CHARACTER_NUMB; i++) {
+        for (int i = 0; i < NetworkUtils.CHARACTER_COUNT; i++) {
             state.setX(i, in.readFloat());
             state.setY(i, in.readFloat());
             state.setRotation(i, in.readFloat());

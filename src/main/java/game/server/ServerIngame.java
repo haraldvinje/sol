@@ -86,7 +86,17 @@ public class ServerIngame {
 
 
         //create entities
-        GameUtils.createLargeMap(wc);
+        //create map
+        if (teams.getTotalClientCount() <= 2) {
+            GameUtils.createMap(wc);
+        }
+        else if (teams.getTotalClientCount() <= 4) {
+            GameUtils.createLargeMap(wc);
+        }
+        else {
+            throw new IllegalStateException("Dont know what map to use for " + teams.getTotalClientCount() + " clients");
+        }
+
         CharacterUtils.createServerCharacters(wc, teams);
 
 
@@ -106,8 +116,9 @@ public class ServerIngame {
             }
 
 
-            if (window.shouldClosed() || userInput.isKeyboardPressed(UserInput.KEY_ESCAPE))
-                break;
+            if (window.shouldClosed() || userInput.isKeyboardPressed(UserInput.KEY_ESCAPE)) {
+                serverGame.setShouldTerminate();
+            }
         }
 
         onTerminate();
@@ -135,6 +146,13 @@ public class ServerIngame {
             charNumb++;
         }
 
+        //check if clients have disconnected
+        //if so, ask to terminate game
+        Arrays.stream(teams.getAllClients()).forEach( client -> {
+            if (client.getTcpPacketIn().isRemoteSocketClosed()) {
+                serverGame.setShouldTerminate();
+            }
+        });
     }
     private void gameOver(int winner) {
         System.out.println("Player "+ winner + " won!");

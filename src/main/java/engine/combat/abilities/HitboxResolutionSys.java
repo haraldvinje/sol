@@ -1,6 +1,7 @@
 package engine.combat.abilities;
 
 import engine.Sys;
+import engine.TeamComp;
 import engine.WorldContainer;
 import engine.combat.DamageableComp;
 import engine.combat.DamagerComp;
@@ -55,13 +56,25 @@ public class HitboxResolutionSys implements Sys{
                 data.setActive(false);
             }
 
+            //remove if hit someone on team
+            else if (wc.hasComponent(otherEntity, TeamComp.class)){
+
+                TeamComp hitboxTeamComp = (TeamComp) wc.getComponent(hitbComp.getOwner(), TeamComp.class);
+                TeamComp otherTeamComp = (TeamComp) wc.getComponent(otherEntity, TeamComp.class);
+                if (hitboxTeamComp.team == otherTeamComp.team) {
+                    data.setActive(false);
+                }
+            }
+
             //if the other entity has already collided with the hitbox, remove collision, else add the interaction
             hitbComp.streamEntityInteractions().forEach(registeredEntity -> {
                 if (registeredEntity == otherEntity) {
                     data.setActive(false);
                 }
             });
-            hitbComp.addInteraction(otherEntity); //add other to the set of interactions
+
+            //add other to the set of interactions
+            hitbComp.addInteraction(otherEntity);
         }
     }
 }

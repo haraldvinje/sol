@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 /**
  *Reads packets sendt over tcp by TcpPacketOutput,
@@ -14,6 +15,13 @@ import java.util.LinkedList;
  * Created by eirik on 28.07.2017.
  */
 public class TcpPacketInput {
+
+    static final int
+            LEAST_PACKET_ID = -2,
+
+            ALIVE_PACKET = -1,
+            DISCONNECT_PACKET = -2;
+
 
 
     private InputStream in;
@@ -28,18 +36,24 @@ public class TcpPacketInput {
     //packets waiting by id
     private HashMap<Integer, LinkedList<NetworkDataInput> > packetsWaiting = new HashMap<>();
 
+    private final int noPacketTimeout;
+    private int noPacketPolls = 0;
 
 
-    public TcpPacketInput(InputStream in, int idRange) {
+    public TcpPacketInput(InputStream in, int noPacketTimeout, int idRange) {
         this.in = in;
+        this.noPacketTimeout = noPacketTimeout;
 
         //allocate lists for packets
-        for (int i = 0; i < idRange+1; i++) {
+        for (int i = LEAST_PACKET_ID; i < idRange+1; i++) {
             packetsWaiting.put(i, new LinkedList<>() );
         }
     }
+    public TcpPacketInput(InputStream in, int noPacketTimeout) {
+        this(in, noPacketTimeout, 50);
+    }
     public TcpPacketInput(InputStream in) {
-        this(in, 50);
+        this(in, 240);
     }
 
     public void close() {
@@ -98,7 +112,8 @@ public class TcpPacketInput {
         }
     }
 
-    public void pollPackets() {
+    public boolean pollPackets() {
+        boolean polledPackets = false;
 
         try {
             while(true) {
@@ -121,6 +136,7 @@ public class TcpPacketInput {
                 if (nextPacketSize != -1 && in.available() >= nextPacketSize) {
 
                     storeDataInPacket(nextPacketSize);
+                    polledPackets = true;
 
                     //tell that the last packet is finished reading
                     nextPacketSize = -1;
@@ -136,6 +152,29 @@ public class TcpPacketInput {
             remoteSocketClosed = true;
             System.err.println("Trying to read bytes, but remote socket closed");
         }
+
+        //check if no packet was received, if so, set remote socket to closed
+        //else reset noPacket timer
+        if (!polledPackets) {
+            if (++noPacketPolls >= noPacketTimeout) {
+                remoteSocketClosed= true;
+            }
+        }
+        else {
+            noPacketPolls = 0;
+        }
+
+        //remove AlivePackets
+        while(hasPacket(TcpPacketInput.ALIVE_PACKET)) {
+            removePacket(TcpPacketInput.ALIVE_PACKET);
+        }
+
+        //check if remote disconnected
+        if (removeIfHasPacket(TcpPacketInput.DISCONNECT_PACKET)) {
+            remoteSocketClosed = true;
+        }
+
+        return polledPackets;
     }
 
     /**
@@ -161,5 +200,22 @@ public class TcpPacketInput {
 
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(100);
+        sb.append("Packets pending in TcpPacketInput:\n");
+        for (Map.Entry<Integer, LinkedList<NetworkDataInput> > entry: packetsWaiting.entrySet()) {
+            int packetId = entry.getKey();
+            LinkedList<NetworkDataInput> packetsPending = entry.getValue();
+
+            if (!packetsPending.isEmpty()) {
+                sb.append(packetId);
+                sb.append(" count: ");
+                sb.append(packetsPending.size());
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
+    }
 
 }

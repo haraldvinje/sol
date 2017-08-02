@@ -59,4 +59,10 @@ public class TcpPacketOutput {
         send(packetId, new NetworkDataOutput());
     }
 
+    public void sendHostAlive() {
+        sendEmpty(TcpPacketInput.ALIVE_PACKET);
+    }
+    public void sendHostDisconnected() {
+        sendEmpty(TcpPacketInput.DISCONNECT_PACKET);
+    }
 }

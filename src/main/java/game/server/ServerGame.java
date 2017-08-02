@@ -1,10 +1,7 @@
 package game.server;
 
 import engine.UserInput;
-import engine.network.NetworkDataInput;
-import engine.network.NetworkDataOutput;
-import engine.network.NetworkPregamePackets;
-import engine.network.NetworkPregameUtils;
+import engine.network.*;
 import game.ClientGameTeams;
 
 import java.util.Arrays;
@@ -46,19 +43,6 @@ public class ServerGame implements Runnable {
 
         this.teams = teams;
 
-//        //create a character selection handle state
-//        characterSelection = new ServerCharacterSelection();
-
-        //eehhh
-//        List<ServerClientHandler> clients = new ArrayList<>();
-//        clients.addAll(teamClients.get(0));
-//        clients.addAll(teamClients.get(1));
-//        GameUtils.CLIENT_HANDELERS = clients;
-//
-//        //eehhh
-//        GameUtils.PROGRAM = GameUtils.SERVER;
-
-
     }
 
 
@@ -96,7 +80,7 @@ public class ServerGame implements Runnable {
 
     public List<ServerClientHandler> getClients() {
         synchronized (this) {
-            return Arrays.asList( serverIngame.getTeams().getAllClients() );
+            return Arrays.asList( teams.getAllClients() );
         }
     }
 
@@ -105,6 +89,20 @@ public class ServerGame implements Runnable {
 
         //retrieve selections
         teams.forEachClient(client -> {
+            TcpPacketInput tcpPacketIn = client.getTcpPacketIn();
+
+            //if one client has disconnected, terminate game
+            //else, tell clients we are alive
+            if (tcpPacketIn.isRemoteSocketClosed()) {
+
+                //tell server we want to terminate
+                //clients should be removed when they enter idle state on server if they eare inactive
+                setShouldTerminate();
+            }
+            else {
+                client.getTcpPacketOut().sendHostAlive();
+            }
+
             NetworkDataInput data = client.getTcpPacketIn().pollPacket(NetworkPregamePackets.CHARSELECT_CLIENT_CHOSE_CHARACTER);
 
             if (data != null) {
@@ -170,13 +168,10 @@ public class ServerGame implements Runnable {
         waitingClientsIngame = teams.getTotalClientCount();
     }
 
-    private void gameOver(int winner) {
-        System.out.println("Player "+ winner + " won!");
-        setShouldTerminate();
-
-    }
 
     private void onTerminate() {
+        //tell clients that we are terminating
+        getClients().forEach(client -> client.getTcpPacketOut().sendEmpty(NetworkPregamePackets.GAME_SERVER_EXIT));
     }
 
     void setShouldTerminate() {

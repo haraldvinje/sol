@@ -10,16 +10,19 @@ import java.util.Arrays;
 public class AllCharacterStateData {
 
 
-    public static final int BYTES = Integer.BYTES + Float.BYTES*3 * NetworkUtils.CHARACTER_NUMB;
+//    public static final int BYTES = Integer.BYTES + Float.BYTES*3 * NetworkUtils.CHARACTER_NUMB;
 
     private int frameNumber;
 
-    private float[] x = new float[NetworkUtils.CHARACTER_NUMB],
-                    y = new float[NetworkUtils.CHARACTER_NUMB],
-                    rotation = new float[NetworkUtils.CHARACTER_NUMB];
+    private float[] x,
+                    y,
+                    rotation;
 
 
     public AllCharacterStateData() {
+        x = new float[NetworkUtils.CHARACTER_COUNT];
+        y = new float[NetworkUtils.CHARACTER_COUNT];
+        rotation = new float[NetworkUtils.CHARACTER_COUNT];
 
     }
 
