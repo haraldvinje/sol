@@ -25,8 +25,8 @@ public class ServerIngame {
     private static final float FRAME_INTERVAL = 1.0f/60.0f;
 
 
-    public static final float WINDOW_WIDTH = GameUtils.MAP_WIDTH /4,
-                                WINDOW_HEIGHT = GameUtils.MAP_HEIGHT /4;
+    public static final float WINDOW_WIDTH = GameUtils.SMALL_MAP_WIDTH /4,
+                                WINDOW_HEIGHT = GameUtils.SMALL_MAP_WIDTH /4;
 
 
 //    private ServerCharacterSelection charactersSelected;

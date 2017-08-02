@@ -44,14 +44,14 @@ import java.util.List;
 public class GameUtils {
 
 
-    public static float MAP_WIDTH = 1600f,
-            MAP_HEIGHT = 900f;
+    public static float SMALL_MAP_WIDTH = 1600f,
+            SMALL_MAP_HEIGHT = 900f;
 
     public static float LARGE_MAP_WIDTH = 3200f;
 
     public static float LARGE_MAP_HEIGHT = 1800f;
 
-    public static float VIEW_WIDTH = MAP_WIDTH, VIEW_HEIGHT = MAP_HEIGHT;
+    public static float VIEW_WIDTH = SMALL_MAP_WIDTH, VIEW_HEIGHT = SMALL_MAP_HEIGHT;
 
     public static Vec2[][] teamStartPos;
 
@@ -155,8 +155,8 @@ public class GameUtils {
     public static void createMap(WorldContainer wc) {
 
         Vec2[][] startPositions = {
-                { new Vec2(100, 400), new Vec2(100, 400) },
-                { new Vec2(1000, 400), new Vec2(1000, 400) }
+                { new Vec2(100, SMALL_MAP_HEIGHT/2), new Vec2(100, SMALL_MAP_HEIGHT/2+100) },
+                { new Vec2(SMALL_MAP_WIDTH-100, SMALL_MAP_HEIGHT/2), new Vec2(SMALL_MAP_WIDTH-100, SMALL_MAP_HEIGHT/2+100) }
         };
         GameUtils.teamStartPos = startPositions;
 
@@ -165,16 +165,16 @@ public class GameUtils {
 
         //create walls
         float wallThickness = 64f;
-        createWall(wc, wallThickness/2, MAP_HEIGHT/2, wallThickness, MAP_HEIGHT);
-        createWall(wc, MAP_WIDTH-wallThickness/2, MAP_HEIGHT/2, wallThickness, MAP_HEIGHT);
+        createWall(wc, wallThickness/2, SMALL_MAP_HEIGHT/2, wallThickness, SMALL_MAP_HEIGHT);
+        createWall(wc, SMALL_MAP_WIDTH-wallThickness/2, SMALL_MAP_HEIGHT/2, wallThickness, SMALL_MAP_HEIGHT);
 
 //        createWall(wc, MAP_WIDTH/2, wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
 //        createWall(wc, MAP_WIDTH/2, MAP_HEIGHT-wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
 
         //create holes
-        createRectangleHoleInvisible(wc, MAP_WIDTH/2, wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
-        createRectangleHoleInvisible(wc, MAP_WIDTH/2, MAP_HEIGHT-wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
-        createCircleHole(wc, MAP_WIDTH/2, MAP_HEIGHT/2, 48f);
+        createRectangleHoleInvisible(wc, SMALL_MAP_WIDTH/2, wallThickness/2, SMALL_MAP_WIDTH-wallThickness*2, wallThickness);
+        createRectangleHoleInvisible(wc, SMALL_MAP_WIDTH/2, SMALL_MAP_HEIGHT-wallThickness/2, SMALL_MAP_WIDTH-wallThickness*2, wallThickness);
+        createCircleHole(wc, SMALL_MAP_WIDTH/2, SMALL_MAP_HEIGHT/2, 48f);
 
     }
 
