@@ -181,7 +181,7 @@ public class GameUtils {
 
 
     public static void createLargeMap(WorldContainer wc){
-        float scale = 1.5f;
+        final float scale = 1.3f;
 
         createLargeBackgroundScale(wc, scale);
 
