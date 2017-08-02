@@ -113,10 +113,15 @@ public class Game {
                 break;
         }
 
-        window.close();
+        onTerminate();
 
     }
 
+    private void onTerminate() {
+        wc.terminate();
+
+        window.close();
+    }
 
 
     public void update() {
