@@ -64,8 +64,9 @@ public class AbilitySys implements Sys {
 
             //end effect
             ab.endEffect(wc, requestingEntity);
-            //end recharge that should not have started
-            ab.setRecharging(false);
+
+            //go to recharge if ability is aborted
+            ab.setRecharging(true);
 
             abComp.setOccupiedBy(null);
         }
