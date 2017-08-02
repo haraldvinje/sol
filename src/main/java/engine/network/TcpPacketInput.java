@@ -16,6 +16,13 @@ import java.util.Map;
  */
 public class TcpPacketInput {
 
+    static final int
+            LEAST_PACKET_ID = -2,
+
+            ALIVE_PACKET = -1,
+            DISCONNECT_PACKET = -2;
+
+
 
     private InputStream in;
 
@@ -29,18 +36,24 @@ public class TcpPacketInput {
     //packets waiting by id
     private HashMap<Integer, LinkedList<NetworkDataInput> > packetsWaiting = new HashMap<>();
 
+    private final int noPacketTimeout;
+    private int noPacketPolls = 0;
 
 
-    public TcpPacketInput(InputStream in, int idRange) {
+    public TcpPacketInput(InputStream in, int noPacketTimeout, int idRange) {
         this.in = in;
+        this.noPacketTimeout = noPacketTimeout;
 
         //allocate lists for packets
-        for (int i = 0; i < idRange+1; i++) {
+        for (int i = LEAST_PACKET_ID; i < idRange+1; i++) {
             packetsWaiting.put(i, new LinkedList<>() );
         }
     }
+    public TcpPacketInput(InputStream in, int noPacketTimeout) {
+        this(in, noPacketTimeout, 50);
+    }
     public TcpPacketInput(InputStream in) {
-        this(in, 50);
+        this(in, 240);
     }
 
     public void close() {
@@ -138,6 +151,27 @@ public class TcpPacketInput {
             //socket is probably closed
             remoteSocketClosed = true;
             System.err.println("Trying to read bytes, but remote socket closed");
+        }
+
+        //check if no packet was received, if so, set remote socket to closed
+        //else reset noPacket timer
+        if (!polledPackets) {
+            if (++noPacketPolls >= noPacketTimeout) {
+                remoteSocketClosed= true;
+            }
+        }
+        else {
+            noPacketPolls = 0;
+        }
+
+        //remove AlivePackets
+        while(hasPacket(TcpPacketInput.ALIVE_PACKET)) {
+            removePacket(TcpPacketInput.ALIVE_PACKET);
+        }
+
+        //check if remote disconnected
+        if (removeIfHasPacket(TcpPacketInput.DISCONNECT_PACKET)) {
+            remoteSocketClosed = true;
         }
 
         return polledPackets;

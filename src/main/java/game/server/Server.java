@@ -14,6 +14,7 @@ import engine.network.NetworkPregamePackets;
 import engine.network.NetworkUtils;
 import engine.network.TcpPacketInput;
 import engine.network.client.ClientUtils;
+import engine.visualEffect.VisualEffectComp;
 import engine.window.Window;
 import utils.maths.Vec4;
 
@@ -38,9 +39,6 @@ public class Server {
     private ServerConnectionInput connectionInput;
     private Thread serverConnectionInputThread;
 
-    //clients connected icons
-    private LinkedList<Integer> allocatedClientIcons = new LinkedList<>();
-    private Map<ServerClientHandler, Integer> activeClientIcons = new HashMap<>();
 
     //texts to print info
     private int infoTextEntity1, infoTextEntity2;
@@ -76,13 +74,6 @@ public class Server {
         connectionInput = new ServerConnectionInput(NetworkUtils.PORT_NUMBER);
         serverConnectionInputThread = new Thread(connectionInput);
 
-
-        //allocate client icons
-        float iconStartX = 100, iconStartY = 100;
-        float iconRadius = 64;
-        for (int i = 0; i < NetworkUtils.CHARACTER_COUNT*3; i++) {
-            allocatedClientIcons.add( allocateClientIcon(wc, iconStartX+iconRadius*2*i, iconStartY, iconRadius) );
-        }
     }
 
     private void createInitialEntities() {
@@ -178,24 +169,42 @@ public class Server {
     }
 
     private void handleIdleState() {
-        idleClients.forEach(c -> {
-            boolean packetPolled = c.getTcpPacketIn().pollPackets();
-            if (packetPolled) System.out.println(c.getTcpPacketIn());
-        });
-
-
-        //check if anyone wants to enter game queue
         Iterator<ServerClientHandler> it = idleClients.iterator();
 
         while(it.hasNext()) {
             ServerClientHandler client = it.next();
 
             TcpPacketInput tcpPacketIn = client.getTcpPacketIn();
+            boolean packetPolled = tcpPacketIn.pollPackets();
+//            if (packetPolled) System.out.println(c.getTcpPacketIn());
 
-            //check if client disconnected
+            //if client is disconnected, remove it
+            //else tell it that server is alive
             if (tcpPacketIn.isRemoteSocketClosed()) {
-                System.err.println("Remote socket is closed :(");
+                System.err.println("A client has disconnected");
+
+                //tell the client that we are disconecting it
+                client.getTcpPacketOut().sendHostDisconnected();
+
+                it.remove();
+                connectedClients.remove(client);
+
+                //terminate client
+                client.terminate();
             }
+            else {
+                client.getTcpPacketOut().sendHostAlive();
+            }
+        }
+
+
+        //check if anyone wants to enter game queue
+        it = idleClients.iterator();
+
+        while(it.hasNext()) {
+            ServerClientHandler client = it.next();
+
+            TcpPacketInput tcpPacketIn = client.getTcpPacketIn();
 
             //handle game queue requests, 1v1 and 2v2
             LinkedList<ServerClientHandler> queue = null;
@@ -236,6 +245,25 @@ public class Server {
                 //pollPackets
                 boolean packetPolled = tcpPacketIn.pollPackets();
                 if (packetPolled) System.out.println(tcpPacketIn);
+
+                //handle disconnection
+                if (tcpPacketIn.isRemoteSocketClosed()) {
+                    //client disconnected
+
+                    //tell client we are no longer handling it
+                    client.getTcpPacketOut().sendHostDisconnected();
+
+                    //remove it from internal state
+                    it.remove();
+                    connectedClients.remove(client);
+
+                    //terminate client object
+                    client.terminate();
+                }
+                //tell client that the server is alive
+                else {
+                    client.getTcpPacketOut().sendHostAlive();
+                }
 
                 //check if a client wants to exit queue, then move it to idle
                 if (tcpPacketIn.removeIfHasPacket(NetworkPregamePackets.QUEUE_CLIENT_EXIT)) {
@@ -292,6 +320,8 @@ public class Server {
 
     public void handleGamesRunning() {
         for (ServerGame game : gamesRunning.keySet()) {
+
+            //check if games should close
             if (game.isShouldTerminate()) {
                 terminateRunningGame(game);
             }
@@ -369,34 +399,10 @@ public class Server {
         wc.assignComponentType(ViewControlComp.class);
         wc.assignComponentType(TextMeshComp.class);
         wc.assignComponentType(ViewRenderComp.class);
+        wc.assignComponentType(VisualEffectComp.class);
 
 
         wc.addSystem(new RenderSys(window));
-    }
-
-
-
-
-    private void activateClientIcon(ServerClientHandler clientHandeler) {
-        if (allocatedClientIcons.isEmpty()) return;
-
-        int icon = allocatedClientIcons.poll();
-        wc.activateEntity(icon);
-    }
-    private void deactivateClientIcon(ServerClientHandler clientHandler) {
-        if (! activeClientIcons.containsKey(clientHandler)) return;
-
-        int icon = activeClientIcons.remove(clientHandler);
-        allocatedClientIcons.add(icon);
-        wc.deactivateEntity(icon);
-    }
-
-    private int allocateClientIcon(WorldContainer wc, float x, float y, float radius) {
-        int e = wc.createEntity();
-        wc.addInactiveComponent(e, new PositionComp(x, y));
-        wc.addInactiveComponent(e, new ColoredMeshComp(ColoredMeshUtils.createCircleTwocolor(radius, 9)));
-
-        return e;
     }
 
 

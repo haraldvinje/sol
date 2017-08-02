@@ -1,5 +1,6 @@
 package game.client;
 
+import engine.GameDataComp;
 import engine.UserInput;
 import engine.WorldContainer;
 import engine.audio.AudioComp;
@@ -8,16 +9,16 @@ import engine.audio.Sound;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
 import engine.graphics.view_.View;
+import engine.network.NetworkPregamePackets;
 import engine.network.TcpPacketInput;
 import engine.network.TcpPacketOutput;
+import engine.network.client.ClientStates;
+import engine.visualEffect.VisualEffectSys;
 import engine.window.Window;
 import game.CharacterUtils;
 import game.ClientGameTeams;
 import game.GameUtils;
 import game.SysUtils;
-
-import java.net.Socket;
-import java.util.List;
 
 /**
  * Created by eirik on 22.06.2017.
@@ -41,9 +42,14 @@ public class ClientIngame implements Runnable{
 
     private WorldContainer wc;
 
+    private boolean shouldTerminate = false;
+
+    private boolean gameOver = false;
+
 
     private ClientGameTeams teams;
     private AudioComp backgroundAudioComp;
+
 
 
     public ClientIngame() {
@@ -64,6 +70,14 @@ public class ClientIngame implements Runnable{
     public synchronized void terminate() {
         running = false;
     }
+    //should create a separate monitor for this variable
+    public synchronized boolean isShouldTerminate() {
+        return shouldTerminate;
+    }
+    public synchronized void setShouldTerminate() {
+//        VisualEffectSys.removeAllEffects();
+        shouldTerminate = true;
+    }
 
     /**
      * blocking while the game runs
@@ -71,7 +85,7 @@ public class ClientIngame implements Runnable{
     @Override
     public void run() {
 
-        window = new Window(0.4f,"Client    Siiiii");
+        window = new Window("Client    Siiiii");
         userInput = new UserInput(window, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
         //make sure window has focus
@@ -140,11 +154,18 @@ public class ClientIngame implements Runnable{
             }
 
 
-            if (window.shouldClosed() || userInput.isKeyboardPressed(UserInput.KEY_ESCAPE))
-                break;
+            if (window.shouldClosed() || userInput.isKeyboardPressed(UserInput.KEY_ESCAPE)) {
+                if (!gameOver) {
+                    //tell server to disconnect us
+                    //we have to disconnect when exiting in the midle of a game
+                    tcpPacketOut.sendHostDisconnected();
+                }
+
+                setShouldTerminate();
+            }
         }
 
-        close();
+        onTerminate();
 
     }
 
@@ -154,12 +175,41 @@ public class ClientIngame implements Runnable{
         window.pollEvents();
 
         wc.updateSystems();
+
+        //check if game is over
+        wc.entitiesOfComponentTypeStream(GameDataComp.class).forEach(entity -> {
+            GameDataComp dataComp = (GameDataComp) wc.getComponent(entity, GameDataComp.class);
+
+            if (dataComp.endGameRequest) {
+                gameOver = true;
+            }
+        });
+
+        //check if server has terminated our game
+        handleExitGame();
     }
 
-    private void close() {
+    private void handleExitGame() {
+        //if received an exit game packet, exit
+        if (tcpPacketIn.removeIfHasPacket(NetworkPregamePackets.GAME_SERVER_EXIT) ||
+                tcpPacketIn.isRemoteSocketClosed()) {
+
+            if (tcpPacketIn.isRemoteSocketClosed()) System.err.println("Remote socket is closed");
+
+            //dont go out of game if we are in end game state
+            if (gameOver) return;
+
+            setShouldTerminate();
+        }
+    }
+
+    private void onTerminate() {
 
         //stop background sound
         backgroundAudioComp.stopSound();
+
+        //terminate systems
+        wc.terminate();
 
         window.close();
     }

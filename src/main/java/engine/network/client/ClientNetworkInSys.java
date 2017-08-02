@@ -50,7 +50,7 @@ public class ClientNetworkInSys implements Sys{
     public void update() {
         //poll net in
         boolean polledPackets = tcpPacketIn.pollPackets();
-        if (polledPackets) System.out.println(tcpPacketIn);
+//        if (polledPackets) System.out.println(tcpPacketIn);
 
 
         updateGameStateByServer();
@@ -196,7 +196,7 @@ public class ClientNetworkInSys implements Sys{
 
         dmgableComp.applyDamage(damageTaken);
 
-        dmgerVisefComp.startEffect(0, dmgablPosComp.getPos());
+        dmgerVisefComp.requestEffect(0, dmgablPosComp.getPos());
 
         if (wc.hasComponent(entityDamager, AudioComp.class)) {
             AudioComp dmgerAudioComp = (AudioComp) wc.getComponent(entityDamager, AudioComp.class);
@@ -232,7 +232,7 @@ public class ClientNetworkInSys implements Sys{
     public void applyEntityDead(EntityDeadData data) {
         //create effect
         Vec2 effPos = ( (PositionComp) wc.getComponent(data.entityId, PositionComp.class) ).getPos();
-        ( (VisualEffectComp)wc.getComponent(data.entityId, VisualEffectComp.class) ).startEffect(0, effPos);
+        ( (VisualEffectComp)wc.getComponent(data.entityId, VisualEffectComp.class) ).requestEffect(0, effPos);
         System.out.println("Entity died: " + data.entityId);
 
         //reset damage

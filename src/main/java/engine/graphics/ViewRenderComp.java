@@ -55,4 +55,10 @@ public class ViewRenderComp implements Component{
     public void addMesh(TextMesh mesh) {
         textMeshes.add(mesh);
     }
+    public void addMesh(TexturedMesh mesh) {
+        textureMeshes.add(mesh);
+    }
+    public void addMesh(ColoredMesh mesh) {
+        colorMeshes.add(mesh);
+    }
 }

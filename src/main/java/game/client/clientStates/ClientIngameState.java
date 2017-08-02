@@ -49,11 +49,14 @@ public class ClientIngameState extends ClientState {
 
         if (playing) {
 
-            if (!gameThread.isAlive()) {
+            if (game.isShouldTerminate()) {
+                System.out.println("Game exited, called from ingame state");
 
-                //game ended
+                //terminate game
+                terminateGame();
 
                 //clear net in
+                System.out.println("Packets post game:\n"+client.getTcpPacketIn());
                 client.getTcpPacketIn().clear();
 
                 //show client window
@@ -63,11 +66,11 @@ public class ClientIngameState extends ClientState {
                 //goto idle state
                 setGotoState(ClientStates.IDLE);
 
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    Thread.sleep(1000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
             }
 
             return;
@@ -88,7 +91,7 @@ public class ClientIngameState extends ClientState {
 
             //when going to game
             playing = true;
-            window.hide();
+//            window.hide();
 
             //create game
             System.out.println("Got data, creating game");
@@ -100,7 +103,7 @@ public class ClientIngameState extends ClientState {
 
     @Override
     public void onExit() {
-        terminateGame();
+
     }
 
     private void createGame(ClientGameTeams teams) {

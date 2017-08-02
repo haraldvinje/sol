@@ -93,11 +93,11 @@ public class ClientConnectingState extends ClientState {
                 setEntityString(statusTextEntity, ioExceptonStatus);
             }
 
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                Thread.sleep(200);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
 
             //return to getIp state
             gettingIp = true;
