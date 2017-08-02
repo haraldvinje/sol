@@ -126,10 +126,24 @@ public class GameUtils {
         }
 
         //create game end text entity and store in data comp
-        int endGameTextEntity = wc.createEntity("game end text");
-        wc.addComponent(endGameTextEntity, new PositionComp(300, 300 ));
-        wc.addComponent(endGameTextEntity, new ViewRenderComp(new TextMesh("", Font.getFont(FontType.BROADWAY), 128, dmgTextColor)));
-        dataComp.gameEndTextEntity = endGameTextEntity;
+//        int endGameTextEntity = wc.createEntity("game end text");
+//        wc.addComponent(endGameTextEntity, new PositionComp(300, 300 ));
+//        wc.addComponent(endGameTextEntity, new ViewRenderComp(new TextMesh("", Font.getFont(FontType.BROADWAY), 128, dmgTextColor)));
+//        dataComp.gameEndTextEntity = endGameTextEntity;
+
+        //add game end images. index 0 = win, index 1 = lose
+        int endGameVictoryEntity = wc.createEntity("game end image");
+        wc.addInactiveComponent(endGameVictoryEntity, new PositionComp(GameUtils.VIEW_WIDTH/2,GameUtils.VIEW_HEIGHT/2));
+        wc.addInactiveComponent(endGameVictoryEntity, new MeshCenterComp(542, 373));
+        wc.addInactiveComponent(endGameVictoryEntity, new ViewRenderComp(TexturedMeshUtils.createRectangle("sol_victory.png", 542*2, 373*2)));
+
+        int endGameDefeatEntity = wc.createEntity("game end image");
+        wc.addInactiveComponent(endGameDefeatEntity, new PositionComp(GameUtils.VIEW_WIDTH/2,GameUtils.VIEW_HEIGHT/2));
+        wc.addInactiveComponent(endGameDefeatEntity, new MeshCenterComp(542, 373));
+        wc.addInactiveComponent(endGameDefeatEntity, new ViewRenderComp(TexturedMeshUtils.createRectangle("sol_defeat.png", 542*2, 373*2)));
+
+        dataComp.gameEndDefeatEntity = endGameDefeatEntity;
+        dataComp.gameEndVictoryEntity = endGameVictoryEntity;
 
         //Create actual game data entity
         int gameDataEntity = wc.createEntity("game data");
@@ -141,8 +155,8 @@ public class GameUtils {
     public static void createMap(WorldContainer wc) {
 
         Vec2[][] startPositions = {
-                { new Vec2(100, 200), new Vec2(100, 400) },
-                { new Vec2(1000, 200), new Vec2(1000, 400) }
+                { new Vec2(100, 400), new Vec2(100, 400) },
+                { new Vec2(1000, 400), new Vec2(1000, 400) }
         };
         GameUtils.teamStartPos = startPositions;
 
@@ -167,7 +181,7 @@ public class GameUtils {
 
 
     public static void createLargeMap(WorldContainer wc){
-        float scale = 1.53819724112859619852985173896f;
+        float scale = 1.5f;
 
         createBackgroundScale(wc, scale);
 
@@ -196,6 +210,7 @@ public class GameUtils {
         GameUtils.teamStartPos = startPositions;
 
 
+
         //create walls for new map. First walls in the base of each competitor
         float w1Thickness = 400;
         float w1Height = 100f;
@@ -205,7 +220,7 @@ public class GameUtils {
         float w3Height = w1Height;
 
         //walls on left side
-        createWall(wc, 200*scale, 650*scale, w1Thickness*scale, w1Height*scale);
+        createWall(wc, 200*scale, 640*scale, w1Thickness*scale, w1Height*scale);
         createWall(wc, 50*scale, 900*scale, w2Thickness*scale, w2Height*scale);
         createWall(wc, 200*scale, 1150*scale, w3Thickness*scale, w3Height*scale);
 
@@ -219,7 +234,7 @@ public class GameUtils {
         //creating holes
 
         //circular holes first on the left side
-        float circHoleRadius = 300;
+        float circHoleRadius = 290;
         createCircleHole(wc, 400*scale, 230*scale, circHoleRadius*scale);
         createCircleHole(wc, 400*scale, (LARGE_MAP_HEIGHT-230)*scale, circHoleRadius*scale);
 
@@ -236,12 +251,12 @@ public class GameUtils {
 
 
         //first on left side
-        createRectangleHole(wc, 200*scale, 300*scale, h1Thickness*scale, h1Height*scale);
-        createRectangleHole(wc, 200*scale, 1500*scale, h2Thickness*scale, h2Height*scale);
+        createRectangleHoleInvisible(wc, 180*scale, 300*scale, h1Thickness*scale, h1Height*scale);
+        createRectangleHoleInvisible(wc, 180*scale, 1500*scale, h2Thickness*scale, h2Height*scale);
 
         //rectangle holes on right side
-        createRectangleHole(wc, 3000*scale, 300*scale, h1Thickness*scale, h1Height*scale);
-        createRectangleHole(wc, 3000*scale, 1500*scale, h2Thickness*scale, h2Height*scale);
+        createRectangleHoleInvisible(wc, 3020*scale, 300*scale, h1Thickness*scale, h1Height*scale);
+        createRectangleHoleInvisible(wc, 3020*scale, 1500*scale, h2Thickness*scale, h2Height*scale);
 
 
 
@@ -254,23 +269,23 @@ public class GameUtils {
 
         //creating walls and holes in center
         float centerSep = 360f;
-        createRectangleHole(wc, (LARGE_MAP_WIDTH / 2 - centerSep)*scale, 1150*scale, 500*scale, 100*scale );
-        createRectangleHole(wc, (LARGE_MAP_WIDTH / 2 + centerSep)*scale, 1150*scale, 500*scale, 100*scale );
-        createWall(wc, (LARGE_MAP_WIDTH/2)*scale, 650*scale, 300*scale, 100*scale);
+        createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH / 2 - centerSep)*scale, 1150*scale, 500*scale, 100*scale );
+        createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH / 2 + centerSep)*scale, 1150*scale, 500*scale, 100*scale );
+        createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH/2)*scale, 647*scale, 285*scale, 90*scale);
 
 
 
-        createWall(wc, (LARGE_MAP_WIDTH/2)*scale, 230*scale, 600*scale, 100*scale);
+        createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH/2)*scale, 230*scale, 600*scale, 100*scale);
         float cSep = 600f;
-        createRectangleHole(wc, (LARGE_MAP_WIDTH / 2 - cSep)*scale, 230*scale, 600*scale, 100*scale );
-        createRectangleHole(wc, (LARGE_MAP_WIDTH / 2 + cSep)*scale, 230*scale, 600*scale, 100*scale );
+        createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH / 2 - cSep)*scale, 210*scale, 600*scale, 100*scale );
+        createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH / 2 + cSep)*scale, 210*scale, 600*scale, 100*scale );
 
 
 
-        createRectangleHole(wc, (LARGE_MAP_WIDTH/2)*scale, (LARGE_MAP_HEIGHT-230)*scale, 600*scale, 100*scale);
+        createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH/2)*scale, (LARGE_MAP_HEIGHT-210)*scale, 600*scale, 100*scale);
         float cSepp = 600f;
-        createWall(wc, (LARGE_MAP_WIDTH / 2 - cSepp)*scale, (LARGE_MAP_HEIGHT-230)*scale, 600*scale, 100*scale );
-        createWall(wc, (LARGE_MAP_WIDTH / 2 + cSepp)*scale, (LARGE_MAP_HEIGHT-230)*scale, 600*scale, 100*scale );
+        createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH / 2 - cSepp)*scale, (LARGE_MAP_HEIGHT-230)*scale, 600*scale, 100*scale );
+        createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH / 2 + cSepp)*scale, (LARGE_MAP_HEIGHT-230)*scale, 600*scale, 100*scale );
 
 
 
@@ -361,8 +376,8 @@ public class GameUtils {
 
     private static int createBackgroundScale(WorldContainer wc, float scale) {
         int bg = wc.createEntity();
-        wc.addComponent(bg, new PositionComp(0, 0, -0.5f));
-        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", scale*LARGE_MAP_WIDTH
+        wc.addComponent(bg, new PositionComp(18*scale, -55*scale, -0.5f));
+        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sol_large_map.png", scale*LARGE_MAP_WIDTH
                 , scale*LARGE_MAP_HEIGHT)));
 
         return bg;
@@ -374,8 +389,8 @@ public class GameUtils {
         int w = wc.createEntity("wall");
         wc.addComponent(w, new PositionComp(x, y));
 
-        wc.addComponent(w, new ColoredMeshComp(ColoredMeshUtils.createRectangle(width, height)));
-        wc.addComponent(w, new MeshCenterComp(width/2, height/2)); //physical rectangle is defined with position being the center, while the graphical square is defined in the upper left corner
+//        wc.addComponent(w, new ColoredMeshComp(ColoredMeshUtils.createRectangle(width, height)));
+//        wc.addComponent(w, new MeshCenterComp(width/2, height/2)); //physical rectangle is defined with position being the center, while the graphical square is defined in the upper left corner
 
 
         wc.addComponent(w, new PhysicsComp(0, 1, 1));
@@ -426,7 +441,7 @@ public class GameUtils {
         int w = wc.createEntity();
         wc.addComponent(w, new PositionComp(x, y));
 
-        wc.addComponent(w, new ColoredMeshComp(ColoredMeshUtils.createCircleMulticolor(radius, 32)));
+//        wc.addComponent(w, new ColoredMeshComp(ColoredMeshUtils.createCircleMulticolor(radius, 32)));
 
         wc.addComponent(w, new PhysicsComp(0, 1, 1));
         wc.addComponent(w, new CollisionComp(new Circle(radius)));
