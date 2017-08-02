@@ -30,6 +30,27 @@ public class CharacterUtils {
     public static final int CHARACTER_COUNT = 3;
     public static final int SHRANK = 0, SCHMATHIAS = 1, BRAIL = 2;
     public static final String[] CHARACTER_NAMES = {"Shrank", "Schmathias", "Brail"};
+    public static final float[] CHARACTER_RADIUS = {
+            32, 32, 32
+    };
+
+    private static final LoadImageData[] loadCharData= {
+            /*Shrank*/     new LoadImageData("sol_frank.png", CHARACTER_RADIUS[0], 160/2f, 512, 256, 180, 130),
+            /*Schmathias*/ new LoadImageData("Schmathias.png", CHARACTER_RADIUS[1], 228/2f, 720, 400, 267, 195),
+            /*Brail*/ new LoadImageData("Schmathias.png", CHARACTER_RADIUS[2], 228/2f, 720, 400, 267, 195),
+
+    };
+
+    public static void addCharacterGraphicsComps(WorldContainer wc, int charId, int entity) {
+        LoadImageData data = loadCharData[charId];
+
+        TexturedMeshComp texmeshComp = new TexturedMeshComp( TexturedMeshUtils.createRectangle(data.filename, data.width, data.height) );
+        MeshCenterComp meshcentComp = new MeshCenterComp(data.offsetX, data.offsetY);
+
+        wc.addComponent(entity, texmeshComp);
+        wc.addComponent(entity, meshcentComp);
+    }
+
 
     private static float hitboxDepth = 1;
 
@@ -55,7 +76,7 @@ public class CharacterUtils {
                     controlled = true;
                 }
 
-                int e = createCharacter(charEnt, wc, controlled, j, i, GameUtils.teamStartPos[j][i].x, GameUtils.teamStartPos[j][i].y);
+                int e = createCharacterById(charEnt, wc, controlled, j, i, GameUtils.teamStartPos[j][i].x, GameUtils.teamStartPos[j][i].y);
 
                 charEntIds[j][i] = e;
 
@@ -77,7 +98,7 @@ public class CharacterUtils {
             int i = 0;
             for (int charEnt : teams.getCharacterIdsOnTeam( j )) {
 
-                int e = createCharacter(charEnt, wc, controlled, j, i, GameUtils.teamStartPos[j][i].x, GameUtils.teamStartPos[j][i].y);
+                int e = createCharacterById(charEnt, wc, controlled, j, i, GameUtils.teamStartPos[j][i].x, GameUtils.teamStartPos[j][i].y);
                 charEntIds[j][i] = e;
 
                 i++;
@@ -88,15 +109,15 @@ public class CharacterUtils {
     }
 
 
-    private static int createCharacter(int characterId, WorldContainer wc, boolean controlled, int team, int idOnTeam, float x, float y) {
+    private static int createCharacterById(int charId, WorldContainer wc, boolean controlled, int team, int idOnTeam, float x, float y) {
         int charEnt;
 
-        switch(characterId) {
-            case SHRANK: charEnt = createShrank(wc, controlled, team, idOnTeam, x, y);
+        switch(charId) {
+            case SHRANK: charEnt = createShrank(wc, charId, controlled, team, idOnTeam, x, y);
                 break;
-            case SCHMATHIAS: charEnt = createSchmathias(wc, controlled, team, idOnTeam, x, y);
+            case SCHMATHIAS: charEnt = createSchmathias(wc, charId, controlled, team, idOnTeam, x, y);
                 break;
-            case BRAIL: charEnt = createBrail(wc, controlled, team, idOnTeam, x, y);
+            case BRAIL: charEnt = createBrail(wc, charId, controlled, team, idOnTeam, x, y);
                 break;
             default:
                 throw new IllegalArgumentException("no character of id given");
@@ -105,7 +126,11 @@ public class CharacterUtils {
         return charEnt;
     }
 
-    private static int createShrank(WorldContainer wc, boolean controlled, int team, int idOnTeam, float x, float y) {
+    private static int createShrank(
+            WorldContainer wc, int charId,
+            boolean controlled, int team, int idOnTeam,
+            float x, float y) {
+
         Sound sndPowershot = new Sound("audio/powershot.ogg");
         Sound sndBoom = new Sound ("audio/boom-bang.ogg");
         Sound sndRapidsShot = new Sound("audio/click4.ogg");
@@ -139,12 +164,17 @@ public class CharacterUtils {
        soundList.add(boomSoundIndex, sndBoom);
 
 
-        return createCharacter(wc, controlled, team, idOnTeam, x, y, "sol_frank.png", 160f/2f, 512, 256, 180, 130, 32, 1800f,
+        return createCharacter(wc, charId,
+                controlled, team, idOnTeam,
+                x, y, 1800f,
                 abRapidshot, abHyperbeam, abPuffer,
                 soundList);
     }
 
-    private static int createSchmathias(WorldContainer wc, boolean controlled, int team, int idOnTeam, float x, float y) {
+    private static int createSchmathias(
+            WorldContainer wc, int charId,
+            boolean controlled, int team, int idOnTeam,
+            float x, float y) {
 
         //frogpunch
         int suhSoundIndex = 0;
@@ -165,11 +195,17 @@ public class CharacterUtils {
         sounds.add(suhSoundIndex, new Sound("audio/si.ogg") );
 
 
-        return createCharacter(wc, controlled, team, idOnTeam, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
+        return createCharacter(wc, charId,
+                controlled, team, idOnTeam,
+                x, y, 2000f,
                 abFrogpunch, abHook, abMeteorpunch, sounds);
     }
 
-    private static int createBrail(WorldContainer wc, boolean controlled, int team, int idOnTeam, float x, float y) {
+    private static int createBrail(
+            WorldContainer wc, int charId,
+            boolean controlled, int team, int idOnTeam,
+            float x, float y) {
+
         Sound snd1 = new Sound("audio/click4.ogg");
         Sound snd2 = new Sound("audio/laser02.ogg");
         Sound snd3 = new Sound("audio/snabbe.ogg");
@@ -198,32 +234,37 @@ public class CharacterUtils {
         sounds.add( snd2 );
         sounds.add( snd3 );
 
-        return createCharacter(wc, controlled, team, idOnTeam, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
+        return createCharacter(wc, charId,
+                controlled, team, idOnTeam,
+                x, y, 2000,
                 abFrogpunch, abHook, abMeteorpunch, sounds);
     }
 
-    private static int createShitface(WorldContainer wc, boolean controlled, int team, int idOnTeam, float x, float y) {
-
-        //frogpunch
-        MeleeAbility abFrogpunch = new MeleeAbility(wc, -1, 3, 5, 3, 20, new Circle(64f),48.0f, null);
-        abFrogpunch.setDamagerValues(wc, 15, 70, 0.8f, -48f, false);
-
-        //hook
-        int hookProjEntity = ProjectileUtils.allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24, null); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
-        ProjectileAbility abHook = new ProjectileAbility(wc, -1, hookProjEntity, 5, 18, 50, 900, 30);
-        abHook.setDamagerValues(wc, 20f, 140f, 0.2f, -128, true);
-
-        //meteorpunch
-        MeleeAbility abMeteorpunch = new MeleeAbility(wc, -1, 15, 3, 4, 60, new Circle(32), 64, null);
-        abMeteorpunch.setDamagerValues(wc, 50, 100, 1.5f, -128f, false);
-
-
-        List<Sound> sounds = new ArrayList<Sound>();
-        sounds.add( new Sound("audio/si.ogg") );
-
-        return createCharacter(wc, controlled, team, idOnTeam, x, y, "Schmathias.png", 228f/2f, 720, 400, 267, 195, 32, 2000f,
-                abFrogpunch, abHook, abMeteorpunch, sounds );
-    }
+//    private static int createShitface(
+//            WorldContainer wc, int charId,
+//            boolean controlled, int team, int idOnTeam, float x, float y) {
+//
+//        //frogpunch
+//        MeleeAbility abFrogpunch = new MeleeAbility(wc, -1, 3, 5, 3, 20, new Circle(64f),48.0f, null);
+//        abFrogpunch.setDamagerValues(wc, 15, 70, 0.8f, -48f, false);
+//
+//        //hook
+//        int hookProjEntity = ProjectileUtils.allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24, null); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
+//        ProjectileAbility abHook = new ProjectileAbility(wc, -1, hookProjEntity, 5, 18, 50, 900, 30);
+//        abHook.setDamagerValues(wc, 20f, 140f, 0.2f, -128, true);
+//
+//        //meteorpunch
+//        MeleeAbility abMeteorpunch = new MeleeAbility(wc, -1, 15, 3, 4, 60, new Circle(32), 64, null);
+//        abMeteorpunch.setDamagerValues(wc, 50, 100, 1.5f, -128f, false);
+//
+//
+//        List<Sound> sounds = new ArrayList<Sound>();
+//        sounds.add( new Sound("audio/si.ogg") );
+//
+//        return createCharacter(wc, controlled, team, idOnTeam,
+//                x, y, 2000f,
+//                abFrogpunch, abHook, abMeteorpunch, sounds );
+//    }
 
 
     public static int allocateHitboxEntity(WorldContainer wc, Circle shape, Sound onHitSound){
@@ -253,21 +294,23 @@ public class CharacterUtils {
 
 
 
-    private static int createCharacter(WorldContainer wc, boolean controlled, int team, int idOnTeam, float x, float y, String imagePath, float radiusOnImage, float imageWidth, float imageHeight, float offsetXOnImage, float offsetYOnImage, float radius, float moveAccel, Ability ab1, Ability ab2, Ability ab3, List<Sound> soundList) {
+    private static int createCharacter(
+            WorldContainer wc,
+            int charId,
+            boolean controlled, int team, int idOnTeam,
+            float x, float y, float moveAccel,
+            Ability ab1, Ability ab2, Ability ab3,
+            List<Sound> soundList) {
+
         int characterEntity = wc.createEntity("character");
 
-        float scale = radius / radiusOnImage;
-        float width = imageWidth * scale;
-        float height = imageHeight * scale;
-        float offsetX = offsetXOnImage * scale;
-        float offsetY = offsetYOnImage * scale;
+        //add graphics
+        addCharacterGraphicsComps(wc, charId, characterEntity);
 
         wc.addComponent(characterEntity, new CharacterComp(moveAccel));//1500f));
         wc.addComponent(characterEntity, new PositionComp(x, y, (float) (characterCount++) / 100f)); //z value is a way to make draw ordering and depth positioning correspond. Else alpha images will appear incorrect.
         wc.addComponent(characterEntity, new RotationComp());
 
-        wc.addComponent(characterEntity, new TexturedMeshComp(TexturedMeshUtils.createRectangle(imagePath, width, height)));
-        wc.addComponent(characterEntity, new MeshCenterComp(offsetX, offsetY));
 
         wc.addComponent(characterEntity, new AbilityComp(ab1, ab2, ab3));
 
@@ -275,7 +318,7 @@ public class CharacterUtils {
 
         //server and offline
         wc.addComponent(characterEntity, new PhysicsComp(80, 5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
-        wc.addComponent(characterEntity, new CollisionComp(new Circle(radius)));
+        wc.addComponent(characterEntity, new CollisionComp(new Circle( CHARACTER_RADIUS[charId] )));
         wc.addComponent(characterEntity, new NaturalResolutionComp());
 
         wc.addComponent(characterEntity, new AffectedByHoleComp());
