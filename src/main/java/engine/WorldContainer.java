@@ -296,7 +296,7 @@ public class WorldContainer {
 
     public Component getComponent(int entity, Class<? extends Component> compType) {
         Component c = getComponentsOfType(compType).get(entity);
-        if (c == null) throw new IllegalStateException("No component of the given type is assigned to the given entity, type="+compType);
+        if (c == null) throw new IllegalStateException("No component of the given type is assigned to the given entity, type="+compType+ " entity number=" + entity);
         return c;
     }
     public <T extends Component> T getComponent(int entity, Class<? extends Component> compType, boolean b) {

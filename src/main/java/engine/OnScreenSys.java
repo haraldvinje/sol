@@ -1,5 +1,6 @@
 package engine;
 
+import engine.audio.AudioComp;
 import engine.character.CharacterComp;
 import engine.combat.DamageableComp;
 import engine.graphics.ColoredMeshComp;
@@ -79,13 +80,27 @@ public class OnScreenSys implements Sys{
 
             //render game end
             if (dataComp.endGameRequest) {
+
+                AudioComp backgroundAudio = (AudioComp) wc.getComponent(dataComp.backgroundMusicEntity, AudioComp.class);
+                backgroundAudio.requestStopSource = true;
+
                 if (dataComp.gameWon) {
 
                     wc.activateEntity( dataComp.gameEndVictoryEntity );
+                    AudioComp audioComp = (AudioComp) wc.getComponent (dataComp.gameEndVictoryEntity, AudioComp.class);
+                    audioComp.playSound(0);
+//                    audioComp.requestSound = 0;
                 }
                 else {
 
                     wc.activateEntity( dataComp.gameEndDefeatEntity );
+                    System.out.println("defeatet else statement");
+                    AudioComp audioComp = (AudioComp) wc.getComponent (dataComp.gameEndDefeatEntity, AudioComp.class);
+                    System.out.println("Got component");
+                    audioComp.playSound(0);
+                    System.out.println("Played Sound Sound of Silensium");
+
+//                    audioComp.requestSound = 0;
                 }
             }
 

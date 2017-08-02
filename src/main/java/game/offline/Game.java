@@ -83,10 +83,10 @@ public class Game {
      */
     public void start() {
 
-        Sound battlefield = new Sound("audio/meleeBattlefield.ogg");
-        backgroundAudioComp = new AudioComp(battlefield, 1, 500, 600);
-        backgroundAudioComp.backgroundMusic();
-        backgroundAudioComp.playSound(0);
+//        Sound battlefield = new Sound("audio/meleeBattlefield.ogg");
+//        backgroundAudioComp = new AudioComp(battlefield, 1, 500, 600);
+//        backgroundAudioComp.backgroundMusic();
+//        backgroundAudioComp.playSound(0);
 
         Sound readyGo = new Sound("audio/readyGo.ogg");
         AudioComp audioComp = new AudioComp(readyGo, 1,600,600);

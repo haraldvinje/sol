@@ -22,6 +22,10 @@ public class AudioComp implements Component {
 
     public int requestSound = -1;
 
+    public boolean requestStopSource = false;
+
+    public boolean backgroundAudio = false;
+
 
     public AudioComp(Sound... s){
         this(Arrays.asList(s), 20,50,300);
@@ -64,11 +68,11 @@ public class AudioComp implements Component {
         alSourceStop(sourcePointer);
         alSourcei(sourcePointer, AL_BUFFER, sound.getBufferPointer());
         alSourcePlay(sourcePointer);
+        System.out.println("after playSource");
     }
 
     public void stopSound() {
         alSourceStop(sourcePointer);
-
     }
 
 

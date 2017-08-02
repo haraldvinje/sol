@@ -106,6 +106,7 @@ public class GameUtils {
 
         GameDataComp dataComp = new GameDataComp();
 
+
         //Create damage text entities, and store id in dataComp
         for (int i = 0; i < teams.getTeamCount();  i++) {
             float currY = startY;
@@ -133,17 +134,65 @@ public class GameUtils {
 
         //add game end images. index 0 = win, index 1 = lose
         int endGameVictoryEntity = wc.createEntity("game end image");
-        wc.addInactiveComponent(endGameVictoryEntity, new PositionComp(GameUtils.VIEW_WIDTH/2,GameUtils.VIEW_HEIGHT/2));
+        wc.addComponent(endGameVictoryEntity, new PositionComp(GameUtils.VIEW_WIDTH/2,GameUtils.VIEW_HEIGHT/2));
         wc.addInactiveComponent(endGameVictoryEntity, new MeshCenterComp(542, 373));
         wc.addInactiveComponent(endGameVictoryEntity, new ViewRenderComp(TexturedMeshUtils.createRectangle("sol_victory.png", 542*2, 373*2)));
 
         int endGameDefeatEntity = wc.createEntity("game end image");
-        wc.addInactiveComponent(endGameDefeatEntity, new PositionComp(GameUtils.VIEW_WIDTH/2,GameUtils.VIEW_HEIGHT/2));
+        wc.addComponent(endGameDefeatEntity, new PositionComp(GameUtils.VIEW_WIDTH/2,GameUtils.VIEW_HEIGHT/2));
         wc.addInactiveComponent(endGameDefeatEntity, new MeshCenterComp(542, 373));
         wc.addInactiveComponent(endGameDefeatEntity, new ViewRenderComp(TexturedMeshUtils.createRectangle("sol_defeat.png", 542*2, 373*2)));
 
+
+
+        Sound victoryTheme = new Sound("audio/si.ogg");
+        AudioComp victoryThemeAudioComp = new AudioComp(victoryTheme);
+        victoryThemeAudioComp.backgroundAudio = true;
+        victoryThemeAudioComp.backgroundSound();
+
+        wc.addInactiveComponent(endGameVictoryEntity, victoryThemeAudioComp);
+        System.out.println("End game victory entity from GameUtils: " + endGameVictoryEntity);
+
+        System.out.println("End game defeat entity from GameUtils: " + endGameDefeatEntity);
+
+        //must have positionComponent for AudoSys to work.
+
+
+        Sound defeatTheme = new Sound("audio/soundOfSilence.ogg");
+        AudioComp defeatThemeAudioComp = new AudioComp(defeatTheme);
+        defeatThemeAudioComp.backgroundAudio = true;
+        defeatThemeAudioComp.backgroundSound();
+        wc.addInactiveComponent(endGameDefeatEntity, defeatThemeAudioComp);
+        //must have positionComponent for AudioSys to work.
+
+
+        //Adding Audiocomp to gamedataEntity;
+        Sound battlefield = new Sound("audio/meleeBattlefield.ogg");
+        AudioComp backgroundAudioComp = new AudioComp(battlefield);
+        backgroundAudioComp.backgroundAudio = true;
+        backgroundAudioComp.backgroundMusic();
+        backgroundAudioComp.requestSound = 0;
+        int backgroundMusicEntity = wc.createEntity();
+        wc.addComponent(backgroundMusicEntity, backgroundAudioComp);
+        //must have positionComponent for AudioSys to work.
+        wc.addComponent(backgroundMusicEntity, new PositionComp(0,0));
+
+
+        Sound readyGo = new Sound("audio/readyGo.ogg");
+        AudioComp audioComp = new AudioComp(readyGo);
+        audioComp.backgroundAudio = true;
+        audioComp.backgroundSound();
+        audioComp.requestSound = 0;
+        int readyGoSoundEntity = wc.createEntity();
+        wc.addComponent(readyGoSoundEntity, audioComp);
+        wc.addComponent(readyGoSoundEntity, new PositionComp(0,0));
+
+
+        dataComp.backgroundMusicEntity = backgroundMusicEntity;
+
         dataComp.gameEndDefeatEntity = endGameDefeatEntity;
         dataComp.gameEndVictoryEntity = endGameVictoryEntity;
+
 
         //Create actual game data entity
         int gameDataEntity = wc.createEntity("game data");
@@ -410,6 +459,7 @@ public class GameUtils {
 
         return bg;
     }
+
 
     private static int createLargeBackgroundScale(WorldContainer wc, float scale) {
         int bg = wc.createEntity("map");

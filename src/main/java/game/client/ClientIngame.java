@@ -126,16 +126,7 @@ public class ClientIngame implements Runnable{
         System.out.println("Initial state:");
         System.out.println(wc.entitiesToString());
 
-        //play background music
-        Sound battlefield = new Sound("audio/meleeBattlefield.ogg");
-        backgroundAudioComp = new AudioComp(battlefield, 1, 500, 600);
-        backgroundAudioComp.backgroundMusic();
-        backgroundAudioComp.playSound(0);
 
-        Sound readyGo = new Sound("audio/readyGo.ogg");
-        AudioComp audioComp = new AudioComp(readyGo, 1,600,600);
-        audioComp.backgroundSound();
-        audioComp.playSound(0);
 
 
         //game loop
