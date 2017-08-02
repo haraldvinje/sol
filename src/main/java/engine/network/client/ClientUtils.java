@@ -5,6 +5,7 @@ import engine.graphics.*;
 import engine.graphics.text.TextMesh;
 import engine.graphics.text.TextMeshComp;
 import engine.graphics.view_.View;
+import engine.visualEffect.VisualEffectComp;
 import engine.window.Window;
 import game.client.Client;
 import utils.maths.Vec4;
@@ -48,6 +49,7 @@ public class ClientUtils {
         wc.assignComponentType(ViewRenderComp.class);
         wc.assignComponentType(RectangleComp.class);
         wc.assignComponentType(ButtonComp.class);
+        wc.assignComponentType(VisualEffectComp.class);
 
 
         //add systems

@@ -70,11 +70,12 @@ public class CharacterSys implements Sys {
         AbilityComp abComp = (AbilityComp) wc.getComponent(entity, AbilityComp.class);
         DamageableComp dmgableComp = (DamageableComp)wc.getComponent(entity, DamageableComp.class);
         AffectedByHoleComp affholeComp = (AffectedByHoleComp)wc.getComponent(entity, AffectedByHoleComp.class);
-//        TextMeshComp textComp = (TextMeshComp)wc.getComponent(entity, TextMeshComp.class);
+        TeamComp teamComp = (TeamComp) wc.getComponent(entity, TeamComp.class);
+        //        TextMeshComp textComp = (TextMeshComp)wc.getComponent(entity, TextMeshComp.class);
 
 
 
-        checkHoleAffected(charNumb, posComp, phComp, charComp, dmgableComp, affholeComp);
+        checkHoleAffected(charNumb, teamComp, posComp, phComp, charComp, dmgableComp, affholeComp);
 
 //        updateDisplayDamage(charNumb, dmgableComp, textComp);
 
@@ -88,10 +89,10 @@ public class CharacterSys implements Sys {
         updateAbilities(entity, charComp, abComp, inputComp, posComp, rotComp);
     }
 
-    private void checkHoleAffected(int charNumb, PositionComp posComp, PhysicsComp physComp, CharacterComp charComp, DamageableComp dmgablComp, AffectedByHoleComp affholeComp) {
+    private void checkHoleAffected(int charNumb, TeamComp teamComp, PositionComp posComp, PhysicsComp physComp, CharacterComp charComp, DamageableComp dmgablComp, AffectedByHoleComp affholeComp) {
         if (affholeComp.isHoleAffectedFlag()) {
 
-            Vec2 respawnPos = (charNumb == 0)? new Vec2(GameUtils.startPositionsTeam1[0][0], GameUtils.startPositionsTeam1[0][1]) : new Vec2(GameUtils.startPositionsTeam2[0][0], GameUtils.startPositionsTeam2[0][1]);
+            Vec2 respawnPos = GameUtils.teamStartPos[teamComp.team][0];
 
             dmgablComp.reset();
             physComp.reset();

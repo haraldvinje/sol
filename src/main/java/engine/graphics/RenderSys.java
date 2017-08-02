@@ -6,6 +6,8 @@ import engine.RotationComp;
 import engine.Sys;
 import engine.WorldContainer;
 import engine.graphics.text.*;
+import engine.visualEffect.VisualEffect;
+import engine.visualEffect.VisualEffectComp;
 import engine.visualEffect.VisualEffectSys;
 import engine.window.Window;
 import org.lwjgl.opengl.GL11;
@@ -91,14 +93,33 @@ public class RenderSys implements Sys {
         //draw text meshes in the world
         wc.entitiesOfComponentTypeStream(TextMeshComp.class).forEach( entity -> {
             TextMeshComp textMeshComp = (TextMeshComp)wc.getComponent(entity, TextMeshComp.class);
-            renderTextMesh(entity, textMeshComp.getTextMesh(), viewTransform, projectionTransform);
+
+            TextMesh textMesh = textMeshComp.getTextMesh();
+
+            Mat4 modelTransform = retrieveModelTransform(entity);
+
+            float textScale = textMesh.getSize() / textMesh.getFont().getFontSize();
+            Mat4 modelScale = Mat4.scale(new Vec3(textScale, textScale, 1f));
+            Mat4 textModelTransform = modelTransform.multiply( modelScale );
+
+            renderTextMesh(textMesh, textMesh.getColor(), textModelTransform, viewTransform, projectionTransform);
         });
 
 
         //draw effects in the world
-        VisualEffectSys.forEachActiveParticle(p -> {
-            Mat4 translateTransform = Mat4.translate( new Vec3(p.getPos(), 1) );
-            renderColoredMesh(p.getMesh(), translateTransform, viewTransform, projectionTransform);
+//        VisualEffectSys.forEachActiveParticle(p -> {
+        wc.entitiesOfComponentTypeStream(VisualEffectComp.class).forEach(entity -> {
+            VisualEffectComp viseffComp = (VisualEffectComp) wc.getComponent(entity, VisualEffectComp.class);
+
+            //render if there is a running effect
+            if (viseffComp.runningEffectId != -1) {
+                VisualEffect runningEffect = viseffComp.effects.get(viseffComp.runningEffectId);
+
+                runningEffect.activeParticleStream().forEach(p -> {
+                    Mat4 translateTransform = Mat4.translate(new Vec3(p.getPos(), 1));
+                    renderColoredMesh(p.getMesh(), translateTransform, viewTransform, projectionTransform);
+                });
+            }
         });
 
 
@@ -134,6 +155,7 @@ public class RenderSys implements Sys {
 
     @Override
     public void terminate() {
+        glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
     }
 

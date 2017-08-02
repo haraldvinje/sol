@@ -36,6 +36,12 @@ dependencies {
     nativeBundle "org.lwjgl:lwjgl-openal:${lwjglVersion}:natives-windows@jar"
     nativeBundle "org.lwjgl:lwjgl-stb:${lwjglVersion}:natives-windows@jar"
 
+    nativeBundle "org.lwjgl:lwjgl:${lwjglVersion}:natives-macos@jar"
+    nativeBundle "org.lwjgl:lwjgl-glfw:${lwjglVersion}:natives-macos@jar"
+    nativeBundle "org.lwjgl:lwjgl-opengl:${lwjglVersion}:natives-macos@jar"
+    nativeBundle "org.lwjgl:lwjgl-openal:${lwjglVersion}:natives-macos@jar"
+    nativeBundle "org.lwjgl:lwjgl-stb:${lwjglVersion}:natives-macos@jar"
+
 
     // Use JUnit test framework
     testCompile 'junit:junit:4.12'

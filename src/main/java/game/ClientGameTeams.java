@@ -36,6 +36,9 @@ public class ClientGameTeams {
     public int getTeamCount() {
         return characterIds.length;
     }
+    public int getTotalCharacterCount() {
+        return Arrays.stream(characterIds).mapToInt(t -> t.length).sum();
+    }
 
 
     public int getControlCharacterTeam() {

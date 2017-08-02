@@ -30,10 +30,12 @@ import engine.physics.*;
 import engine.visualEffect.VisualEffectComp;
 import engine.visualEffect.VisualEffectSys;
 import engine.window.Window;
+import utils.maths.M;
 import utils.maths.Vec2;
 import utils.maths.Vec4;
 
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -51,7 +53,7 @@ public class GameUtils {
 
     public static float VIEW_WIDTH = MAP_WIDTH, VIEW_HEIGHT = MAP_HEIGHT;
 
-    public static int[][] startPositionsTeam1, startPositionsTeam2;
+    public static Vec2[][] teamStartPos;
 
 
 
@@ -87,11 +89,12 @@ public class GameUtils {
         wc.assignComponentType(AudioComp.class);
         wc.assignComponentType(SoundListenerComp.class);
         wc.assignComponentType(GameDataComp.class);
+        wc.assignComponentType(TeamComp.class);
 
     }
 
 
-    public static int createGameData(WorldContainer wc, ClientGameTeams teams, List<Integer> charEntityIds) {
+    public static int createGameData(WorldContainer wc, ClientGameTeams teams, int[][] charEntityIds) {
         //charEntityIds are assumed to be in same order as team character ids
 
         float[] teamStartX = {10, GameUtils.VIEW_WIDTH-200};
@@ -114,7 +117,8 @@ public class GameUtils {
                 wc.addComponent(t, new PositionComp(teamStartX[i], currY));
                 wc.addComponent(t, new ViewRenderComp(new TextMesh("0", Font.getFont(FontType.BROADWAY), dmgTextSize, dmgTextColor)));
 
-                dataComp.charDamageTextEntities.put(charEntityIds.get(i+j), t);
+                //map character entity id to text entity id
+                dataComp.charDamageTextEntities.put(charEntityIds[i][j], t);
 
                 ++j;
                 currY += spaceY;
@@ -122,10 +126,24 @@ public class GameUtils {
         }
 
         //create game end text entity and store in data comp
-        int endGameTextEntity = wc.createEntity("game end text");
-        wc.addComponent(endGameTextEntity, new PositionComp(300, 300 ));
-        wc.addComponent(endGameTextEntity, new ViewRenderComp(new TextMesh("", Font.getFont(FontType.BROADWAY), 128, dmgTextColor)));
-        dataComp.gameEndTextEntity = endGameTextEntity;
+//        int endGameTextEntity = wc.createEntity("game end text");
+//        wc.addComponent(endGameTextEntity, new PositionComp(300, 300 ));
+//        wc.addComponent(endGameTextEntity, new ViewRenderComp(new TextMesh("", Font.getFont(FontType.BROADWAY), 128, dmgTextColor)));
+//        dataComp.gameEndTextEntity = endGameTextEntity;
+
+        //add game end images. index 0 = win, index 1 = lose
+        int endGameVictoryEntity = wc.createEntity("game end image");
+        wc.addInactiveComponent(endGameVictoryEntity, new PositionComp(GameUtils.VIEW_WIDTH/2,GameUtils.VIEW_HEIGHT/2));
+        wc.addInactiveComponent(endGameVictoryEntity, new MeshCenterComp(542, 373));
+        wc.addInactiveComponent(endGameVictoryEntity, new ViewRenderComp(TexturedMeshUtils.createRectangle("sol_victory.png", 542*2, 373*2)));
+
+        int endGameDefeatEntity = wc.createEntity("game end image");
+        wc.addInactiveComponent(endGameDefeatEntity, new PositionComp(GameUtils.VIEW_WIDTH/2,GameUtils.VIEW_HEIGHT/2));
+        wc.addInactiveComponent(endGameDefeatEntity, new MeshCenterComp(542, 373));
+        wc.addInactiveComponent(endGameDefeatEntity, new ViewRenderComp(TexturedMeshUtils.createRectangle("sol_defeat.png", 542*2, 373*2)));
+
+        dataComp.gameEndDefeatEntity = endGameDefeatEntity;
+        dataComp.gameEndVictoryEntity = endGameVictoryEntity;
 
         //Create actual game data entity
         int gameDataEntity = wc.createEntity("game data");
@@ -136,10 +154,11 @@ public class GameUtils {
 
     public static void createMap(WorldContainer wc) {
 
-        int[][] startPositionsTeam1 = { {100, 200}, {100, 400}};
-        int[][] startPositionsTeam2 = { {1000, 200}, {1000, 400}};
-        GameUtils.startPositionsTeam1 = startPositionsTeam1;
-        GameUtils.startPositionsTeam2 = startPositionsTeam2;
+        Vec2[][] startPositions = {
+                { new Vec2(100, 400), new Vec2(100, 400) },
+                { new Vec2(1000, 400), new Vec2(1000, 400) }
+        };
+        GameUtils.teamStartPos = startPositions;
 
         //create background
         createBackground(wc);
@@ -173,25 +192,23 @@ public class GameUtils {
 //
 //        int startX2 = 3*startX;
 
+        Vec2[][] startPositions = {
+                //team1
+                { new Vec2(250, 800), new Vec2(250, 1000) },
+                //team2
+                { new Vec2(2950, 800), new Vec2(2950, 1000) }
+        };
+      
+        //scale positions
+        Arrays.stream(startPositions).forEach( teamPositions -> {
+                Arrays.stream(teamPositions).forEach( pos -> {
+                    pos.setAs( pos.scale(scale) );
+                });
+        });
+        //set positions for use
+        GameUtils.teamStartPos = startPositions;
 
-        double team1StartX = 250;
-        double team1StartY1 = 800;
-        double team1StartY2 = 1000;
-        double team2StartX = 2950;
 
-
-        int t1SX = (int) Math.floor(team1StartX*scale);
-        int t1SY1 = (int) Math.floor(team1StartY1*scale);
-        int t1SY2 = (int) Math.floor(team1StartY2*scale);
-        int t2SX = (int) Math.floor(team2StartX*scale);
-        int t2SY1 = t1SY1;
-        int t2SY2 = t1SY2;
-
-
-        int[][] startPositionsTeam1 = { {t1SX, t1SY1}, {t1SX, t1SY2}};
-        int[][] startPositionsTeam2 = { {t2SX, t2SY1}, {t2SX, t2SY2}};
-        GameUtils.startPositionsTeam1 = startPositionsTeam1;
-        GameUtils.startPositionsTeam2 = startPositionsTeam2;
 
         //create walls for new map. First walls in the base of each competitor
         float w1Thickness = 400;
@@ -202,9 +219,11 @@ public class GameUtils {
         float w3Height = w1Height;
 
         //walls on left side
+
         createWallInvisible(wc, 200*scale, 640*scale, w1Thickness*scale, w1Height*scale);
         createWallInvisible(wc, 50*scale, 900*scale, w2Thickness*scale, w2Height*scale);
         createWallInvisible(wc, 200*scale, 1150*scale, w3Thickness*scale, w3Height*scale);
+
 
         //walls on right side
         createWallInvisible(wc, 3000*scale, 650*scale, w1Thickness*scale, w1Height*scale);
@@ -217,8 +236,10 @@ public class GameUtils {
 
         //circular holes first on the left side
         float circHoleRadius = 290;
+
         createCircleHoleInvisible(wc, 400*scale, 230*scale, circHoleRadius*scale);
         createCircleHoleInvisible(wc, 400*scale, (LARGE_MAP_HEIGHT-230)*scale, circHoleRadius*scale);
+
 
         //circular holes on the right side
         createCircleHoleInvisible(wc, 2800*scale, 230*scale, circHoleRadius*scale);
@@ -253,11 +274,11 @@ public class GameUtils {
         float centerSep = 360f;
         createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH / 2 - centerSep)*scale, 1150*scale, 500*scale, 100*scale );
         createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH / 2 + centerSep)*scale, 1150*scale, 500*scale, 100*scale );
+
+
         createWallInvisible(wc, (LARGE_MAP_WIDTH/2)*scale, 647*scale, 285*scale, 90*scale);
-
-
-
         createWallInvisible(wc, (LARGE_MAP_WIDTH/2)*scale, 230*scale, 600*scale, 100*scale);
+
         float cSep = 600f;
         createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH / 2 - cSep)*scale, 210*scale, 600*scale, 100*scale );
         createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH / 2 + cSep)*scale, 210*scale, 600*scale, 100*scale );
@@ -266,8 +287,10 @@ public class GameUtils {
 
         createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH/2)*scale, (LARGE_MAP_HEIGHT-210)*scale, 600*scale, 100*scale);
         float cSepp = 600f;
+
         createWallInvisible(wc, (LARGE_MAP_WIDTH / 2 - cSepp)*scale, (LARGE_MAP_HEIGHT-230)*scale, 600*scale, 100*scale );
         createWallInvisible(wc, (LARGE_MAP_WIDTH / 2 + cSepp)*scale, (LARGE_MAP_HEIGHT-230)*scale, 600*scale, 100*scale );
+
 
 
 
@@ -400,8 +423,8 @@ public class GameUtils {
 
     private static int createBackgroundScale(WorldContainer wc, float scale) {
         int bg = wc.createEntity();
-        wc.addComponent(bg, new PositionComp(0, 0, -0.5f));
-        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", scale*LARGE_MAP_WIDTH
+        wc.addComponent(bg, new PositionComp(18*scale, -55*scale, -0.5f));
+        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sol_large_map.png", scale*LARGE_MAP_WIDTH
                 , scale*LARGE_MAP_HEIGHT)));
 
         return bg;
@@ -413,8 +436,8 @@ public class GameUtils {
         int w = wc.createEntity("wall");
         wc.addComponent(w, new PositionComp(x, y));
 
-        wc.addComponent(w, new ColoredMeshComp(ColoredMeshUtils.createRectangle(width, height)));
-        wc.addComponent(w, new MeshCenterComp(width/2, height/2)); //physical rectangle is defined with position being the center, while the graphical square is defined in the upper left corner
+//        wc.addComponent(w, new ColoredMeshComp(ColoredMeshUtils.createRectangle(width, height)));
+//        wc.addComponent(w, new MeshCenterComp(width/2, height/2)); //physical rectangle is defined with position being the center, while the graphical square is defined in the upper left corner
 
 
         wc.addComponent(w, new PhysicsComp(0, 1, 1));
@@ -465,7 +488,7 @@ public class GameUtils {
         int w = wc.createEntity();
         wc.addComponent(w, new PositionComp(x, y));
 
-        wc.addComponent(w, new ColoredMeshComp(ColoredMeshUtils.createCircleMulticolor(radius, 32)));
+//        wc.addComponent(w, new ColoredMeshComp(ColoredMeshUtils.createCircleMulticolor(radius, 32)));
 
         wc.addComponent(w, new PhysicsComp(0, 1, 1));
         wc.addComponent(w, new CollisionComp(new Circle(radius)));

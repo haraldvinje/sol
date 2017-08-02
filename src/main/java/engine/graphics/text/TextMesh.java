@@ -181,6 +181,9 @@ public class TextMesh {
 
         }
 
+//        System.out.println(indices.length/charIndiciesCount);
+//        System.out.println();
+
         setVertexData(vertecies, uvs, indices);
     }
 

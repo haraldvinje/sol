@@ -29,7 +29,7 @@ public class OnScreenSys implements Sys{
 //    private List<Integer> damageTexts = new ArrayList<>();
 //    private int gameEndTextEntity;
 
-    private String wictoryString = "Wictory :)";
+    private String wictoryString = "Victory :)";
     private String defeatString = "Defeat :(";
     private Vec4 wictoryColor = new Vec4(0, 1, 0, 1);
     private Vec4 defeatColor = new Vec4(1, 0, 0, 1);
@@ -77,18 +77,15 @@ public class OnScreenSys implements Sys{
                 textViewrendComp.getTextMesh(0).setString( String.format("%.0f", charDmgableComp.getDamage() ) );
             }
 
-            //render game end text
+            //render game end
             if (dataComp.endGameRequest) {
-                ViewRenderComp gameendViewrendComp = (ViewRenderComp) wc.getComponent(dataComp.gameEndTextEntity, ViewRenderComp.class);
-                TextMesh textMesh = gameendViewrendComp.getTextMesh(0);
-
                 if (dataComp.gameWon) {
-                    textMesh.setString(String.format("%s",wictoryString));
-                    textMesh.setColor(wictoryColor);
+
+                    wc.activateEntity( dataComp.gameEndVictoryEntity );
                 }
                 else {
-                    textMesh.setString(String.format("%s",defeatString) );
-                    textMesh.setColor(defeatColor);
+
+                    wc.activateEntity( dataComp.gameEndDefeatEntity );
                 }
             }
 

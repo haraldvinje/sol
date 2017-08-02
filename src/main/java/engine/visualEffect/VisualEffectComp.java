@@ -18,10 +18,14 @@ import java.util.stream.Stream;
 public class VisualEffectComp implements Component {
 
 
-    private List<VisualEffect> effects;
+    public List<VisualEffect> effects;
 
-    private LinkedList<VisualEffect> runEffects = new LinkedList<>();
+//    private LinkedList<VisualEffect> runEffects = new LinkedList<>();
 
+    public int requestEffectId = -1;
+    public Vec2 requestEffectPos = new Vec2();
+
+    public int runningEffectId = -1;
 
 
     public VisualEffectComp(List<VisualEffect> effects) {
@@ -36,18 +40,25 @@ public class VisualEffectComp implements Component {
      * Effect playes until it times out
      * @param effectId
      */
-    public void startEffect(int effectId, Vec2 pos) {
+    public void requestEffect(int effectId, Vec2 pos) {
+        requestEffectId = effectId;
+        requestEffectPos = pos;
+    }
+    void startEffect(int effectId, Vec2 pos) {
         VisualEffect effect = effects.get(effectId);
 
         effect.startEffect(pos);
-        runEffects.add(effect);
+
+        //request effect
+
+//        runEffects.add(effect);
     }
 
-    public boolean hasEffectsToStart() {
-        return !runEffects.isEmpty();
-    }
-    public VisualEffect popVisualEffect() {
-        return runEffects.poll();
-    }
+//    public boolean hasEffectsToStart() {
+//        return !runEffects.isEmpty();
+//    }
+//    public VisualEffect popVisualEffect() {
+//        return runEffects.poll();
+//    }
 
 }

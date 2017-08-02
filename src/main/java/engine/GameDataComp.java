@@ -12,7 +12,7 @@ public class GameDataComp implements Component {
     public Map<Integer, Integer> charDamageTextEntities = new HashMap<>();
 
     //gameEndText entity
-    public int gameEndTextEntity;
+    public int gameEndVictoryEntity, gameEndDefeatEntity;
 
     //end game request
     public boolean endGameRequest = false;

@@ -124,16 +124,17 @@ public class DamageResolutionSys implements Sys {
 
 
         //apply hitstun
-        int stunDuration = (int)knockbackLen/60;
+        int stunDuration = (int)(knockbackLen/60f);
         dmgablComp.setStunTimer(stunDuration);
 
         //apply visual effect
-        dmgerViseffComp.startEffect(0, dmgablPosComp.getPos());
+//        dmgerViseffComp.startEffect(0, dmgablPosComp.getPos());
 
 
         //set deltDamage and interrupt flags
         dmgerComp.deltDamage();
         dmgablComp.interrupt();
+
 
         //add a data object about the interraction to the damaged entity. To be read by feks network
         HitData data = new HitData(damager, damaged, damage, knockback);

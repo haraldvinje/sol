@@ -48,7 +48,7 @@ public class NetworkProtocolTest {
         //create data
         AllCharacterStateData origDataOut = new AllCharacterStateData();
         origDataOut.setFrameNumber(10);
-        for (int i = 0; i < NetworkUtils.CHARACTER_NUMB; i++) {
+        for (int i = 0; i < NetworkUtils.CHARACTER_COUNT; i++) {
             origDataOut.setX(i, largeRandom());
             origDataOut.setY(i, largeRandom());
             origDataOut.setRotation(i, largeRandom());

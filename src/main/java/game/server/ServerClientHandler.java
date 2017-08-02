@@ -111,6 +111,13 @@ public class ServerClientHandler {
         return null;
     }
 
+    public void terminate() {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 //    public void sendEmptyPacket(int packetId){

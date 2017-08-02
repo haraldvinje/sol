@@ -23,8 +23,11 @@ import java.util.Map;
  */
 public class Client {
 
-    public static final float WINDOW_WIDTH_SCALE = 0.7f, WINDOW_HEIGHT_SCALE = 0.7f;
+//    public static final float WINDOW_WIDTH_SCALE = 0.7f, WINDOW_HEIGHT_SCALE = 0.7f;
+    public static final float WINDOW_WIDTH_SCALE = 0.2f, WINDOW_HEIGHT_SCALE = 0.2f;
+
     public static final float CLIENT_WIDTH = 1600f, CLIENT_HEIGHT = 900f;
+
 
     public static final float FRAME_INTERVAL = 1f/60f;
 
@@ -69,6 +72,19 @@ public class Client {
         else throw new IllegalStateException("Trying to set socket after it is already set");
     }
 
+    public void removeSocket() {
+        try {
+            socket.close();
+            tcpPacketOut.close();
+            tcpPacketIn.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        socket = null;
+        tcpPacketIn = null;
+        tcpPacketOut = null;
+    }
 
     public Socket getSocket() {
         return socket;
@@ -86,7 +102,7 @@ public class Client {
     }
 
     public void init() {
-        window = new Window(WINDOW_WIDTH_SCALE, WINDOW_HEIGHT_SCALE, "SOL client");
+        window = new Window(0.7f, "SOL client");
 
         userInput = new UserInput(window, CLIENT_WIDTH, CLIENT_HEIGHT);
 
@@ -164,6 +180,18 @@ public class Client {
         //poll packets to make them available for read
         if (tcpPacketIn != null && currentState != states.get( ClientStates.INGAME ) ) {
             tcpPacketIn.pollPackets();
+
+            if (tcpPacketIn.isRemoteSocketClosed()) {
+                System.err.println("Server closed");
+
+                removeSocket();
+                gotoState(ClientStates.INTRO);
+//                System.exit(3);
+
+            }
+            else {
+                tcpPacketOut.sendHostAlive();
+            }
         }
 
         //update according to state
