@@ -253,7 +253,7 @@ public class GameUtils {
         float centerSep = 360f;
         createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH / 2 - centerSep)*scale, 1150*scale, 500*scale, 100*scale );
         createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH / 2 + centerSep)*scale, 1150*scale, 500*scale, 100*scale );
-        createWallInvisible(wc, (LARGE_MAP_WIDTH/2)*scale, 650*scale, 300*scale, 100*scale);
+        createWallInvisible(wc, (LARGE_MAP_WIDTH/2)*scale, 647*scale, 285*scale, 90*scale);
 
 
 
@@ -391,7 +391,7 @@ public class GameUtils {
     private static int createLargeBackgroundScale(WorldContainer wc, float scale) {
         int bg = wc.createEntity("map");
         wc.addComponent(bg, new PositionComp(scale*18, scale*-55, -0.5f));
-        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("largeMap.png", scale*LARGE_MAP_WIDTH, scale*LARGE_MAP_HEIGHT)));
+        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("largeMapSol3.png", scale*LARGE_MAP_WIDTH, scale*LARGE_MAP_HEIGHT)));
 
         return bg;
     }
