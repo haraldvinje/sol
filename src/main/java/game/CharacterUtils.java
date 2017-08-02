@@ -31,13 +31,13 @@ public class CharacterUtils {
     public static final int SHRANK = 0, SCHMATHIAS = 1, BRAIL = 2;
     public static final String[] CHARACTER_NAMES = {"Shrank", "Schmathias", "Brail"};
     public static final float[] CHARACTER_RADIUS = {
-            32, 32, 32
+            32, 32, 40
     };
 
     private static final LoadImageData[] loadCharData= {
             /*Shrank*/     new LoadImageData("sol_frank.png", CHARACTER_RADIUS[0], 160/2f, 512, 256, 180, 130),
             /*Schmathias*/ new LoadImageData("Schmathias.png", CHARACTER_RADIUS[1], 228/2f, 720, 400, 267, 195),
-            /*Brail*/ new LoadImageData("brail.png", CHARACTER_RADIUS[2], 208, 1600, 1200, 795, 585),
+            /*Brail*/ new LoadImageData("brail.png", CHARACTER_RADIUS[2], 272, 1600, 1200, 795, 585),
 
     };
 
