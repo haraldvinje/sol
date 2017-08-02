@@ -91,7 +91,7 @@ public class ClientIngameState extends ClientState {
 
             //when going to game
             playing = true;
-//            window.hide();
+            window.hide();
 
             //create game
             System.out.println("Got data, creating game");

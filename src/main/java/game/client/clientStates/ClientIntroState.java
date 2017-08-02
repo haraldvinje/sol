@@ -3,9 +3,7 @@ package game.client.clientStates;
 import engine.PositionComp;
 import engine.UserInput;
 import engine.WorldContainer;
-import engine.graphics.ColoredMeshComp;
-import engine.graphics.ColoredMeshUtils;
-import engine.graphics.ViewRenderComp;
+import engine.graphics.*;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
 import engine.graphics.text.TextMesh;
@@ -18,6 +16,9 @@ import utils.maths.Vec4;
  * Created by eirik on 26.07.2017.
  */
 public class ClientIntroState extends ClientState {
+
+
+    private int gameLogoEntity;
 
 
     @Override
@@ -46,9 +47,9 @@ public class ClientIntroState extends ClientState {
     }
 
     private void createInitialEntities(WorldContainer wc) {
-        int circ = wc.createEntity();
-        wc.addComponent(circ, new PositionComp(Client.CLIENT_WIDTH/2f, Client.CLIENT_HEIGHT/2f));
-        wc.addComponent(circ, new ColoredMeshComp(ColoredMeshUtils.createCircleTwocolor(Client.CLIENT_HEIGHT*0.4f, 32)));
+//        int circ = wc.createEntity();
+//        wc.addComponent(circ, new PositionComp(Client.CLIENT_WIDTH/2f, Client.CLIENT_HEIGHT/2f));
+//        wc.addComponent(circ, new ColoredMeshComp(ColoredMeshUtils.createCircleTwocolor(Client.CLIENT_HEIGHT*0.4f, 32)));
 
         int wt = wc.createEntity(); //welcome text
         wc.addComponent(wt, new PositionComp(100, 100));
@@ -57,5 +58,10 @@ public class ClientIntroState extends ClientState {
         wt = wc.createEntity(); //connect text
         wc.addComponent(wt, new PositionComp(100, 200));
         wc.addComponent(wt, new ViewRenderComp(new TextMesh("Click to connect to server", Font.getFont(FontType.BROADWAY), 32, new Vec4(1, 1, 1, 0.7f))));
+
+        gameLogoEntity = wc.createEntity("game logo");
+        wc.addComponent(gameLogoEntity, new PositionComp(0,0));
+        wc.addComponent(gameLogoEntity, new TexturedMeshComp(
+                TexturedMeshUtils.createRectangle("sol_logo.png", 1600, 900)));
     }
 }

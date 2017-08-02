@@ -14,6 +14,7 @@ import engine.network.client.ClientState;
 import engine.network.client.ClientStates;
 import game.CharacterUtils;
 import utils.maths.Vec2;
+import utils.maths.Vec4;
 
 /**
  * Created by eirik on 04.07.2017.
@@ -22,6 +23,9 @@ public class ClientCharacterselectState extends ClientState {
 
 
     private int[] characterIconEntities;
+    int[] buttonEntities;
+    private int gameLogoEntity;
+    private int lockInButtonEntity;
 
     private int cursorEntity;
     private int commitEntity;
@@ -29,15 +33,27 @@ public class ClientCharacterselectState extends ClientState {
     private boolean characterCommited;
     private int characterSelected;
 
+    private float buttonsTop = ClientUtils.buttonsTop - 60;
 
-    private float characterSpace = 200;
-    private float iconCenterX = Client.CLIENT_WIDTH/2;
-    private float iconCenterY = Client.CLIENT_HEIGHT/2;
+    private float buttonSpaceY = 50;
+    private float iconSpaceX = 450;
+
+    private float cursorSpaceX = -25;
+    private float cursorSpaceY = 32;
+
+    private float incrementIconSpaceX = 60;
+
+    private String lockInButtonString = "Lock in";
+    private float lockInExtraSpaceY = 20;
+    private Vec4 lockInButtonColor = new Vec4(0.6f, 0.9f, 0.6f, 1f);
+//    private float iconCenterX = Client.CLIENT_WIDTH/2;
+//    private float iconCenterY = Client.CLIENT_HEIGHT/2;
 
     @Override
     public void init() {
         super.init();
 
+        buttonEntities = new int[CharacterUtils.CHARACTER_COUNT];
         characterIconEntities = new int[CharacterUtils.CHARACTER_COUNT];
         createInitialEntities(wc);
     }
@@ -81,26 +97,20 @@ public class ClientCharacterselectState extends ClientState {
         if (characterCommited) return;
 
         //decrease character selected id
-        if (userInput.isKeyboardPressed(UserInput.KEY_LEFT)) {
+        if (userInput.isKeyboardPressed(UserInput.KEY_UP)) {
             if (characterSelected > 0) {
                 --characterSelected;
             }
         }
         //increase character selected id
-        else if (userInput.isKeyboardPressed(UserInput.KEY_RIGHT)) {
+        else if (userInput.isKeyboardPressed(UserInput.KEY_DOWN)) {
             if (characterSelected < CharacterUtils.CHARACTER_COUNT - 1) {
                 ++characterSelected;
             }
         }
         else if (userInput.isKeyboardPressed(UserInput.KEY_ENTER)) {
 
-            characterCommited = true;
-
-            //send data to server that character is selected
-            sendCharacterSelected(characterSelected);
-
-            //change cursor
-            commitCursor();
+            commitCharacterSelected();
         }
 
     }
@@ -114,14 +124,13 @@ public class ClientCharacterselectState extends ClientState {
         }
 
         //get selected character position
-        PositionComp charPosComp = (PositionComp) wc.getComponent(characterSelected, PositionComp.class);
+        PositionComp charPosComp = (PositionComp) wc.getComponent(buttonEntities[characterSelected], PositionComp.class);
 
         //get cursor position
         PositionComp cursPosComp = (PositionComp) wc.getComponent(cursorEntity, PositionComp.class);
 
         //set cursor position
-        float offsetX = 64, offsetY = 64;
-        cursPosComp.setPos(charPosComp.getPos().add(new Vec2(offsetX, offsetY)));
+        cursPosComp.setPos( charPosComp.getPos().add( new Vec2(cursorSpaceX, cursorSpaceY) ) );
     }
 
     private boolean handleServerInput() {
@@ -134,6 +143,15 @@ public class ClientCharacterselectState extends ClientState {
     }
 
 
+    private void commitCharacterSelected() {
+        if (characterCommited) return;
+
+        characterCommited = true;
+        //send data to server that character is selected
+        sendCharacterSelected(characterSelected);
+        //change cursor
+        commitCursor();
+    }
     private void commitCursor() {
         PositionComp cursorPosComp = (PositionComp) wc.getComponent(cursorEntity, PositionComp.class);
 
@@ -152,18 +170,16 @@ public class ClientCharacterselectState extends ClientState {
 
 
     private void createInitialEntities(WorldContainer wc) {
-//        this.characterSpace = 128;
-//        this.iconCenterX = Client.CLIENT_WIDTH/2;
-//        this.iconCenterY = Client.CLIENT_HEIGHT/2;
 
-        //create character icons
-
-        //create character buttons
-        int[] buttons = new int[CharacterUtils.CHARACTER_COUNT];
+        //create character buttons and icons
         for (int i = 0; i < CharacterUtils.CHARACTER_COUNT; i++) {
             final int ii = i;
-            buttons[i] = ClientUtils.createButton(wc,
-                    ClientUtils.buttonsLeft, ClientUtils.buttonsTop+ i*(ClientUtils.buttonHeight+ClientUtils.buttonVertSpace),
+
+            float x = ClientUtils.buttonsLeft;
+            float y = buttonsTop + i*(ClientUtils.buttonHeight + buttonSpaceY);
+
+            buttonEntities[i] = ClientUtils.createButton(wc,
+                    x, y,
                     ClientUtils.buttonWidth, ClientUtils.buttonHeight,
 
                     new TextMesh(CharacterUtils.CHARACTER_NAMES[i], Font.getDefaultFont(), ClientUtils.buttonTextSize, ClientUtils.buttonTextColor),
@@ -172,13 +188,33 @@ public class ClientCharacterselectState extends ClientState {
                     null, null
             );
 
-//            //create character icons
-//            int charIconEntity = wc.createEntity("character icon");
-//            CharacterUtils.addCharacterGraphicsComps(wc, i, charIconEntity);
-//
-//            characterIconEntities[i] = charIconEntity;
+            //create character icons
+            int charIconEntity = wc.createEntity("character icon");
+            wc.addComponent(charIconEntity, new PositionComp(x + iconSpaceX + i*incrementIconSpaceX,y));
+            CharacterUtils.addCharacterGraphicsComps(wc, i, charIconEntity);
+
+            characterIconEntities[i] = charIconEntity;
         }
 
+        //crate lockInButton
+        float x = ClientUtils.buttonsLeft;
+        float y = buttonsTop + lockInExtraSpaceY + CharacterUtils.CHARACTER_COUNT * (ClientUtils.buttonHeight + buttonSpaceY);
+
+        lockInButtonEntity = ClientUtils.createButton(wc,
+                x, y,
+                ClientUtils.buttonWidth, ClientUtils.buttonHeight,
+
+                new TextMesh(lockInButtonString, Font.getDefaultFont(), ClientUtils.buttonTextSize, lockInButtonColor),
+                null,
+                (e, a) -> commitCharacterSelected(),
+                null, null
+        );
+
+        //create small sol logo
+        gameLogoEntity = wc.createEntity("game logo");
+        wc.addComponent(gameLogoEntity, new PositionComp(Client.CLIENT_WIDTH-320, Client.CLIENT_HEIGHT-180-20));
+        wc.addComponent(gameLogoEntity, new TexturedMeshComp(
+                TexturedMeshUtils.createRectangle("sol_logo.png", 320, 180)));
 
 //        int shrankIcon = wc.createEntity();
 //        wc.addComponent(shrankIcon, new PositionComp(iconCenterX - characterSpace/2, iconCenterY));
@@ -200,7 +236,7 @@ public class ClientCharacterselectState extends ClientState {
 
 
         this.cursorEntity  = wc.createEntity();
-        wc.addComponent(cursorEntity, new PositionComp(iconCenterX - characterSpace/2 + 30, iconCenterY + 150));
+        wc.addComponent(cursorEntity, new PositionComp(0, 0) );
         float[] red = {1f,0f,0f};
         wc.addComponent(cursorEntity, new ColoredMeshComp(ColoredMeshUtils.createCircleSinglecolor(20, 16, red)));
 

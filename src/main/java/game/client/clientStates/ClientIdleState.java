@@ -1,12 +1,15 @@
 package game.client.clientStates;
 
 import engine.PositionComp;
+import engine.graphics.TexturedMeshComp;
+import engine.graphics.TexturedMeshUtils;
 import engine.graphics.ViewRenderComp;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
 import engine.graphics.text.TextMesh;
 import engine.network.NetworkPregamePackets;
 import engine.network.client.*;
+import game.client.Client;
 
 /**
  * Created by eirik on 04.07.2017.
@@ -16,6 +19,7 @@ public class ClientIdleState extends ClientState {
 
     private int welcomeTextEntity;
     private int connectedTextEntity;
+    private int gameLogoEntity;
 
     private String[] buttonTexts;
     private int[] buttons;
@@ -110,6 +114,12 @@ public class ClientIdleState extends ClientState {
             );
 
         }
+
+        //create small sol logo
+        gameLogoEntity = wc.createEntity("game logo");
+        wc.addComponent(gameLogoEntity, new PositionComp(Client.CLIENT_WIDTH-320, Client.CLIENT_HEIGHT-180-20));
+        wc.addComponent(gameLogoEntity, new TexturedMeshComp(
+                TexturedMeshUtils.createRectangle("sol_logo.png", 320, 180)));
 
     }
 

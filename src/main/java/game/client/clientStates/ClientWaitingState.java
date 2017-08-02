@@ -2,11 +2,14 @@ package game.client.clientStates;
 
 import engine.PositionComp;
 import engine.WorldContainer;
+import engine.graphics.TexturedMeshComp;
+import engine.graphics.TexturedMeshUtils;
 import engine.graphics.ViewRenderComp;
 import engine.graphics.text.Font;
 import engine.graphics.text.TextMesh;
 import engine.network.*;
 import engine.network.client.*;
+import game.client.Client;
 
 /**
  * Created by eirik on 04.07.2017.
@@ -17,6 +20,7 @@ public class ClientWaitingState extends ClientState {
 
 
     private int exitQueueButtonEntity;
+    private int gameLogoEntity;
 
     private String exitQueueString = "Exit queue";
 
@@ -111,6 +115,13 @@ public class ClientWaitingState extends ClientState {
                 (b, a) -> exitQueue(),
                 null, null
         );
+
+
+        //create small sol logo
+        gameLogoEntity = wc.createEntity("game logo");
+        wc.addComponent(gameLogoEntity, new PositionComp(Client.CLIENT_WIDTH-320, Client.CLIENT_HEIGHT-180-20));
+        wc.addComponent(gameLogoEntity, new TexturedMeshComp(
+                TexturedMeshUtils.createRectangle("sol_logo.png", 320, 180)));
     }
 
 }

@@ -4,6 +4,8 @@ import engine.PositionComp;
 import engine.UserInput;
 import engine.WorldContainer;
 import engine.graphics.MeshCenterComp;
+import engine.graphics.TexturedMeshComp;
+import engine.graphics.TexturedMeshUtils;
 import engine.graphics.ViewRenderComp;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
@@ -30,6 +32,7 @@ public class ClientConnectingState extends ClientState {
     private int connectingTextEntity;
     private int ipTextEntity;
     private int statusTextEntity;
+    private int gameLogoEntity;
 
     private boolean gettingIp;
 
@@ -217,6 +220,12 @@ public class ClientConnectingState extends ClientState {
         wc.addComponent(st, new PositionComp(Client.CLIENT_WIDTH/2 - 400, Client.CLIENT_HEIGHT/2 -150));
         wc.addComponent(st, new ViewRenderComp(new TextMesh("", Font.getFont(FontType.BROADWAY), 32, new Vec4(1, 0, 0, 0.8f))));
         statusTextEntity = st;
+
+        //create small sol logo
+        gameLogoEntity = wc.createEntity("game logo");
+        wc.addComponent(gameLogoEntity, new PositionComp(Client.CLIENT_WIDTH-320, Client.CLIENT_HEIGHT-180-20));
+        wc.addComponent(gameLogoEntity, new TexturedMeshComp(
+                TexturedMeshUtils.createRectangle("sol_logo.png", 320, 180)));
     }
 
     private void setEntityString(int textMeshEntity, String s) {
