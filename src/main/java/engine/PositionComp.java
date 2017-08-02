@@ -67,4 +67,9 @@ public class PositionComp implements Component {
 //    public int getMask() {
 //        return WorldContainer.COMPMASK_POSITION;
 //    }
+
+    @Override
+    public String toString() {
+        return "x="+x+" y="+y;
+    }
 }
