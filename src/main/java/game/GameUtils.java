@@ -30,6 +30,7 @@ import engine.physics.*;
 import engine.visualEffect.VisualEffectComp;
 import engine.visualEffect.VisualEffectSys;
 import engine.window.Window;
+import game.server.ServerGameDataComp;
 import utils.maths.M;
 import utils.maths.Vec2;
 import utils.maths.Vec4;
@@ -47,9 +48,11 @@ public class GameUtils {
     public static float SMALL_MAP_WIDTH = 1600f,
             SMALL_MAP_HEIGHT = 900f;
 
-    public static float LARGE_MAP_WIDTH = 3200f;
+    public static float LARGE_MAP_WIDTH = 2034;//3200f;
+    public static float LARGE_MAP_HEIGHT = 1087; //1800f;
 
-    public static float LARGE_MAP_HEIGHT = 1800f;
+    public static float LARGE_MAP_WIN_LINES_X[];
+    public static Vec2 LARGE_MAP_WIN_LINES_Y;
 
     public static float VIEW_WIDTH = SMALL_MAP_WIDTH, VIEW_HEIGHT = SMALL_MAP_HEIGHT;
 
@@ -90,6 +93,7 @@ public class GameUtils {
         wc.assignComponentType(SoundListenerComp.class);
         wc.assignComponentType(GameDataComp.class);
         wc.assignComponentType(TeamComp.class);
+        wc.assignComponentType(ServerGameDataComp.class);
 
     }
 
@@ -181,25 +185,41 @@ public class GameUtils {
 
 
     public static void createLargeMap(WorldContainer wc){
-        final float scale = 1.3f;
+        final float scale = 2f; //1.3f;
+
+        //////// WIN LINES
+        float[] winLines = {(LARGE_MAP_WIDTH -356)*scale,  356 *scale};
+        LARGE_MAP_WIN_LINES_X = winLines;
+
+        //for both teams
+        LARGE_MAP_WIN_LINES_Y = new Vec2(422*scale, (422+253) *scale);
 
         createLargeBackgroundScale(wc, scale);
 
-        int startX = (int)LARGE_MAP_WIDTH/4;
 
-//        int centerY = (int)LARGE_MAP_HEIGHT/2;
-//
-//
-//        int startX2 = 3*startX;
+        /////////START POSITIONS
+
+        //set start pos rel to map center y
+        //defined for base on left, and mirrotred for right
+        float spaceSepY = 46;
+        float spaceX = 200;
+
+        //left x position scaled
+        float sx = spaceX;
+        float sy1 = (LARGE_MAP_HEIGHT/2 - spaceSepY);
+        float sy2 = (LARGE_MAP_HEIGHT/2 + spaceSepY);
+
+        float sxMirror = (LARGE_MAP_WIDTH - sx);
+
 
         Vec2[][] startPositions = {
                 //team1
-                { new Vec2(250, 800), new Vec2(250, 1000) },
+                { new Vec2(sx, sy1), new Vec2(sx, sy2) },
                 //team2
-                { new Vec2(2950, 800), new Vec2(2950, 1000) }
+                { new Vec2(sxMirror, sy1), new Vec2(sxMirror, sy2) }
         };
       
-        //scale positions
+        //scale start positions
         Arrays.stream(startPositions).forEach( teamPositions -> {
                 Arrays.stream(teamPositions).forEach( pos -> {
                     pos.setAs( pos.scale(scale) );
@@ -209,109 +229,108 @@ public class GameUtils {
         GameUtils.teamStartPos = startPositions;
 
 
+        ////////// WALLS BASE
 
-        //create walls for new map. First walls in the base of each competitor
-        float w1Thickness = 400;
-        float w1Height = 100f;
-        float w2Thickness = 100f;
-        float w2Height = 400f;
-        float w3Thickness = w1Thickness;
-        float w3Height = w1Height;
+        //both sides
+        float cx, cy, w, h, r;
+        float cxm, cym;
+        //back wall
+        cx = 28;    cy = LARGE_MAP_HEIGHT/2;    w = 56;     h = 252;
+        cxm = LARGE_MAP_WIDTH - cx;     cym = cy;
+        createWallInvisible(wc, cx*scale, cy*scale, w*scale, h*scale);
+        createWallInvisible(wc, cxm*scale, cym*scale, w*scale, h*scale);
 
-        //walls on left side
+        //top
+        cx = 125; cy = cy-h/2-w/2 -6; w = 250; h = 64;
+        cxm = LARGE_MAP_WIDTH - cx;
+        cym = cy;
+        createWallInvisible(wc, cx*scale, cy*scale, w*scale, h*scale);
+        createWallInvisible(wc, cxm*scale, cym*scale, w*scale, h*scale);
 
-        createWallInvisible(wc, 200*scale, 640*scale, w1Thickness*scale, w1Height*scale);
-        createWallInvisible(wc, 50*scale, 900*scale, w2Thickness*scale, w2Height*scale);
-        createWallInvisible(wc, 200*scale, 1150*scale, w3Thickness*scale, w3Height*scale);
-
-
-        //walls on right side
-        createWallInvisible(wc, 3000*scale, 650*scale, w1Thickness*scale, w1Height*scale);
-        createWallInvisible(wc, 3150*scale, 900*scale, w2Thickness*scale, w2Height*scale);
-        createWallInvisible(wc, 3000*scale, 1150*scale, w3Thickness*scale, w3Height*scale);
-
-
-
-        //creating holes
-
-        //circular holes first on the left side
-        float circHoleRadius = 290;
-
-        createCircleHoleInvisible(wc, 400*scale, 230*scale, circHoleRadius*scale);
-        createCircleHoleInvisible(wc, 400*scale, (LARGE_MAP_HEIGHT-230)*scale, circHoleRadius*scale);
+        //bot
+        cy = LARGE_MAP_HEIGHT - cy;
+        cym = cy;
+        createWallInvisible(wc, cx*scale, cy*scale, w*scale, h*scale);
+        createWallInvisible(wc, cxm*scale, cym*scale, w*scale, h*scale);
 
 
-        //circular holes on the right side
-        createCircleHoleInvisible(wc, 2800*scale, 230*scale, circHoleRadius*scale);
-        createCircleHoleInvisible(wc, 2800*scale, (LARGE_MAP_HEIGHT-230)*scale, circHoleRadius*scale);
+        //////////CENTER CIRCLE WALLS
+        cx = 628;
+        cxm = LARGE_MAP_WIDTH-cx;
+        cy = (LARGE_MAP_HEIGHT/2); //549 * scale;
+        r = 125;
 
-        //creating rectangle holes
-        float h1Thickness = 400;
-        float h1Height = 600;
+        //left side
+        createCircleWallInvisible(wc, cx*scale, cy*scale, r*scale);
 
-        float h2Thickness = h1Thickness;
-        float h2Height = h1Height;
-
-
-        //first on left side
-        createRectangleHoleInvisible(wc, 180*scale, 300*scale, h1Thickness*scale, h1Height*scale);
-        createRectangleHoleInvisible(wc, 180*scale, 1500*scale, h2Thickness*scale, h2Height*scale);
-
-        //rectangle holes on right side
-        createRectangleHoleInvisible(wc, 3020*scale, 300*scale, h1Thickness*scale, h1Height*scale);
-        createRectangleHoleInvisible(wc, 3020*scale, 1500*scale, h2Thickness*scale, h2Height*scale);
+        //rightSide
+        createCircleWallInvisible(wc, cxm*scale, cy*scale, r*scale);
 
 
 
-        float c1WallRadius = 200f;
-        float circleWallsSeperation = 600;
-        createCircleWallInvisible(wc, (LARGE_MAP_WIDTH / 2 - circleWallsSeperation)*scale, (LARGE_MAP_HEIGHT/2)*scale, c1WallRadius*scale);
-        createCircleWallInvisible(wc, (LARGE_MAP_WIDTH / 2 + circleWallsSeperation)*scale, (LARGE_MAP_HEIGHT/2)*scale, c1WallRadius*scale);
+        /////////CORNER CIRCLE HOLES
+
+        cx = 123;
+        cy = 25;
+        r = 317;
+        cxm = LARGE_MAP_WIDTH-cx;
+        cym = LARGE_MAP_HEIGHT-cy;
+
+        //top left
+        createCircleHoleInvisible(wc, cx*scale, cy*scale, r*scale);
+        //bot left
+        createCircleHoleInvisible(wc, cx*scale, cym*scale, r*scale);
+        //bot right
+        createCircleHoleInvisible(wc, cxm*scale, cym*scale, r*scale);
+        //top right
+        createCircleHoleInvisible(wc, cxm*scale, cy*scale, r*scale);
 
 
+        ////////RECTANGLE EDGE WALLs HOLES
 
-        //creating walls and holes in center
-        float centerSep = 360f;
-        createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH / 2 - centerSep)*scale, 1150*scale, 500*scale, 100*scale );
-        createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH / 2 + centerSep)*scale, 1150*scale, 500*scale, 100*scale );
+        cx = 1015;
+        cy = 121;
+        w = 386;
+        h = 64;
+        float hh = h-32; //so holes areent on the edge
+        cym = LARGE_MAP_HEIGHT-cy;
 
+        //center: top wall, bot hole
+        createWallInvisible(wc, cx*scale, cy*scale, w*scale, h*scale);
+        createRectangleHoleInvisible(wc, cx*scale, cym*scale, w*scale, hh*scale);
 
-        createWallInvisible(wc, (LARGE_MAP_WIDTH/2)*scale, 647*scale, 285*scale, 90*scale);
-        createWallInvisible(wc, (LARGE_MAP_WIDTH/2)*scale, 230*scale, 600*scale, 100*scale);
+        cx = cx - w;
+        cxm = LARGE_MAP_WIDTH-cx;
 
-        float cSep = 600f;
-        createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH / 2 - cSep)*scale, 210*scale, 600*scale, 100*scale );
-        createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH / 2 + cSep)*scale, 210*scale, 600*scale, 100*scale );
-
-
-
-        createRectangleHoleInvisible(wc, (LARGE_MAP_WIDTH/2)*scale, (LARGE_MAP_HEIGHT-210)*scale, 600*scale, 100*scale);
-        float cSepp = 600f;
-
-        createWallInvisible(wc, (LARGE_MAP_WIDTH / 2 - cSepp)*scale, (LARGE_MAP_HEIGHT-230)*scale, 600*scale, 100*scale );
-        createWallInvisible(wc, (LARGE_MAP_WIDTH / 2 + cSepp)*scale, (LARGE_MAP_HEIGHT-230)*scale, 600*scale, 100*scale );
-
-
-
-
-     /*   createRectangleHoleInvisible(wc, MAP_WIDTH/2, wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
-        createRectangleHoleInvisible(wc, MAP_WIDTH/2, MAP_HEIGHT-wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);*/
+        //sides: top hole bot wall
+        //left
+        createRectangleHoleInvisible(wc, cx*scale, cy*scale, w*scale, hh*scale);
+        createWallInvisible(wc, cx*scale, cym*scale, w*scale, h*scale);
+        //right
+        createRectangleHoleInvisible(wc, cxm*scale, cy*scale, w*scale, hh*scale);
+        createWallInvisible(wc, cxm*scale, cym*scale, w*scale, h*scale);
 
 
-/*
-        //create walls
-        float wallThickness = 64f;
-        createWall(wc, wallThickness/2, MAP_HEIGHT/2, wallThickness, MAP_HEIGHT);
-        createWall(wc, MAP_WIDTH-wallThickness/2, MAP_HEIGHT/2, wallThickness, MAP_HEIGHT);
-//        createWall(wc, MAP_WIDTH/2, wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
-//        createWall(wc, MAP_WIDTH/2, MAP_HEIGHT-wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
-        //create holes
-        createRectangleHoleInvisible(wc, MAP_WIDTH/2, wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
-        createRectangleHoleInvisible(wc, MAP_WIDTH/2, MAP_HEIGHT-wallThickness/2, MAP_WIDTH-wallThickness*2, wallThickness);
-        createCircleHole(wc, MAP_WIDTH/2, MAP_HEIGHT/2, 48f);
-        */
+        //////WALL AND HOLES CENTER
+        cx = 766;
+        cy = 709;
+        w = 284;
+        h = 40;
+        cxm = LARGE_MAP_WIDTH - cx;
+        cym = LARGE_MAP_HEIGHT - cy;
 
-        //create background
+        //bot holes
+        createRectangleHoleInvisible(wc, cx*scale, cy*scale, w*scale, h*scale);
+        createRectangleHoleInvisible(wc, cxm*scale, cy*scale, w*scale, h*scale);
+
+        //top walls
+        cx = LARGE_MAP_WIDTH/2;
+        cy = 390;
+        w = 191;
+        h = 64;
+        createWallInvisible(wc, cx*scale, cy*scale, w*scale, h*scale);
+
+
     }
 
 
@@ -413,22 +432,23 @@ public class GameUtils {
 
     private static int createLargeBackgroundScale(WorldContainer wc, float scale) {
         int bg = wc.createEntity("map");
-        wc.addComponent(bg, new PositionComp(scale*18, scale*-55, -0.5f));
-        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("largeMap.png", scale*LARGE_MAP_WIDTH, scale*LARGE_MAP_HEIGHT)));
+//        wc.addComponent(bg, new PositionComp(scale*18, scale*-55, -0.5f));
+        wc.addComponent(bg, new PositionComp(0, 0, -0.5f));
+        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sol_large_map.png", scale*LARGE_MAP_WIDTH, scale*LARGE_MAP_HEIGHT)));
 
         return bg;
     }
 
 
 
-    private static int createBackgroundScale(WorldContainer wc, float scale) {
-        int bg = wc.createEntity();
-        wc.addComponent(bg, new PositionComp(18*scale, -55*scale, -0.5f));
-        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sol_large_map.png", scale*LARGE_MAP_WIDTH
-                , scale*LARGE_MAP_HEIGHT)));
-
-        return bg;
-    }
+//    private static int createBackgroundScale(WorldContainer wc, float scale) {
+//        int bg = wc.createEntity();
+//        wc.addComponent(bg, new PositionComp(18*scale, -55*scale, -0.5f));
+//        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sol_large_map.png", scale*LARGE_MAP_WIDTH
+//                , scale*LARGE_MAP_HEIGHT)));
+//
+//        return bg;
+//    }
 
 
 

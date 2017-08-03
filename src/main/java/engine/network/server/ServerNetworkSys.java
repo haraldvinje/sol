@@ -14,6 +14,8 @@ import engine.network.*;
 import engine.network.networkPackets.*;
 import engine.physics.AffectedByHoleComp;
 import game.server.ServerClientHandler;
+import game.server.ServerGameDataComp;
+import game.server.ServerIngame;
 
 import java.util.*;
 
@@ -194,11 +196,11 @@ public class ServerNetworkSys implements Sys {
     private List<GameOverData> retrieveGameOver() {
         List<GameOverData> gameOver = new ArrayList<>();
 
-        wc.entitiesOfComponentTypeStream(CharacterComp.class).forEach(entity -> {
-            CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
+        wc.entitiesOfComponentTypeStream(ServerGameDataComp.class).forEach(entity -> {
+            ServerGameDataComp dataComp = (ServerGameDataComp) wc.getComponent(entity, ServerGameDataComp.class);
 
-            if (charComp.getRespawnCount() >= 3) {
-                gameOver.add( new GameOverData(entity) );
+            if (dataComp.teamWon != -1) {
+                gameOver.add( new GameOverData(dataComp.teamWon) );
             }
         });
 

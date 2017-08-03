@@ -6,6 +6,7 @@ import engine.*;
 import engine.audio.AudioComp;
 import engine.audio.AudioMaster;
 import engine.audio.Sound;
+import engine.character.CharacterComp;
 import engine.graphics.*;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
@@ -63,7 +64,7 @@ public class Game {
 
         };
 
-        ClientGameTeams teams = new ClientGameTeams(characterIds, 1, 0);
+        ClientGameTeams teams = new ClientGameTeams(characterIds, 0, 0);
 
         int[][] charEntities = CharacterUtils.createOfflineCharacters(wc, teams);
 
@@ -129,6 +130,49 @@ public class Game {
 
         wc.updateSystems();
 
+        //print if win condition for one character
+        int teamCount = 2;
+        int[] charsOnTeam = new int[teamCount];
+        int[] charsOverWinLine = new int[teamCount];
+        wc.entitiesOfComponentTypeStream(CharacterComp.class).forEach(entity -> {
+            PositionComp posComp = (PositionComp) wc.getComponent(entity, PositionComp.class);
+            TeamComp teamComp = (TeamComp) wc.getComponent(entity, TeamComp.class);
+
+            ++ charsOnTeam[teamComp.team];
+
+            boolean xInside = false, yInside = false;
+
+            //test y
+            if (posComp.getY() > GameUtils.LARGE_MAP_WIN_LINES_Y.x &&
+                    posComp.getY() < GameUtils.LARGE_MAP_WIN_LINES_Y.y) {
+
+                yInside = true;
+                //test x
+                //if on team 0
+                if (teamComp.team == 0) {
+                    if (posComp.getX() > GameUtils.LARGE_MAP_WIN_LINES_X[0]) {
+                        xInside = true;
+                    }
+                }
+                //if on team 1
+                else {
+                    if (posComp.getX() < GameUtils.LARGE_MAP_WIN_LINES_X[1]) {
+                        xInside = true;
+                    }
+                }
+            }
+            if (yInside && xInside) {
+                ++ charsOverWinLine[teamComp.team];
+            }
+        });
+
+        //check if a team won
+        for (int i = 0; i < teamCount; i++) {
+            if (charsOverWinLine[i] != 0) {//scharsOnTeam[i] == charsOverWinLine[i]) {
+                System.out.println("Winning!!!!");
+                break;
+            }
+        }
     }
 
 
