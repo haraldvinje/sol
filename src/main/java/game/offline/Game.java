@@ -56,10 +56,10 @@ public class Game {
 
         GameUtils.assignComponentTypes(wc);
 
-        GameUtils.createMap(wc);
+        GameUtils.createLargeMap(wc);
 
         int[][] characterIds = {
-                {CharacterUtils.BRAIL, CharacterUtils.MAGNET},
+                {CharacterUtils.BRAIL, CharacterUtils.SHRANK},
                 {CharacterUtils.MAGNET, CharacterUtils.SCHMATHIAS}
         };
 
