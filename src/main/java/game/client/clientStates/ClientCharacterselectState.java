@@ -191,7 +191,7 @@ public class ClientCharacterselectState extends ClientState {
             //create character icons
             int charIconEntity = wc.createEntity("character icon");
             wc.addComponent(charIconEntity, new PositionComp(x + iconSpaceX + i*incrementIconSpaceX,y));
-            CharacterUtils.addCharacterGraphicsComps(wc, i, charIconEntity);
+            CharacterUtils.addCharacterGraphicsComps(wc, 1, i, charIconEntity);
 
             characterIconEntities[i] = charIconEntity;
         }

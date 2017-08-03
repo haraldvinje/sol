@@ -64,7 +64,7 @@ public class Game {
 
         };
 
-        ClientGameTeams teams = new ClientGameTeams(characterIds, 0, 0);
+        ClientGameTeams teams = new ClientGameTeams(characterIds, 0, 1);
 
         int[][] charEntities = CharacterUtils.createOfflineCharacters(wc, teams);
 

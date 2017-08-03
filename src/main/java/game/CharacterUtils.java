@@ -28,20 +28,30 @@ public class CharacterUtils {
 
     public static final int CHARACTER_COUNT = 3;
     public static final int SHRANK = 0, SCHMATHIAS = 1, BRAIL = 2;
-    public static final String[] CHARACTER_NAMES = {"Shrank", "King Skurk Two", "Brail"};
+    public static final String[] CHARACTER_NAMES = {"Shrank", "Schmathias", "Brail"};
     public static final float[] CHARACTER_RADIUS = {
             32, 32, 40
     };
 
-    private static final LoadImageData[] loadCharData= {
-            /*Shrank*/     new LoadImageData("sol_frank.png", CHARACTER_RADIUS[0], 160/2f, 512, 256, 180, 130),
-            /*Schmathias*/ new LoadImageData("schmathias_red.png", CHARACTER_RADIUS[1], 200/2f, 900, 400, 267, 195),
-            /*Brail*/ new LoadImageData("Schmathias.png", CHARACTER_RADIUS[2], 228/2f, 720, 400, 267, 195),
+    //teamId - charId
+    private static final LoadImageData[][] loadCharData= {
+            //Shrank
+            {new LoadImageData("sol_frank_red.png", CHARACTER_RADIUS[0], 160 / 2f, 512, 256, 180, 130),
+                    new LoadImageData("sol_frank_blue.png", CHARACTER_RADIUS[0], 160 / 2f, 512, 256, 180, 130)
+            },
+            /*Schmathias*/
+            {new LoadImageData("Schmathias_red.png", CHARACTER_RADIUS[1], 146, 1258, 536, 386, 258),
+                    new LoadImageData("Schmathias_blue.png", CHARACTER_RADIUS[1], 146, 1258, 536, 386, 258)
+            },
+            /*Brail*/
+            {new LoadImageData("brail.png", CHARACTER_RADIUS[2], 272, 1600, 1200, 795, 585),
+                    new LoadImageData("brail.png", CHARACTER_RADIUS[2], 272, 1600, 1200, 795, 585)
+            }
 
     };
 
-    public static void addCharacterGraphicsComps(WorldContainer wc, int charId, int entity) {
-        LoadImageData data = loadCharData[charId];
+    public static void addCharacterGraphicsComps(WorldContainer wc, int teamId, int charId, int entity) {
+        LoadImageData data = loadCharData[charId][teamId];
 
         TexturedMeshComp texmeshComp = new TexturedMeshComp( TexturedMeshUtils.createRectangle(data.filename, data.width, data.height) );
         MeshCenterComp meshcentComp = new MeshCenterComp(data.offsetX, data.offsetY);
@@ -310,7 +320,7 @@ public class CharacterUtils {
         int characterEntity = wc.createEntity("character");
 
         //add graphics
-        addCharacterGraphicsComps(wc, charId, characterEntity);
+        addCharacterGraphicsComps(wc, team, charId, characterEntity);
 
         wc.addComponent(characterEntity, new CharacterComp(moveAccel));//1500f));
         wc.addComponent(characterEntity, new PositionComp(x, y, (float) (characterCount++) / 100f)); //z value is a way to make draw ordering and depth positioning correspond. Else alpha images will appear incorrect.
