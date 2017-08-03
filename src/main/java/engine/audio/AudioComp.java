@@ -17,7 +17,6 @@ public class AudioComp implements Component {
 
     public List<Sound> soundList = new ArrayList<Sound>();
 
-
     private int sourcePointer;
 
     public int requestSound = -1;
@@ -68,7 +67,6 @@ public class AudioComp implements Component {
         alSourceStop(sourcePointer);
         alSourcei(sourcePointer, AL_BUFFER, sound.getBufferPointer());
         alSourcePlay(sourcePointer);
-        System.out.println("after playSource");
     }
 
     public void stopSound() {

@@ -84,21 +84,19 @@ public class OnScreenSys implements Sys{
                 AudioComp backgroundAudio = (AudioComp) wc.getComponent(dataComp.backgroundMusicEntity, AudioComp.class);
                 backgroundAudio.requestStopSource = true;
 
-                if (dataComp.gameWon) {
+                if (dataComp.gameWon && !wc.hasComponent(dataComp.gameEndVictoryEntity, AudioComp.class)) {
 
                     wc.activateEntity( dataComp.gameEndVictoryEntity );
                     AudioComp audioComp = (AudioComp) wc.getComponent (dataComp.gameEndVictoryEntity, AudioComp.class);
-                    audioComp.playSound(0);
-//                    audioComp.requestSound = 0;
+
+                    audioComp.requestSound = 0;
                 }
-                else {
+                else if (!wc.hasComponent(dataComp.gameEndDefeatEntity, AudioComp.class)) {
 
                     wc.activateEntity( dataComp.gameEndDefeatEntity );
-                    System.out.println("defeatet else statement");
                     AudioComp audioComp = (AudioComp) wc.getComponent (dataComp.gameEndDefeatEntity, AudioComp.class);
-                    System.out.println("Got component");
-                    audioComp.playSound(0);
-                    System.out.println("Played Sound Sound of Silensium");
+                    audioComp.requestSound = 0;
+
 
 //                    audioComp.requestSound = 0;
                 }
