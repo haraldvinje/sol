@@ -26,7 +26,6 @@ public class CharacterSys implements Sys {
 
     private WorldContainer wc;
 
-    private static final int respawnTime = 60;
 
 
 
@@ -122,7 +121,7 @@ public class CharacterSys implements Sys {
 
         else if (affholeComp.isHoleAffectedFlag()) {
 
-            charComp.respawnTimer = respawnTime;
+            charComp.respawnTimer = charComp.respawnTime;
 
         }
 

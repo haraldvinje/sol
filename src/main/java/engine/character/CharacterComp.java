@@ -20,6 +20,8 @@ import utils.maths.Vec2;
  */
 public class CharacterComp implements Component {
 
+
+    public int respawnTime = 60;
     public int respawnTimer = -1;
 
     private float moveAccel;

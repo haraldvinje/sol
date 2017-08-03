@@ -183,9 +183,13 @@ public class ServerNetworkSys implements Sys {
         List<EntityDeadData> deadEntities = new ArrayList<>();
 
         wc.entitiesOfComponentTypeStream(CharacterComp.class).forEach( entity -> {
-            AffectedByHoleComp affholeComp = (AffectedByHoleComp) wc.getComponent(entity, AffectedByHoleComp.class);
-
-            if (affholeComp.isHoleAffectedFlag()) {
+//            AffectedByHoleComp affholeComp = (AffectedByHoleComp) wc.getComponent(entity, AffectedByHoleComp.class);
+//
+//            if (affholeComp.isHoleAffectedFlag()) {
+//                deadEntities.add( new EntityDeadData( entity ) );
+//            }
+            CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
+            if (charComp.respawnTimer == charComp.respawnTime) {
                 deadEntities.add( new EntityDeadData( entity ) );
             }
         });
