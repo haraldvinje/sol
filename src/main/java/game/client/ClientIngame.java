@@ -48,7 +48,6 @@ public class ClientIngame implements Runnable{
 
 
     private ClientGameTeams teams;
-    private AudioComp backgroundAudioComp;
 
 
 
@@ -196,8 +195,6 @@ public class ClientIngame implements Runnable{
 
     private void onTerminate() {
 
-        //stop background sound
-        backgroundAudioComp.stopSound();
 
         //terminate systems
         wc.terminate();

@@ -28,7 +28,7 @@ public class CharacterUtils {
 
     public static final int CHARACTER_COUNT = 3;
     public static final int SHRANK = 0, SCHMATHIAS = 1, BRAIL = 2;
-    public static final String[] CHARACTER_NAMES = {"Shrank", "Schmathias", "Brail"};
+    public static final String[] CHARACTER_NAMES = {"Shrank", "King Skurk Two", "Brail"};
     public static final float[] CHARACTER_RADIUS = {
             32, 32, 40
     };
