@@ -300,7 +300,7 @@ public class GameUtils {
 
 
         //////////CENTER CIRCLE WALLS
-        cx = 628;
+        cx = 632; //628;
         cxm = LARGE_MAP_WIDTH-cx;
         cy = (LARGE_MAP_HEIGHT/2); //549 * scale;
         r = 125;
@@ -334,7 +334,7 @@ public class GameUtils {
         ////////RECTANGLE EDGE WALLs HOLES
 
         cx = 1015;
-        cy = 121;
+        cy = 117; //121;
         w = 386;
         h = 64;
         float hh = h-32; //so holes areent on the edge
@@ -346,6 +346,10 @@ public class GameUtils {
 
         cx = cx - w;
         cxm = LARGE_MAP_WIDTH-cx;
+
+        //quickfix
+        cy -= 5;
+        cym = LARGE_MAP_HEIGHT - cy;
 
         //sides: top hole bot wall
         //left
