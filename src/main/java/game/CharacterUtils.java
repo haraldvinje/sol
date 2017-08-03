@@ -228,7 +228,7 @@ public class CharacterUtils {
 
         Sound snd1 = new Sound("audio/click4.ogg");
         Sound snd2 = new Sound("audio/laser02.ogg");
-        Sound snd3 = new Sound("audio/snabbe.ogg");
+        Sound snd3 = new Sound("audio/boom-bang.ogg");
 
         int ab1CharSnd = 0;
         int ab2CharSnd = 1;
@@ -266,8 +266,8 @@ public class CharacterUtils {
             float x, float y) {
 
         Sound snd1 = new Sound("audio/click4.ogg");
-        Sound snd2 = new Sound("audio/laser02.ogg");
-        Sound snd3 = new Sound("audio/snabbe.ogg");
+        Sound snd2 = new Sound("audio/masai_arrow_throw.ogg");
+        Sound snd3 = new Sound("audio/lion-roar.ogg");
 
         int ab1CharSnd = 0;
         int ab2CharSnd = 1;
@@ -280,7 +280,7 @@ public class CharacterUtils {
         ab1.setDamagerValues(wc, 150, 600, 0.7f, -100f, false);
 
         //spear
-        int spearProj = ProjectileUtils.allocateImageProjectileEntity(wc, "magnet_spear.png", 48, 536, 32*2, 32, new Sound("audio/hook_hit.ogg")); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
+        int spearProj = ProjectileUtils.allocateImageProjectileEntity(wc, "magnet_spear.png", 48, 536, 32*2, 32, new Sound("audio/arrow_impact.ogg")); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
         ProjectileAbility ab2 = new ProjectileAbility(wc, ab2CharSnd, spearProj, 30, 18, 50, 1500, 90);
         ab2.setDamagerValues(wc, 400f, 800f, 2f, -32f, false);
 
