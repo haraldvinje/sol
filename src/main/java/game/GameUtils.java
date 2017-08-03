@@ -500,8 +500,8 @@ public class GameUtils {
         int w = wc.createEntity("wall");
         wc.addComponent(w, new PositionComp(x, y));
 
-//        wc.addComponent(w, new ColoredMeshComp(ColoredMeshUtils.createRectangle(width, height)));
-//        wc.addComponent(w, new MeshCenterComp(width/2, height/2)); //physical rectangle is defined with position being the center, while the graphical square is defined in the upper left corner
+        wc.addComponent(w, new ColoredMeshComp(ColoredMeshUtils.createRectangle(width, height)));
+        wc.addComponent(w, new MeshCenterComp(width/2, height/2)); //physical rectangle is defined with position being the center, while the graphical square is defined in the upper left corner
 
 
         wc.addComponent(w, new PhysicsComp(0, 1, 1));
