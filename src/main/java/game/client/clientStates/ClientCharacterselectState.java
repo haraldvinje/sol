@@ -33,15 +33,17 @@ public class ClientCharacterselectState extends ClientState {
     private boolean characterCommited;
     private int characterSelected;
 
-    private float buttonsTop = ClientUtils.buttonsTop - 60;
+    private float buttonsTop = ClientUtils.buttonsTop - 60*2;
 
     private float buttonSpaceY = 50;
-    private float iconSpaceX = 450;
+    private float iconSpaceX = 450+100;
+    private float iconSpaceYExtra = 30;
+    private float incrementIconSpaceX = 60;
+
 
     private float cursorSpaceX = -25;
     private float cursorSpaceY = 32;
 
-    private float incrementIconSpaceX = 60;
 
     private String lockInButtonString = "Lock in";
     private float lockInExtraSpaceY = 20;
@@ -188,9 +190,11 @@ public class ClientCharacterselectState extends ClientState {
                     null, null
             );
 
+            x += iconSpaceX + i*incrementIconSpaceX;
+            y += iconSpaceYExtra*i;
             //create character icons
             int charIconEntity = wc.createEntity("character icon");
-            wc.addComponent(charIconEntity, new PositionComp(x + iconSpaceX + i*incrementIconSpaceX,y));
+            wc.addComponent(charIconEntity, new PositionComp(x, y));
             CharacterUtils.addCharacterGraphicsComps(wc, 1, i, charIconEntity);
 
             characterIconEntities[i] = charIconEntity;
@@ -215,24 +219,6 @@ public class ClientCharacterselectState extends ClientState {
         wc.addComponent(gameLogoEntity, new PositionComp(Client.CLIENT_WIDTH-320, Client.CLIENT_HEIGHT-180-20));
         wc.addComponent(gameLogoEntity, new TexturedMeshComp(
                 TexturedMeshUtils.createRectangle("sol_logo.png", 320, 180)));
-
-//        int shrankIcon = wc.createEntity();
-//        wc.addComponent(shrankIcon, new PositionComp(iconCenterX - characterSpace/2, iconCenterY));
-//        wc.addComponent(shrankIcon, new TexturedMeshComp(TexturedMeshUtils.createRectangle("sol_frank.png", 100, 100)));
-//
-//        int schmathiasIcon = wc.createEntity();
-//        wc.addComponent(schmathiasIcon, new PositionComp(iconCenterX + characterSpace/2, iconCenterY));
-//        wc.addComponent(schmathiasIcon, new TexturedMeshComp(TexturedMeshUtils.createRectangle("Schmathias.png", 100, 100)));
-//
-//        int brailIcon = wc.createEntity();
-//        wc.addComponent(brailIcon, new PositionComp(iconCenterX + characterSpace/2 + characterSpace, iconCenterY));
-//        wc.addComponent(brailIcon, new TexturedMeshComp(TexturedMeshUtils.createRectangle("Schmathias.png", 100, 100)));
-//
-//
-//        //store character icons in list
-//        characterIconEntities[CharacterUtils.SHRANK] = shrankIcon;
-//        characterIconEntities[CharacterUtils.SCHMATHIAS] = schmathiasIcon;
-//        characterIconEntities[CharacterUtils.BRAIL] = brailIcon;
 
 
         this.cursorEntity  = wc.createEntity();

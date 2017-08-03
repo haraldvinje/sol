@@ -25,12 +25,15 @@ import java.util.List;
  */
 public class CharacterUtils {
 
+    private static float hitboxDepth = -0.1f;
 
-    public static final int CHARACTER_COUNT = 3;
-    public static final int SHRANK = 0, SCHMATHIAS = 1, BRAIL = 2;
-    public static final String[] CHARACTER_NAMES = {"Shrank", "Schmathias", "Brail"};
+    private static int characterCount;
+
+    public static final int CHARACTER_COUNT = 4;
+    public static final int SHRANK = 0, SCHMATHIAS = 1, BRAIL = 2, MAGNET = 3;
+    public static final String[] CHARACTER_NAMES = {"Frank", "KingSkurkTwo", "Brail", "MagneT"};
     public static final float[] CHARACTER_RADIUS = {
-            32, 32, 40
+            32, 32, 44, 36
     };
 
     //teamId - charId
@@ -40,18 +43,23 @@ public class CharacterUtils {
                     new LoadImageData("sol_frank_blue.png", CHARACTER_RADIUS[0], 160 / 2f, 512, 256, 180, 130)
             },
             /*Schmathias*/
-            {new LoadImageData("Schmathias_red.png", CHARACTER_RADIUS[1], 146, 1258, 536, 386, 258),
-                    new LoadImageData("Schmathias_blue.png", CHARACTER_RADIUS[1], 146, 1258, 536, 386, 258)
+            {new LoadImageData("schmathias_red.png", CHARACTER_RADIUS[1], 146, 1258, 536, 386, 258),
+                    new LoadImageData("schmathias_blue.png", CHARACTER_RADIUS[1], 146, 1258, 536, 386, 258)
             },
             /*Brail*/
-            {new LoadImageData("brail.png", CHARACTER_RADIUS[2], 272, 1600, 1200, 795, 585),
-                    new LoadImageData("brail.png", CHARACTER_RADIUS[2], 272, 1600, 1200, 795, 585)
+            {new LoadImageData("brail_red.png", CHARACTER_RADIUS[2], 272, 1600, 1200, 795, 585),
+                    new LoadImageData("brail_blue.png", CHARACTER_RADIUS[2], 272, 1600, 1200, 795, 585)
+            },
+            //Magnet
+            {new LoadImageData("magnet.png", CHARACTER_RADIUS[3], 296/2, 1200, 600, 365, 257),
+                    new LoadImageData("masai_blue.png", CHARACTER_RADIUS[3], 296/2, 1200, 600, 365, 257)
             }
-
     };
 
     public static void addCharacterGraphicsComps(WorldContainer wc, int teamId, int charId, int entity) {
         LoadImageData data = loadCharData[charId][teamId];
+
+//        System.out.println("charId="+charId+" teamId="+teamId+" entity="+entity+ " Filename="+data.filename);
 
         TexturedMeshComp texmeshComp = new TexturedMeshComp( TexturedMeshUtils.createRectangle(data.filename, data.width, data.height) );
         MeshCenterComp meshcentComp = new MeshCenterComp(data.offsetX, data.offsetY);
@@ -59,11 +67,6 @@ public class CharacterUtils {
         wc.addComponent(entity, texmeshComp);
         wc.addComponent(entity, meshcentComp);
     }
-
-
-    private static float hitboxDepth = 1;
-
-    private static int characterCount;
 
 
 
@@ -127,6 +130,8 @@ public class CharacterUtils {
             case SCHMATHIAS: charEnt = createSchmathias(wc, charId, controlled, team, idOnTeam, x, y);
                 break;
             case BRAIL: charEnt = createBrail(wc, charId, controlled, team, idOnTeam, x, y);
+                break;
+            case MAGNET: charEnt = createMagnet(wc, charId, controlled, team, idOnTeam, x, y);
                 break;
             default:
                 throw new IllegalArgumentException("no character of id given");
@@ -243,6 +248,46 @@ public class CharacterUtils {
         //merge
         MeleeAbility ab3 = new MeleeAbility(wc, ab3CharSnd, 10, 2, 8, 60, new Circle(160), 128, null);
         ab3.setDamagerValues(wc, 20, 800, 0.4f, 0, true);
+
+        List<Sound> sounds = new ArrayList<>();
+        sounds.add( snd1 );
+        sounds.add( snd2 );
+        sounds.add( snd3 );
+
+        return createCharacter(wc, charId,
+                controlled, team, idOnTeam,
+                x, y, 2000,
+                ab1, ab2, ab3, sounds);
+    }
+
+    private static int createMagnet (
+            WorldContainer wc, int charId,
+            boolean controlled, int team, int idOnTeam,
+            float x, float y) {
+
+        Sound snd1 = new Sound("audio/click4.ogg");
+        Sound snd2 = new Sound("audio/laser02.ogg");
+        Sound snd3 = new Sound("audio/snabbe.ogg");
+
+        int ab1CharSnd = 0;
+        int ab2CharSnd = 1;
+        int ab3CharSnd = 2;
+
+        float[] purple = {1.0f, 0f, 1.0f};
+
+        //spear poke
+        MeleeAbility ab1 = new MeleeAbility(wc, ab1CharSnd, 6, 6, 6, 13, new Circle(20f),128.0f, null);
+        ab1.setDamagerValues(wc, 150, 600, 0.7f, -100f, false);
+
+        //spear
+        int spearProj = ProjectileUtils.allocateImageProjectileEntity(wc, "magnet_spear.png", 48, 536, 32*2, 32, new Sound("audio/hook_hit.ogg")); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
+        ProjectileAbility ab2 = new ProjectileAbility(wc, ab2CharSnd, spearProj, 30, 18, 50, 1500, 90);
+        ab2.setDamagerValues(wc, 400f, 800f, 2f, -32f, false);
+
+        //lion
+        int lionProj = ProjectileUtils.allocateImageProjectileEntity(wc, "masai_lion.png", 210/2, 435, 457, 64, new Sound("audio/hook_hit.ogg")); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
+        ProjectileAbility ab3 = new ProjectileAbility(wc, ab2CharSnd, lionProj, 12, 12, 50, 400, 40);
+        ab3.setDamagerValues(wc, 600f, 800f, 0.5f, 0, false);
 
         List<Sound> sounds = new ArrayList<>();
         sounds.add( snd1 );
