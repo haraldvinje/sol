@@ -1,6 +1,7 @@
 package engine.network.client;
 
 import engine.*;
+import engine.combat.abilities.ProjectileComp;
 import engine.graphics.*;
 import engine.graphics.text.TextMesh;
 import engine.graphics.text.TextMeshComp;
@@ -50,6 +51,8 @@ public class ClientUtils {
         wc.assignComponentType(RectangleComp.class);
         wc.assignComponentType(ButtonComp.class);
         wc.assignComponentType(VisualEffectComp.class);
+        wc.assignComponentType(ProjectileComp.class); //because of draw order
+
 
 
         //add systems

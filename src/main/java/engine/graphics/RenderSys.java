@@ -5,6 +5,7 @@ import engine.PositionComp;
 import engine.RotationComp;
 import engine.Sys;
 import engine.WorldContainer;
+import engine.combat.abilities.ProjectileComp;
 import engine.graphics.text.*;
 import engine.visualEffect.VisualEffect;
 import engine.visualEffect.VisualEffectComp;
@@ -85,9 +86,19 @@ public class RenderSys implements Sys {
         });
 
         //draw textured meshes in the world
+        //not projectiles
         wc.entitiesOfComponentTypeStream(TexturedMeshComp.class).forEach( entity -> {
-            TexturedMeshComp texturedMeshComp = (TexturedMeshComp)wc.getComponent(entity, TexturedMeshComp.class);
-            renderTexturedMesh(entity, texturedMeshComp.getMesh(), viewTransform, projectionTransform);
+            if ( !wc.hasComponent(entity, ProjectileComp.class)) {
+                TexturedMeshComp texturedMeshComp = (TexturedMeshComp) wc.getComponent(entity, TexturedMeshComp.class);
+                renderTexturedMesh(entity, texturedMeshComp.getMesh(), viewTransform, projectionTransform);
+            }
+        });
+        //projectiles
+        wc.entitiesOfComponentTypeStream(TexturedMeshComp.class).forEach( entity -> {
+            if ( wc.hasComponent(entity, ProjectileComp.class)) {
+                TexturedMeshComp texturedMeshComp = (TexturedMeshComp) wc.getComponent(entity, TexturedMeshComp.class);
+                renderTexturedMesh(entity, texturedMeshComp.getMesh(), viewTransform, projectionTransform);
+            }
         });
 
         //draw text meshes in the world
