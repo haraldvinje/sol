@@ -18,7 +18,6 @@ import engine.visualEffect.VisualEffectUtils;
 import game.server.ServerGameTeams;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -36,9 +35,10 @@ public class CharacterUtils {
 
     private static final LoadImageData[] loadCharData= {
             /*Shrank*/     new LoadImageData("sol_frank.png", CHARACTER_RADIUS[0], 160/2f, 512, 256, 180, 130),
-            /*Schmathias*/ new LoadImageData("Schmathias.png", CHARACTER_RADIUS[1], 228/2f, 720, 400, 267, 195),
+            /*Schmathias*/ new LoadImageData("schmathias_red.png", CHARACTER_RADIUS[1], 200/2f, 900, 400, 267, 195),
             /*Brail*/ new LoadImageData("Schmathias.png", CHARACTER_RADIUS[2], 228/2f, 720, 400, 267, 195),
-
+            /*Red Schmathias*/ new LoadImageData("schmathias_red.png", CHARACTER_RADIUS[1],  228/2f, 720, 400, 267, 195),
+            /*Blue Schmathias*/ new LoadImageData("schmathias_blue.png", CHARACTER_RADIUS[1], 228/2f, 720, 400, 267, 195)
     };
 
     public static void addCharacterGraphicsComps(WorldContainer wc, int charId, int entity) {
@@ -177,28 +177,34 @@ public class CharacterUtils {
             float x, float y) {
 
         //frogpunch
-        int suhSoundIndex = 0;
+        int frogPunchSoundIndex = 0;
+        int hookInitSoundIndex = 1;
+        int meteorPunchSoundIndex = 2;
 
-        MeleeAbility abFrogpunch = new MeleeAbility(wc, suhSoundIndex, 3, 5, 3, 20, new Circle(64f),48.0f, null);
+
+
+        MeleeAbility abFrogpunch = new MeleeAbility(wc, frogPunchSoundIndex, 3, 5, 3, 20, new Circle(64f),48.0f, null);
         abFrogpunch.setDamagerValues(wc, 150, 700, 0.8f, -48f, false);
 
         //hook
-        int hookProjEntity = ProjectileUtils.allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24, null); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
-        ProjectileAbility abHook = new ProjectileAbility(wc, suhSoundIndex, hookProjEntity, 5, 18, 50, 900, 30);
+        int hookProjEntity = ProjectileUtils.allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24, new Sound("audio/hook_hit.ogg")); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
+        ProjectileAbility abHook = new ProjectileAbility(wc, hookInitSoundIndex, hookProjEntity, 5, 18, 50, 900, 30);
         abHook.setDamagerValues(wc, 200f, 1400f, 0.2f, -128, true);
 
         //meteorpunch
-        MeleeAbility abMeteorpunch = new MeleeAbility(wc, suhSoundIndex, 15, 3, 4, 60, new Circle(32), 64, null);
+        MeleeAbility abMeteorpunch = new MeleeAbility(wc, meteorPunchSoundIndex, 15, 3, 4, 60, new Circle(32), 64, null);
         abMeteorpunch.setDamagerValues(wc, 500, 1000, 1.5f, -128f, false);
 
-        List<Sound> sounds = new ArrayList<>();
-        sounds.add(suhSoundIndex, new Sound("audio/si.ogg") );
+        List<Sound> soundList = new ArrayList<>();
+        soundList.add(frogPunchSoundIndex, new Sound("audio/boom-kick.ogg") );
+        soundList.add(hookInitSoundIndex, new Sound("audio/hook_init.ogg"));
+        soundList.add(meteorPunchSoundIndex, new Sound("audio/boom-kick.ogg"));
 
 
         return createCharacter(wc, charId,
                 controlled, team, idOnTeam,
                 x, y, 2000f,
-                abFrogpunch, abHook, abMeteorpunch, sounds);
+                abFrogpunch, abHook, abMeteorpunch, soundList);
     }
 
     private static int createBrail(

@@ -58,8 +58,8 @@ public class Game {
         GameUtils.createLargeMap(wc);
 
         int[][] characterIds = {
-                {CharacterUtils.BRAIL, CharacterUtils.SHRANK},
-                {CharacterUtils.SHRANK, CharacterUtils.SHRANK}
+                {CharacterUtils.BRAIL, CharacterUtils.SCHMATHIAS},
+                {CharacterUtils.SCHMATHIAS, CharacterUtils.SCHMATHIAS}
 
         };
 

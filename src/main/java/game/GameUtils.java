@@ -149,14 +149,8 @@ public class GameUtils {
         AudioComp victoryThemeAudioComp = new AudioComp(victoryTheme);
         victoryThemeAudioComp.backgroundAudio = true;
         victoryThemeAudioComp.backgroundSound();
-
         wc.addInactiveComponent(endGameVictoryEntity, victoryThemeAudioComp);
-        System.out.println("End game victory entity from GameUtils: " + endGameVictoryEntity);
-
-        System.out.println("End game defeat entity from GameUtils: " + endGameDefeatEntity);
-
         //must have positionComponent for AudoSys to work.
-
 
         Sound defeatTheme = new Sound("audio/soundOfSilence.ogg");
         AudioComp defeatThemeAudioComp = new AudioComp(defeatTheme);
