@@ -232,17 +232,17 @@ public class CharacterUtils {
         float[] purple = {1.0f, 0f, 1.0f};
 
         //lightForce
-        MeleeAbility abFrogpunch = new MeleeAbility(wc, ab1CharSnd, 6, 6, 6, 30, new Circle(64f),64.0f, null);
-        abFrogpunch.setDamagerValues(wc, 100, 600, 0.9f, 400f, true);
+        MeleeAbility ab1 = new MeleeAbility(wc, ab1CharSnd, 6, 6, 6, 30, new Circle(70f),64.0f, null);
+        ab1.setDamagerValues(wc, 150, 600, 1.2f, 400f, true);
 
         //chagger
         int chaggProjectile = ProjectileUtils.allocateSinglecolorProjectileAbility(wc, 64f, purple,null); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
-        ProjectileAbility abHook = new ProjectileAbility(wc, ab2CharSnd, chaggProjectile, 10, 6, 120, 650, 30);
-        abHook.setDamagerValues(wc, 150, 400, 0.8f, 64, false);
+        ProjectileAbility ab2 = new ProjectileAbility(wc, ab2CharSnd, chaggProjectile, 10, 6, 120, 650, 40);
+        ab2.setDamagerValues(wc, 300, 400, 0.8f, 64, false);
 
         //merge
-        MeleeAbility abMeteorpunch = new MeleeAbility(wc, ab3CharSnd, 10, 6, 4, 60, new Circle(160), 128, null);
-        abMeteorpunch.setDamagerValues(wc, 20, 800, 0.4f, 0, true);
+        MeleeAbility ab3 = new MeleeAbility(wc, ab3CharSnd, 10, 2, 8, 60, new Circle(160), 128, null);
+        ab3.setDamagerValues(wc, 20, 800, 0.4f, 0, true);
 
         List<Sound> sounds = new ArrayList<>();
         sounds.add( snd1 );
@@ -252,7 +252,7 @@ public class CharacterUtils {
         return createCharacter(wc, charId,
                 controlled, team, idOnTeam,
                 x, y, 2000,
-                abFrogpunch, abHook, abMeteorpunch, sounds);
+                ab1, ab2, ab3, sounds);
     }
 
 //    private static int createShitface(
