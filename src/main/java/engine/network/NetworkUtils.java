@@ -21,7 +21,7 @@ public class NetworkUtils {
     public static int SERVER_INPUT_BUFFERING = 1;
     public static int CLIENT_INPUT_BUFFERING = 2;
 
-    public static float CLIENT_INTERPOLATION_FRAME_COUNT = 1.0f;
+    public static float CLIENT_INTERPOLATION_FRAME_COUNT = 2; //1.0f;
 
     //to simulate packet loss
     public static float PACKET_LOSS_TO_SERVER = 0.0f;
