@@ -56,13 +56,17 @@ public class Game {
 
         GameUtils.assignComponentTypes(wc);
 
-        GameUtils.createLargeMap(wc);
+        GameUtils.createMap(wc);
 
         int[][] characterIds = {
-                {CharacterUtils.BRAIL, CharacterUtils.SCHMATHIAS},
-                {CharacterUtils.SCHMATHIAS, CharacterUtils.SCHMATHIAS}
-
+                {CharacterUtils.BRAIL, CharacterUtils.MAGNET},
+                {CharacterUtils.MAGNET, CharacterUtils.SCHMATHIAS}
         };
+
+//        int[][] characterIds = {
+//                { CharacterUtils.MAGNET},
+//                { CharacterUtils.SCHMATHIAS}
+//        };
 
         ClientGameTeams teams = new ClientGameTeams(characterIds, 0, 1);
 
@@ -130,49 +134,49 @@ public class Game {
 
         wc.updateSystems();
 
-        //print if win condition for one character
-        int teamCount = 2;
-        int[] charsOnTeam = new int[teamCount];
-        int[] charsOverWinLine = new int[teamCount];
-        wc.entitiesOfComponentTypeStream(CharacterComp.class).forEach(entity -> {
-            PositionComp posComp = (PositionComp) wc.getComponent(entity, PositionComp.class);
-            TeamComp teamComp = (TeamComp) wc.getComponent(entity, TeamComp.class);
-
-            ++ charsOnTeam[teamComp.team];
-
-            boolean xInside = false, yInside = false;
-
-            //test y
-            if (posComp.getY() > GameUtils.LARGE_MAP_WIN_LINES_Y.x &&
-                    posComp.getY() < GameUtils.LARGE_MAP_WIN_LINES_Y.y) {
-
-                yInside = true;
-                //test x
-                //if on team 0
-                if (teamComp.team == 0) {
-                    if (posComp.getX() > GameUtils.LARGE_MAP_WIN_LINES_X[0]) {
-                        xInside = true;
-                    }
-                }
-                //if on team 1
-                else {
-                    if (posComp.getX() < GameUtils.LARGE_MAP_WIN_LINES_X[1]) {
-                        xInside = true;
-                    }
-                }
-            }
-            if (yInside && xInside) {
-                ++ charsOverWinLine[teamComp.team];
-            }
-        });
-
-        //check if a team won
-        for (int i = 0; i < teamCount; i++) {
-            if (charsOverWinLine[i] != 0) {//scharsOnTeam[i] == charsOverWinLine[i]) {
-                System.out.println("Winning!!!!");
-                break;
-            }
-        }
+//        //print if win condition for one character
+//        int teamCount = 2;
+//        int[] charsOnTeam = new int[teamCount];
+//        int[] charsOverWinLine = new int[teamCount];
+//        wc.entitiesOfComponentTypeStream(CharacterComp.class).forEach(entity -> {
+//            PositionComp posComp = (PositionComp) wc.getComponent(entity, PositionComp.class);
+//            TeamComp teamComp = (TeamComp) wc.getComponent(entity, TeamComp.class);
+//
+//            ++ charsOnTeam[teamComp.team];
+//
+//            boolean xInside = false, yInside = false;
+//
+//            //test y
+//            if (posComp.getY() > GameUtils.LARGE_MAP_WIN_LINES_Y.x &&
+//                    posComp.getY() < GameUtils.LARGE_MAP_WIN_LINES_Y.y) {
+//
+//                yInside = true;
+//                //test x
+//                //if on team 0
+//                if (teamComp.team == 0) {
+//                    if (posComp.getX() > GameUtils.LARGE_MAP_WIN_LINES_X[0]) {
+//                        xInside = true;
+//                    }
+//                }
+//                //if on team 1
+//                else {
+//                    if (posComp.getX() < GameUtils.LARGE_MAP_WIN_LINES_X[1]) {
+//                        xInside = true;
+//                    }
+//                }
+//            }
+//            if (yInside && xInside) {
+//                ++ charsOverWinLine[teamComp.team];
+//            }
+//        });
+//
+//        //check if a team won
+//        for (int i = 0; i < teamCount; i++) {
+//            if (charsOverWinLine[i] != 0) {//scharsOnTeam[i] == charsOverWinLine[i]) {
+//                System.out.println("Winning!!!!");
+//                break;
+//            }
+//        }
     }
 
 

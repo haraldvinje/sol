@@ -84,7 +84,7 @@ public class ClientIngame implements Runnable{
     @Override
     public void run() {
 
-        window = new Window( "Client    Siiiii");
+        window = new Window("Client    Siiiii");
         userInput = new UserInput(window, GameUtils.VIEW_WIDTH, GameUtils.VIEW_HEIGHT);
 
         //make sure window has focus

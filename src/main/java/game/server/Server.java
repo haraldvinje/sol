@@ -4,6 +4,7 @@ import engine.PositionComp;
 import engine.RotationComp;
 import engine.UserInput;
 import engine.WorldContainer;
+import engine.combat.abilities.ProjectileComp;
 import engine.graphics.*;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
@@ -403,6 +404,8 @@ public class Server {
         wc.assignComponentType(TextMeshComp.class);
         wc.assignComponentType(ViewRenderComp.class);
         wc.assignComponentType(VisualEffectComp.class);
+        wc.assignComponentType(ProjectileComp.class); //because of draw order
+
 
 
         wc.addSystem(new RenderSys(window));
