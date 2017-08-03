@@ -28,10 +28,16 @@ public class AudioSys implements Sys {
             AudioComp ac = (AudioComp) wc.getComponent(entity, AudioComp.class);
             PositionComp posComp = (PositionComp) wc.getComponent(entity, PositionComp.class);
 
-            ac.setPosition(posComp.getPos3());
+            if (!ac.backgroundAudio){
+                ac.setPosition(posComp.getPos3());
+            }
 
             if (ac.requestSound!=-1){
                 ac.playSound(ac.requestSound);
+            }
+
+            if (ac.requestStopSource){
+                ac.stopSound();
             }
 
             //resetting so sound does not play repeatedly

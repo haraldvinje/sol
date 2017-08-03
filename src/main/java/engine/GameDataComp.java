@@ -11,6 +11,11 @@ public class GameDataComp implements Component {
     //map charEntity to damage text entity
     public Map<Integer, Integer> charDamageTextEntities = new HashMap<>();
 
+
+    //entity for ingame background audio
+    public int backgroundMusicEntity;
+
+
     //gameEndText entity
     public int gameEndVictoryEntity, gameEndDefeatEntity;
 

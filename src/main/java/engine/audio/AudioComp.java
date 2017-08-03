@@ -17,10 +17,13 @@ public class AudioComp implements Component {
 
     public List<Sound> soundList = new ArrayList<Sound>();
 
-
     private int sourcePointer;
 
     public int requestSound = -1;
+
+    public boolean requestStopSource = false;
+
+    public boolean backgroundAudio = false;
 
 
     public AudioComp(Sound... s){
@@ -68,7 +71,6 @@ public class AudioComp implements Component {
 
     public void stopSound() {
         alSourceStop(sourcePointer);
-
     }
 
 

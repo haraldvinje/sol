@@ -1,5 +1,6 @@
 package engine;
 
+import engine.audio.AudioComp;
 import engine.character.CharacterComp;
 import engine.combat.DamageableComp;
 import engine.graphics.ColoredMeshComp;
@@ -79,13 +80,25 @@ public class OnScreenSys implements Sys{
 
             //render game end
             if (dataComp.endGameRequest) {
-                if (dataComp.gameWon) {
+
+                AudioComp backgroundAudio = (AudioComp) wc.getComponent(dataComp.backgroundMusicEntity, AudioComp.class);
+                backgroundAudio.requestStopSource = true;
+
+                if (dataComp.gameWon && !wc.hasComponent(dataComp.gameEndVictoryEntity, AudioComp.class)) {
 
                     wc.activateEntity( dataComp.gameEndVictoryEntity );
+                    AudioComp audioComp = (AudioComp) wc.getComponent (dataComp.gameEndVictoryEntity, AudioComp.class);
+
+                    audioComp.requestSound = 0;
                 }
-                else {
+                else if (!wc.hasComponent(dataComp.gameEndDefeatEntity, AudioComp.class)) {
 
                     wc.activateEntity( dataComp.gameEndDefeatEntity );
+                    AudioComp audioComp = (AudioComp) wc.getComponent (dataComp.gameEndDefeatEntity, AudioComp.class);
+                    audioComp.requestSound = 0;
+
+
+//                    audioComp.requestSound = 0;
                 }
             }
 
