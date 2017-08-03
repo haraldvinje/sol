@@ -40,8 +40,8 @@ public class CharacterUtils {
                     new LoadImageData("sol_frank_blue.png", CHARACTER_RADIUS[0], 160 / 2f, 512, 256, 180, 130)
             },
             /*Schmathias*/
-            {new LoadImageData("Schmathias_red.png", CHARACTER_RADIUS[1], 146, 1258, 536, 386, 258),
-                    new LoadImageData("Schmathias_blue.png", CHARACTER_RADIUS[1], 146, 1258, 536, 386, 258)
+            {new LoadImageData("schmathias_red.png", CHARACTER_RADIUS[1], 146, 1258, 536, 386, 258),
+                    new LoadImageData("schmathias_blue.png", CHARACTER_RADIUS[1], 146, 1258, 536, 386, 258)
             },
             /*Brail*/
             {new LoadImageData("brail.png", CHARACTER_RADIUS[2], 272, 1600, 1200, 795, 585),
