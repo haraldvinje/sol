@@ -286,7 +286,7 @@ public class CharacterUtils {
 
         //lion
         int lionProj = ProjectileUtils.allocateImageProjectileEntity(wc, "masai_lion.png", 210/2, 435, 457, 64, new Sound("audio/hook_hit.ogg")); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
-        ProjectileAbility ab3 = new ProjectileAbility(wc, ab2CharSnd, lionProj, 12, 12, 50, 400, 40);
+        ProjectileAbility ab3 = new ProjectileAbility(wc, ab3CharSnd, lionProj, 12, 12, 50, 400, 40);
         ab3.setDamagerValues(wc, 600f, 800f, 0.5f, 0, false);
 
         List<Sound> sounds = new ArrayList<>();
