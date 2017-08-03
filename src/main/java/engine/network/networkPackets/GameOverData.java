@@ -8,11 +8,11 @@ public class GameOverData {
     public static final int BYTES = Integer.BYTES;
 
 
-    public int charEntityLost;
+    public int teamWon;
 
 
-    public GameOverData(int charEntityLost) {
-        this.charEntityLost = charEntityLost;
+    public GameOverData(int teamWon) {
+        this.teamWon = teamWon;
     }
 
     public GameOverData() {

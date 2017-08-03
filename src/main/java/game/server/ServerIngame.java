@@ -1,5 +1,7 @@
 package game.server;
 
+import engine.PositionComp;
+import engine.TeamComp;
 import engine.UserInput;
 import engine.WorldContainer;
 import engine.audio.AudioMaster;
@@ -7,6 +9,7 @@ import engine.character.*;
 import engine.graphics.text.Font;
 import engine.graphics.text.FontType;
 import engine.graphics.view_.View;
+import engine.network.networkPackets.GameOverData;
 import engine.physics.*;
 import engine.window.Window;
 import game.CharacterUtils;
@@ -41,6 +44,7 @@ public class ServerIngame {
     private boolean running = true;
     private long lastTime;
 
+    private boolean smallMap;
 
     private ServerGameTeams teams;
 //    private List< List<ServerClientHandler> > teamClients;
@@ -48,6 +52,9 @@ public class ServerIngame {
 
     private int[] stockLossCount;
 
+
+    //quikfix. This gets read from serverNetworkSys
+    public int gameDataEntity;
 
 
     public ServerIngame() {
@@ -58,6 +65,9 @@ public class ServerIngame {
     public void init( ServerGame serverGame, ServerGameTeams teams) {
         this.serverGame = serverGame;
         this.teams = teams;
+
+        //are we on small map?
+        smallMap = teams.getTotalClientCount() <= 2;
 
 
         //add an stockLoss entry for every client
@@ -82,22 +92,26 @@ public class ServerIngame {
 
 
 
-        System.out.println("Server game initiated with clients: "+ Arrays.toString(teams.getAllClients()) );
-
 
         //create entities
         //create map
-        if (teams.getTotalClientCount() <= 2) {
+        if (smallMap) {
             GameUtils.createMap(wc);
         }
-        else if (teams.getTotalClientCount() <= 4) {
+        else {
             GameUtils.createLargeMap(wc);
         }
-        else {
-            throw new IllegalStateException("Dont know what map to use for " + teams.getTotalClientCount() + " clients");
-        }
+
 
         CharacterUtils.createServerCharacters(wc, teams);
+
+
+        //add a gameData entity
+        gameDataEntity = wc.createEntity("game data");
+        wc.addComponent(gameDataEntity, new ServerGameDataComp());
+
+        System.out.println("Server game initiated with clients: "+ Arrays.toString(teams.getAllClients()) );
+
 
 
         //game loop
@@ -131,20 +145,7 @@ public class ServerIngame {
 
         wc.updateSystems();
 
-        //check stocks left
-        Integer charNumb = 0;
-        for (int entity : wc.getEntitiesWithComponentType(CharacterComp.class) ) {
-            AffectedByHoleComp affholeComp = (AffectedByHoleComp) wc.getComponent(entity, AffectedByHoleComp.class);
-            if (affholeComp.isHoleAffectedFlag()) {
-                stockLossCount[charNumb]++;
-            }
-
-            if (stockLossCount[charNumb] >= 3) {
-                gameOver(1-charNumb);
-            }
-
-            charNumb++;
-        }
+        handleWinCondition();
 
         //check if clients have disconnected
         //if so, ask to terminate game
@@ -154,6 +155,77 @@ public class ServerIngame {
             }
         });
     }
+
+    private void handleWinCondition() {
+        ServerGameDataComp dataComp = (ServerGameDataComp) wc.getComponent(gameDataEntity, ServerGameDataComp.class);
+        //if win condition was obtained last frame, exit
+        if (dataComp.teamWon != -1) {
+            //gameOver will shut down serverIngame
+            gameOver(dataComp.teamWon);
+        }
+
+        //check win condition
+        if (smallMap) {
+
+            wc.entitiesOfComponentTypeStream(CharacterComp.class).forEach(entity -> {
+                CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
+
+                if (charComp.getRespawnCount() >= 3) {
+                    TeamComp teamComp = (TeamComp) wc.getComponent(entity, TeamComp.class);
+
+                    //set team won to the team not containing the loser. assuming two teams
+                    dataComp.teamWon = 1 - teamComp.team;
+                }
+            });
+
+        }
+        else {
+            //check characters push win condition
+            int teamCount = 2;
+            int[] charsOnTeam = new int[teamCount];
+            int[] charsOverWinLine = new int[teamCount];
+            wc.entitiesOfComponentTypeStream(CharacterComp.class).forEach(entity -> {
+                PositionComp posComp = (PositionComp) wc.getComponent(entity, PositionComp.class);
+                TeamComp teamComp = (TeamComp) wc.getComponent(entity, TeamComp.class);
+
+                ++ charsOnTeam[teamComp.team];
+
+                boolean xInside = false, yInside = false;
+
+                //test y
+                if (posComp.getY() > GameUtils.LARGE_MAP_WIN_LINES_Y.x &&
+                        posComp.getY() < GameUtils.LARGE_MAP_WIN_LINES_Y.y) {
+                    yInside = true;
+
+                    //test x
+                    //if on team 0
+                    if (teamComp.team == 0) {
+                        if (posComp.getX() > GameUtils.LARGE_MAP_WIN_LINES_X[0]) {
+                            xInside = true;
+                        }
+                    }
+                    //if on team 1
+                    else {
+                        if (posComp.getX() < GameUtils.LARGE_MAP_WIN_LINES_X[1]) {
+                            xInside = true;
+                        }
+                    }
+                }
+                if (yInside && xInside) {
+                    ++ charsOverWinLine[teamComp.team];
+                }
+            });
+
+            //check if a team won
+            for (int i = 0; i < teamCount; i++) {
+                if (charsOnTeam[i] == charsOverWinLine[i]) {
+                    dataComp.teamWon = i;
+                    break;
+                }
+            }
+        }
+    }
+
     private void gameOver(int winner) {
         System.out.println("Player "+ winner + " won!");
         serverGame.setShouldTerminate();

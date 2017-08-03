@@ -75,7 +75,10 @@ public class CharacterSys implements Sys {
 
 
 
-        checkHoleAffected(charNumb, teamComp, posComp, phComp, charComp, dmgableComp, affholeComp);
+        //returns false if we are in respawn delay
+        if ( !checkHoleAffected(charNumb, teamComp, posComp, phComp, charComp, dmgableComp, affholeComp) ) {
+            return;
+        }
 
 //        updateDisplayDamage(charNumb, dmgableComp, textComp);
 
@@ -89,9 +92,19 @@ public class CharacterSys implements Sys {
         updateAbilities(entity, charComp, abComp, inputComp, posComp, rotComp);
     }
 
-    private void checkHoleAffected(int charNumb, TeamComp teamComp, PositionComp posComp, PhysicsComp physComp, CharacterComp charComp, DamageableComp dmgablComp, AffectedByHoleComp affholeComp) {
-        if (affholeComp.isHoleAffectedFlag()) {
+    private boolean checkHoleAffected(int charNumb, TeamComp teamComp, PositionComp posComp, PhysicsComp physComp, CharacterComp charComp, DamageableComp dmgablComp, AffectedByHoleComp affholeComp) {
+        //decrease respawn timer if it is above 0
+        //respawn character if it is 1
+        //set timer if character fell in hole
+        if (charComp.respawnTimer > 0) {
+            --charComp.respawnTimer;
 
+            return false;
+        }
+        else if (charComp.respawnTimer == 0) {
+            charComp.respawnTimer = -1;
+
+            //respawn the character
             Vec2 respawnPos = GameUtils.teamStartPos[teamComp.team][0];
 
             dmgablComp.reset();
@@ -102,7 +115,17 @@ public class CharacterSys implements Sys {
             posComp.setPos(respawnPos);
 
             System.out.println("Character numb: "+charNumb+" stocks lost: "+charComp.getRespawnCount());
+
+            return false;
         }
+
+        else if (affholeComp.isHoleAffectedFlag()) {
+
+            charComp.respawnTimer = charComp.respawnTime;
+
+        }
+
+        return true;
     }
 
 

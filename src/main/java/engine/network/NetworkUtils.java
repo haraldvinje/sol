@@ -185,7 +185,7 @@ public class NetworkUtils {
     public static NetworkDataOutput gameOverToPacket(GameOverData data) {
         NetworkDataOutput out = new NetworkDataOutput();
 
-        out.writeInt(data.charEntityLost);
+        out.writeInt(data.teamWon);
 
         return out;
     }
@@ -193,7 +193,7 @@ public class NetworkUtils {
     public static GameOverData packetToGameOver(NetworkDataInput in) {
         GameOverData data = new GameOverData();
 
-        data.charEntityLost = in.readInt();
+        data.teamWon = in.readInt();
 
         return data;
     }

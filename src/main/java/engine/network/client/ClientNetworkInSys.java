@@ -244,19 +244,17 @@ public class ClientNetworkInSys implements Sys{
 
         //if the entity lost is on the same team as the controlled entity, print that we lost
 
-        int lostEntityTeam = ((TeamComp)wc.getComponent(data.charEntityLost, TeamComp.class)).team;
         int controlledEntityTeam = -1;
         for (int controlledEntity : wc.getEntitiesWithComponentType(ControlledComp.class)) {
             controlledEntityTeam = ((TeamComp)wc.getComponent(controlledEntity, TeamComp.class)).team;
         }
-        boolean won = controlledEntityTeam != lostEntityTeam;
+        boolean won = controlledEntityTeam == data.teamWon;
 
         wc.entitiesOfComponentTypeStream(GameDataComp.class).forEach(entity -> {
             GameDataComp dataComp = (GameDataComp) wc.getComponent(entity, GameDataComp.class);
             dataComp.endGameRequest = true;
             dataComp.gameWon = won;
         });
-        System.out.println("Game over: " + data.charEntityLost);
     }
 
 //    public AllCharacterStateData readCharacterData() {
