@@ -280,8 +280,10 @@ public class GameUtils {
         //back wall
         cx = 28;    cy = LARGE_MAP_HEIGHT/2;    w = 56;     h = 252;
         cxm = LARGE_MAP_WIDTH - cx;     cym = cy;
-        createWallInvisible(wc, cx*scale, cy*scale, w*scale, h*scale);
-        createWallInvisible(wc, cxm*scale, cym*scale, w*scale, h*scale);
+//        createWallInvisible(wc, cx*scale, cy*scale, w*scale, h*scale);
+//        createWallInvisible(wc, cxm*scale, cym*scale, w*scale, h*scale);
+        createRectangleHoleInvisible(wc, cx*scale, cy*scale, w*scale, h*scale);
+        createRectangleHoleInvisible(wc, cxm*scale, cym*scale, w*scale, h*scale);
 
         //top
         cx = 125; cy = cy-h/2-w/2 -6; w = 250; h = 64;
