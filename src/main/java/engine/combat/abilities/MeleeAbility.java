@@ -1,22 +1,16 @@
 package engine.combat.abilities;
 
-import engine.Component;
 import engine.PositionComp;
 import engine.RotationComp;
 import engine.WorldContainer;
-import engine.character.UserCharacterInputComp;
+import engine.audio.AudioComp;
+import engine.audio.Sound;
 import engine.combat.DamagerComp;
-import engine.graphics.ColoredMesh;
-import engine.graphics.ColoredMeshComp;
-import engine.graphics.ColoredMeshUtils;
 import engine.physics.*;
+import engine.visualEffect.VisualEffectComp;
+import game.CharacterUtils;
 import game.GameUtils;
-import org.w3c.dom.css.Rect;
 import utils.maths.Vec2;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
 
 /**
  * Created by eirik on 19.06.2017.
@@ -30,21 +24,21 @@ public class MeleeAbility extends Ability{
     private float relativeAngle;
 
 
-    public MeleeAbility(WorldContainer wc, int startupTime, int activeHitboxTime, int endlagTime, int rechargeTime,
-                        Shape hitboxShape, float distance){
-        super(wc, startupTime, activeHitboxTime, endlagTime, rechargeTime);
+
+    public MeleeAbility(WorldContainer wc, int startEffectSoundIndex, int startupTime, int activeHitboxTime, int endlagTime, int rechargeTime,
+                        Shape hitboxShape, float distance, Sound onHitSound){
+        super(wc, startEffectSoundIndex, startupTime, activeHitboxTime, endlagTime, rechargeTime);
 
         this.relativeDistance = distance;
         this.relativeAngle = 0;
 
         if (hitboxShape instanceof Circle){
-            hitboxEntity = GameUtils.allocateHitboxEntity(wc, (Circle)hitboxShape);
+            hitboxEntity = CharacterUtils.allocateHitboxEntity(wc, (Circle)hitboxShape, onHitSound);
         }
 
         if (hitboxShape instanceof Rectangle){
             throw new UnsupportedOperationException("Cannot have rectangle hitboxes as of now");
         }
-
 
     }
 //    public MeleeAbility(WorldContainer wc){
@@ -75,9 +69,13 @@ public class MeleeAbility extends Ability{
 
         PositionComp reqPosComp = (PositionComp)wc.getComponent(requestingEntity, PositionComp.class);
         RotationComp reqRotComp = (RotationComp)wc.getComponent(requestingEntity, RotationComp.class);
+        AudioComp reqAudioComp = (AudioComp)wc.getComponent(requestingEntity, AudioComp.class);
 
         RotationComp hbRotComp = (RotationComp)wc.getComponent(hitboxEntity, RotationComp.class);
         HitboxComp hbHitbComp = (HitboxComp) wc.getComponent(hitboxEntity, HitboxComp.class);
+
+
+
 
         //set hitbox comp state
         hbHitbComp.reset();
@@ -89,6 +87,7 @@ public class MeleeAbility extends Ability{
 
         //set relative positiom
         positionHitbox(wc, requestingEntity);
+
     }
 
     @Override
@@ -99,7 +98,7 @@ public class MeleeAbility extends Ability{
     @Override
     public void endEffect(WorldContainer wc, int requestingEntity) {
         //deactivate hitbox
-        wc.deactivateEntity(hitboxEntity);
+        deactivateHitbox(wc);
     }
 
     private void positionHitbox(WorldContainer wc, int requestingEntity) {
@@ -110,6 +109,14 @@ public class MeleeAbility extends Ability{
 
         Vec2 relPos = Vec2.newLenDir(relativeDistance, reqRotComp.getAngle() + relativeAngle );
         hbPosComp.setPos( reqPosComp.getPos().add(relPos) );
+    }
+
+
+    private void deactivateHitbox(WorldContainer wc) {
+        wc.deactivateEntity(hitboxEntity);
+        wc.activateComponent(hitboxEntity, VisualEffectComp.class);
+        wc.activateComponent(hitboxEntity, AudioComp.class);
+        wc.activateComponent(hitboxEntity, PositionComp.class);
     }
 
 }

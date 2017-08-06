@@ -6,14 +6,16 @@ import engine.Sys;
 import engine.WorldContainer;
 import engine.character.CharacterComp;
 import engine.character.CharacterInputComp;
+import engine.combat.DamageableComp;
 import engine.combat.abilities.AbilityComp;
 import engine.combat.abilities.HitboxComp;
 import engine.combat.abilities.ProjectileComp;
-import engine.graphics.ColoredMeshComp;
-import engine.graphics.ColoredMeshUtils;
-import engine.network.CharacterInputData;
-import engine.network.GameStateData;
-import engine.network.NetworkUtils;
+import engine.network.*;
+import engine.network.networkPackets.*;
+import engine.physics.AffectedByHoleComp;
+import game.server.ServerClientHandler;
+import game.server.ServerGameDataComp;
+import game.server.ServerIngame;
 
 import java.util.*;
 
@@ -45,9 +47,14 @@ public class ServerNetworkSys implements Sys {
     @Override
     public void update() {
 
+        //poll client network input
+        clientHandlers.forEach(client -> {
+            client.getTcpPacketIn().pollPackets();
+        });
+
         updateCharactersByInput();
 
-        updateClientsByGameState();
+        sendGameDataToClients();
 
         frameNumber++;
         if (frameNumber == Integer.MAX_VALUE) throw new IllegalStateException("max frame number value reached. Make it wrap");
@@ -69,6 +76,8 @@ public class ServerNetworkSys implements Sys {
 
             //get input from each client, hoply corresponding to character ordering, and update the entity
             CharacterInputComp inpComp = (CharacterInputComp) wc.getComponent(entity, CharacterInputComp.class);
+
+            //data from clients
             CharacterInputData inData = clientHandlers.get(i).getInputData();
 
             if (inData != null) {
@@ -80,56 +89,40 @@ public class ServerNetworkSys implements Sys {
         }
     }
 
-    private void updateClientsByGameState() {
-        //get game state
-        GameStateData stateData = retrieveGameState();
+    private void sendGameDataToClients() {
 
-        //send game state
-        sendGameState(stateData);
+        sendCharacterData( retrieveCharacterData() );
+
+        retrieveAbilitiesStarted().forEach(abStarted -> sendAbilityStarted(abStarted) );
+
+        retrieveHitsDetected().forEach(hitsDetected -> sendHitDetected(hitsDetected) );
+
+        retrieveDeadProjectiles().forEach(deadProj -> sendProjectileDead(deadProj) );
+
+        retrieveDeadEntities().forEach(deadEntity -> sendEntityDead(deadEntity));
+
+        retrieveGameOver().forEach(gameOver -> sendGameOver(gameOver));
     }
 
 
-    private GameStateData retrieveGameState() {
-        GameStateData sd = new GameStateData();
+    private AllCharacterStateData retrieveCharacterData() {
+        AllCharacterStateData sd = new AllCharacterStateData();
 
         sd.setFrameNumber(frameNumber);
 
         Set<Integer> chars = wc.getEntitiesWithComponentType(CharacterComp.class);
-        if (chars.size() != 2) throw new IllegalStateException("THere is not 2 characters on the field :(");
+//        if (chars.size() != 2) throw new IllegalStateException("THere is not 2 characters on the field :(");
 
         int charNumb = 0;
         for (int c : chars) {
             PositionComp posComp = (PositionComp)wc.getComponent(c, PositionComp.class);
             RotationComp rotComp = (RotationComp)wc.getComponent(c, RotationComp.class);
-            CharacterComp charComp = (CharacterComp)wc.getComponent(c, CharacterComp.class);
-            AbilityComp abComp = (AbilityComp)wc.getComponent(c, AbilityComp.class);
+//            CharacterComp charComp = (CharacterComp)wc.getComponent(c, CharacterComp.class);
 
             sd.setX(charNumb, posComp.getX());
             sd.setY(charNumb, posComp.getY());
             sd.setRotation(charNumb, rotComp.getAngle());
 
-            //reset ability executed and terminated values
-            sd.setAbilityExecuted(charNumb, -1); //default -1, no ability
-            sd.setAbilityTerminated(charNumb, -1);
-
-            //find newly executed abilities
-            if (abComp.hasNewExecuting()) {
-                sd.setAbilityExecuted(charNumb, abComp.popNewExecuting());
-            }
-
-            //find terminating projectiles. Only sends ONE for the moment, even though there might be more
-            for (int entity : wc.getEntitiesWithComponentType(ProjectileComp.class)) {
-                ProjectileComp projComp = (ProjectileComp)wc.getComponent(entity, ProjectileComp.class);
-                HitboxComp hitbComp = (HitboxComp)wc.getComponent(entity, HitboxComp.class);
-
-                //if the projectile dont belong to the current character, skip it
-                if (hitbComp.getOwner() != c) continue;
-
-                if (projComp.isShouldDeactivateFlag()) {
-                    sd.setAbilityTerminated(charNumb, projComp.getAbilityId());
-                    break; //as said before, it only finds ONE!
-                }
-            }
 
             charNumb++;
         }
@@ -137,20 +130,118 @@ public class ServerNetworkSys implements Sys {
         return sd;
     }
 
+    private List<AbilityStartedData> retrieveAbilitiesStarted() {
+        List<AbilityStartedData> data = new ArrayList<>();
 
-    public void sendGameState(GameStateData gameState) {
-        ListIterator<ServerClientHandler> it = clientHandlers.listIterator();
-        while (it.hasNext()) {
-            ServerClientHandler handler = it.next();
+        wc.entitiesOfComponentTypeStream(AbilityComp.class).forEach(abEntity -> {
+            AbilityComp abComp = (AbilityComp)wc.getComponent(abEntity, AbilityComp.class);
 
-            if (!handler.sendStateData(gameState) ) {
-                //client has disconnected, remove it
-                it.remove();
+            //find newly executed abilities
+            if (abComp.hasNewExecuting()) {
+                int startedAbility = abComp.popNewExecuting();
+                data.add( new AbilityStartedData(abEntity, startedAbility) );
+            }
+        });
+
+        return data;
+    }
+
+    private List<HitDetectedData> retrieveHitsDetected() {
+        List<HitDetectedData> data = new ArrayList<>();
+
+        wc.entitiesOfComponentTypeStream(DamageableComp.class).forEach(dmgablEntity -> {
+            DamageableComp dmgablComp = (DamageableComp)wc.getComponent(dmgablEntity, DamageableComp.class);
+
+            dmgablComp.hitDataStream().forEach( hitData -> {
+                data.add( new HitDetectedData(hitData.getEntityDamager(), hitData.getEntityDamaged(), hitData.getDamageDelt() ) );
+
+            });
+        });
+
+        return data;
+    }
+
+    private List<ProjectileDeadData> retrieveDeadProjectiles() {
+        List<ProjectileDeadData> projectileData = new ArrayList<>();
+
+        for (int entity : wc.getEntitiesWithComponentType(ProjectileComp.class)) {
+            ProjectileComp projComp = (ProjectileComp)wc.getComponent(entity, ProjectileComp.class);
+            HitboxComp hitbComp = (HitboxComp)wc.getComponent(entity, HitboxComp.class);
+
+
+            if (projComp.isShouldDeactivateFlag()) {
+                ProjectileDeadData data = new ProjectileDeadData(hitbComp.getOwner(), projComp.getAbilityId());
+                projectileData.add(data);
             }
         }
+
+        return projectileData;
     }
 
 
+    private List<EntityDeadData> retrieveDeadEntities() {
+        List<EntityDeadData> deadEntities = new ArrayList<>();
+
+        wc.entitiesOfComponentTypeStream(CharacterComp.class).forEach( entity -> {
+//            AffectedByHoleComp affholeComp = (AffectedByHoleComp) wc.getComponent(entity, AffectedByHoleComp.class);
+//
+//            if (affholeComp.isHoleAffectedFlag()) {
+//                deadEntities.add( new EntityDeadData( entity ) );
+//            }
+            CharacterComp charComp = (CharacterComp) wc.getComponent(entity, CharacterComp.class);
+            if (charComp.respawnTimer == charComp.respawnTime) {
+                deadEntities.add( new EntityDeadData( entity ) );
+            }
+        });
+
+        return deadEntities;
+    }
+
+    private List<GameOverData> retrieveGameOver() {
+        List<GameOverData> gameOver = new ArrayList<>();
+
+        wc.entitiesOfComponentTypeStream(ServerGameDataComp.class).forEach(entity -> {
+            ServerGameDataComp dataComp = (ServerGameDataComp) wc.getComponent(entity, ServerGameDataComp.class);
+
+            if (dataComp.teamWon != -1) {
+                gameOver.add( new GameOverData(dataComp.teamWon) );
+            }
+        });
+
+        return gameOver;
+    }
+
+    public void sendCharacterData(AllCharacterStateData gameState) {
+        clientHandlers.forEach(client -> client.sendCharacterData(gameState));
+    }
+
+    private void sendAbilityStarted(AbilityStartedData abData) {
+        clientHandlers.forEach(client -> client.sendAbilityStarted(abData));
+    }
+    private void sendHitDetected(HitDetectedData hitData) {
+        clientHandlers.forEach(client -> client.sendHitDetected(hitData));
+    }
+    private void sendProjectileDead(ProjectileDeadData projDeadData) {
+        clientHandlers.forEach(client -> client.sendProjectileDead(projDeadData));
+    }
+    private void sendEntityDead(EntityDeadData data) {
+        //create packet
+        NetworkDataOutput out = NetworkUtils.entityDeadToPacket(data);
+
+        //send packet to all clients
+        clientHandlers.forEach(client -> {
+            client.getTcpPacketOut().send(NetworkUtils.SERVER_CHARACTER_DEAD_ID, out);
+        });
+    }
+    private void sendGameOver(GameOverData data) {
+        //create network packet
+        NetworkDataOutput out = NetworkUtils.gameOverToPacket(data);
+
+        //send packet to all clients
+        clientHandlers.forEach(client -> {
+            client.getTcpPacketOut().send(NetworkUtils.SERVER_GAME_OVER_ID, out);
+        });
+    }
 
 
 

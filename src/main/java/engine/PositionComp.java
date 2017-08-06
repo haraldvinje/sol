@@ -1,17 +1,23 @@
 package engine;
 
 import utils.maths.Vec2;
+import utils.maths.Vec3;
 
 /**
  * Created by eirik on 13.06.2017.
  */
 public class PositionComp implements Component {
 
-    private float x, y;
+    private float x, y, z;
 
-    public PositionComp(float x, float y) {
+
+    public PositionComp(float x, float y, float z) {
         setX(x);
         setY(y);
+        setZ(z);
+    }
+    public PositionComp(float x, float y) {
+        this(x, y, 0);
     }
 
     public float getX() {
@@ -34,6 +40,13 @@ public class PositionComp implements Component {
         setY(getY()+y);
     }
 
+    public float getZ() {
+        return z;
+    }
+    public void setZ(float z) {
+        this.z = z;
+    }
+
     public void setPos(Vec2 v) {
         setX(v.x);
         setY(v.y);
@@ -46,9 +59,17 @@ public class PositionComp implements Component {
         return new Vec2(x, y);
     }
 
+    public Vec3 getPos3() {
+        return new Vec3(x, y, z);
+    }
 
 //    @Override
 //    public int getMask() {
 //        return WorldContainer.COMPMASK_POSITION;
 //    }
+
+    @Override
+    public String toString() {
+        return "x="+x+" y="+y;
+    }
 }

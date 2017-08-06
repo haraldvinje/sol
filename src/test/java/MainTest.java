@@ -1,4 +1,4 @@
-import game.Main;
+import game.offline.Main;
 import org.junit.Assert;
 import org.junit.Test;
 

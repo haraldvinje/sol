@@ -18,6 +18,10 @@ public abstract class Ability {
     private int endlagTime;
     private int rechargeTime;
 
+    private int startEffectSoundIndex = -1;
+
+
+
     private boolean recharging = false;
 
     private boolean requestExecution;
@@ -26,7 +30,8 @@ public abstract class Ability {
 
 
 
-    public Ability(WorldContainer wc, int startupTime, int effectTime, int endlagTime, int rechargeTime){
+    public Ability(WorldContainer wc, int startEffectSoundIndex, int startupTime, int effectTime, int endlagTime, int rechargeTime){
+        this.startEffectSoundIndex = startEffectSoundIndex;
         this.startupTime = startupTime;
         this.effectTime = effectTime;
         this.endlagTime = endlagTime;
@@ -60,6 +65,9 @@ public abstract class Ability {
         this.requestExecution = b;
     }
 
+    int getStartEffectSoundIndex() {
+        return startEffectSoundIndex;
+    }
 
     int getStartupTime() {
         return startupTime;

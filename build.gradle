@@ -27,10 +27,20 @@ dependencies {
     compile "org.lwjgl:lwjgl:${lwjglVersion}"
     compile "org.lwjgl:lwjgl-glfw:${lwjglVersion}"
     compile "org.lwjgl:lwjgl-opengl:${lwjglVersion}"
+    compile "org.lwjgl:lwjgl-openal:${lwjglVersion}"
+    compile "org.lwjgl:lwjgl-stb:${lwjglVersion}"
 
     nativeBundle "org.lwjgl:lwjgl:${lwjglVersion}:natives-windows@jar"
     nativeBundle "org.lwjgl:lwjgl-glfw:${lwjglVersion}:natives-windows@jar"
     nativeBundle "org.lwjgl:lwjgl-opengl:${lwjglVersion}:natives-windows@jar"
+    nativeBundle "org.lwjgl:lwjgl-openal:${lwjglVersion}:natives-windows@jar"
+    nativeBundle "org.lwjgl:lwjgl-stb:${lwjglVersion}:natives-windows@jar"
+
+    nativeBundle "org.lwjgl:lwjgl:${lwjglVersion}:natives-macos@jar"
+    nativeBundle "org.lwjgl:lwjgl-glfw:${lwjglVersion}:natives-macos@jar"
+    nativeBundle "org.lwjgl:lwjgl-opengl:${lwjglVersion}:natives-macos@jar"
+    nativeBundle "org.lwjgl:lwjgl-openal:${lwjglVersion}:natives-macos@jar"
+    nativeBundle "org.lwjgl:lwjgl-stb:${lwjglVersion}:natives-macos@jar"
 
 
     // Use JUnit test framework
@@ -48,7 +58,7 @@ task runServer(type: JavaExec) {
 
     classpath = sourceSets.main.runtimeClasspath
 
-    main = 'game.MainServer'
+    main = 'game.server.MainServer'
 
     systemProperty 'java.library.path', project.nativeLibsDir
 }
@@ -57,8 +67,9 @@ task runClient(type: JavaExec) {
 
     classpath = sourceSets.main.runtimeClasspath
 
-    args = ["localhost"]
-    main = 'game.MainClient'
+    args = ["localhost"]//["192.168.1.24"]
+
+    main = 'game.client.MainClient'
 
     systemProperty 'java.library.path', project.nativeLibsDir
 }
@@ -67,14 +78,16 @@ task runServerClient(dependsOn: ['runClient', 'runServer'])
 runClient.mustRunAfter runServer
 
 run {
-    mainClassName = 'game.Main'
+
+    mainClassName = 'game.offline.Main'
 
     systemProperty 'java.library.path', project.nativeLibsDir
 }
 
 
+
 task createFatOfflineJar(type: Jar) {
-    ext.jarTypeInfo = ["-offline", "game.Main"]
+    ext.jarTypeInfo = ["-offline", "game.offline.Main"]
 
     manifest {
         attributes 'Implementation-Title': 'Gradle Jar File Example',
@@ -88,7 +101,7 @@ task createFatOfflineJar(type: Jar) {
 }
 
 task createFatServerJar(type: Jar) {
-    ext.jarTypeInfo = ["-server","game.MainServer"]
+    ext.jarTypeInfo = ["-server","game.server.MainServer"]
 
     manifest {
         attributes 'Implementation-Title': 'Gradle Jar File Example',
@@ -102,7 +115,7 @@ task createFatServerJar(type: Jar) {
 }
 
 task createFatClientJar(type: Jar) {
-    ext.jarTypeInfo = ["-client","game.MainClient"]
+    ext.jarTypeInfo = ["-client","game.client.MainClient"]
 
     manifest {
         attributes 'Implementation-Title': 'Gradle Jar File Example',
