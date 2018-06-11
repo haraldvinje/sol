@@ -283,7 +283,7 @@ public class CharacterUtils {
         float[] purple = {1.0f, 0f, 1.0f};
 
         //spear poke
-        MeleeAbility ab1 = new MeleeAbility(wc, ab1CharSnd, 6, 6, 6, 13, new Circle(20f),128.0f, null);
+        MeleeAbility ab1 = new MeleeAbility(wc, ab1CharSnd, 6, 6, 2, 13, new Circle(26f),128.0f, null);
         ab1.setDamagerValues(wc, 150f, 600, 0.7f, -100f, false);
 
         //spear
@@ -294,7 +294,7 @@ public class CharacterUtils {
         //lion
         int lionProj = ProjectileUtils.allocateImageProjectileEntity(wc, "masai_lion.png", 210/2, 435, 457, 64, new Sound("audio/hook_hit.ogg")); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
         ProjectileAbility ab3 = new ProjectileAbility(wc, ab3CharSnd, lionProj, 20, 12, 120, 600, 200);
-        ab3.setDamagerValues(wc, 200f, 800f, 0.5f, 0, false);
+        ab3.setDamagerValues(wc, 200f, 1200f, 0.5f, 0, false);
 
         List<Sound> sounds = new ArrayList<>();
         sounds.add( snd1 );
