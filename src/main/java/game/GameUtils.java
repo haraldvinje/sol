@@ -222,7 +222,8 @@ public class GameUtils {
         //create holes
         createRectangleHoleInvisible(wc, SMALL_MAP_WIDTH/2, wallThickness/2, SMALL_MAP_WIDTH-wallThickness*2, wallThickness);
         createRectangleHoleInvisible(wc, SMALL_MAP_WIDTH/2, SMALL_MAP_HEIGHT-wallThickness/2, SMALL_MAP_WIDTH-wallThickness*2, wallThickness);
-        createCircleHole(wc, SMALL_MAP_WIDTH/2, SMALL_MAP_HEIGHT/2, 48f);
+        float centerHoleRadius = 48f *(SMALL_MAP_WIDTH / 1600);
+        createCircleHole(wc, SMALL_MAP_WIDTH/2, SMALL_MAP_HEIGHT/2, centerHoleRadius);
 
     }
 
