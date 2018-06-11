@@ -45,8 +45,8 @@ import java.util.List;
 public class GameUtils {
 
 
-    public static float SMALL_MAP_WIDTH = 1600f*1.5f,
-            SMALL_MAP_HEIGHT = 900f*1.5f;
+    public static float SMALL_MAP_WIDTH = 1600f*1.25f,
+            SMALL_MAP_HEIGHT = 900f*1.25f;
 
     public static float LARGE_MAP_WIDTH = 2034;//3200f;
     public static float LARGE_MAP_HEIGHT = 1087; //1800f;

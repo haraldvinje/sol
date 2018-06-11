@@ -269,6 +269,9 @@ public class CharacterUtils {
             boolean controlled, int team, int idOnTeam,
             float x, float y) {
 
+        float moveAccel = 9000f;
+
+
         Sound snd1 = new Sound("audio/click4.ogg");
         Sound snd2 = new Sound("audio/masai_arrow_throw.ogg");
         Sound snd3 = new Sound("audio/lion-roar.ogg");
@@ -281,17 +284,17 @@ public class CharacterUtils {
 
         //spear poke
         MeleeAbility ab1 = new MeleeAbility(wc, ab1CharSnd, 6, 6, 6, 13, new Circle(20f),128.0f, null);
-        ab1.setDamagerValues(wc, 150, 600, 0.7f, -100f, false);
+        ab1.setDamagerValues(wc, 150f, 600, 0.7f, -100f, false);
 
         //spear
         int spearProj = ProjectileUtils.allocateImageProjectileEntity(wc, "magnet_spear.png", 48, 536, 32*2, 32, new Sound("audio/arrow_impact.ogg")); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
-        ProjectileAbility ab2 = new ProjectileAbility(wc, ab2CharSnd, spearProj, 30, 18, 50, 1500, 90);
+        ProjectileAbility ab2 = new ProjectileAbility(wc, ab2CharSnd, spearProj, 20, 10, 60, 1500, 90);
         ab2.setDamagerValues(wc, 400f, 800f, 2f, -32f, false);
 
         //lion
         int lionProj = ProjectileUtils.allocateImageProjectileEntity(wc, "masai_lion.png", 210/2, 435, 457, 64, new Sound("audio/hook_hit.ogg")); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
-        ProjectileAbility ab3 = new ProjectileAbility(wc, ab3CharSnd, lionProj, 12, 12, 50, 400, 40);
-        ab3.setDamagerValues(wc, 600f, 800f, 0.5f, 0, false);
+        ProjectileAbility ab3 = new ProjectileAbility(wc, ab3CharSnd, lionProj, 20, 12, 120, 600, 200);
+        ab3.setDamagerValues(wc, 200f, 800f, 0.5f, 0, false);
 
         List<Sound> sounds = new ArrayList<>();
         sounds.add( snd1 );
@@ -300,7 +303,7 @@ public class CharacterUtils {
 
         return createCharacter(wc, charId,
                 controlled, team, idOnTeam,
-                x, y, 2000,
+                x, y, moveAccel,
                 ab1, ab2, ab3, sounds);
     }
 
