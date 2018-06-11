@@ -25,21 +25,33 @@ public class CharacterComp implements Component {
     public int respawnTimer = -1;
 
     private float moveAccel;
+    private float maxSpeed;
 
     private int respawnCount = 0;
 
 
-    public CharacterComp(float moveAccel) {
+    public CharacterComp(float moveAccel, float maxSpeed) {
         setMoveAccel(moveAccel);
+        setMaxSpeed(maxSpeed);
+    }
+    public CharacterComp(float moveAccel) {
+        this(moveAccel, 500f);
     }
 
 
     public float getMoveAccel() {
         return moveAccel;
     }
+    public float getMaxSpeed() {
+        return maxSpeed;
+    }
 
     public void setMoveAccel(float moveAccel) {
         this.moveAccel = moveAccel;
+    }
+
+    public void setMaxSpeed(float maxSpeed) {
+        this.maxSpeed = maxSpeed;
     }
 
     public void incrementRespawnCount() {

@@ -145,6 +145,9 @@ public class CharacterUtils {
             boolean controlled, int team, int idOnTeam,
             float x, float y) {
 
+        float moveAccel = 10000f;
+        float maxSpeed = 500f;
+
         Sound sndPowershot = new Sound("audio/powershot.ogg");
         Sound sndBoom = new Sound ("audio/boom-bang.ogg");
         Sound sndRapidsShot = new Sound("audio/click4.ogg");
@@ -180,7 +183,7 @@ public class CharacterUtils {
 
         return createCharacter(wc, charId,
                 controlled, team, idOnTeam,
-                x, y, 10000f,
+                x, y, moveAccel, maxSpeed,
                 abRapidshot, abHyperbeam, abPuffer,
                 soundList);
     }
@@ -190,8 +193,9 @@ public class CharacterUtils {
             boolean controlled, int team, int idOnTeam,
             float x, float y) {
 
-        float moveAccel = 12000f;
+        float moveAccel = 15000f;
         float moveFriction = 5f;
+        float maxSpeed = 600f;
 
         //frogpunch
         int frogPunchSoundIndex = 0;
@@ -221,7 +225,7 @@ public class CharacterUtils {
         return createCharacter(wc, charId,
                 controlled, team, idOnTeam,
                 x, y, moveAccel,//2000f,
-                moveFriction,
+                moveFriction, maxSpeed,
                 abFrogpunch, abHook, abMeteorpunch, soundList);
     }
 
@@ -230,7 +234,8 @@ public class CharacterUtils {
             boolean controlled, int team, int idOnTeam,
             float x, float y) {
 
-        float moveAccel = 6000f;
+        float moveAccel = 10000f;
+        float maxSpeed = 400f;
 
         Sound snd1 = new Sound("audio/click4.ogg");
         Sound snd2 = new Sound("audio/laser02.ogg");
@@ -252,7 +257,7 @@ public class CharacterUtils {
         ab2.setDamagerValues(wc, 300, 400, 0.8f, 64, false);
 
         //merge
-        MeleeAbility ab3 = new MeleeAbility(wc, ab3CharSnd, 10, 2, 0, 60, new Circle(230), 128, null);
+        MeleeAbility ab3 = new MeleeAbility(wc, ab3CharSnd, 10, 2, 8, 60, new Circle(230), 128, null);
         ab3.setDamagerValues(wc, 100, 1000, 0.4f, 0, true);
 
         List<Sound> sounds = new ArrayList<>();
@@ -262,7 +267,7 @@ public class CharacterUtils {
 
         return createCharacter(wc, charId,
                 controlled, team, idOnTeam,
-                x, y, moveAccel,
+                x, y, moveAccel, maxSpeed,
                 ab1, ab2, ab3, sounds);
     }
 
@@ -271,7 +276,8 @@ public class CharacterUtils {
             boolean controlled, int team, int idOnTeam,
             float x, float y) {
 
-        float moveAccel = 9000f;
+        float moveAccel = 12000f;
+        float maxSpeed = 500f;
 
 
         Sound snd1 = new Sound("audio/click4.ogg");
@@ -286,12 +292,12 @@ public class CharacterUtils {
 
         //spear poke
         MeleeAbility ab1 = new MeleeAbility(wc, ab1CharSnd, 6, 6, 2, 13, new Circle(26f),128.0f, null);
-        ab1.setDamagerValues(wc, 150f, 600, 0.7f, -100f, false);
+        ab1.setDamagerValues(wc, 150f, 800, 0.5f, -100f, false);
 
         //spear
         int spearProj = ProjectileUtils.allocateImageProjectileEntity(wc, "magnet_spear.png", 48, 536, 32*2, 32, new Sound("audio/arrow_impact.ogg")); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
         ProjectileAbility ab2 = new ProjectileAbility(wc, ab2CharSnd, spearProj, 20, 10, 60, 1500, 90);
-        ab2.setDamagerValues(wc, 400f, 800f, 2f, -32f, false);
+        ab2.setDamagerValues(wc, 300f, 800f, 2f, -32f, false);
 
         //lion
         int lionProj = ProjectileUtils.allocateImageProjectileEntity(wc, "masai_lion.png", 210/2, 435, 457, 64, new Sound("audio/hook_hit.ogg")); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
@@ -305,7 +311,7 @@ public class CharacterUtils {
 
         return createCharacter(wc, charId,
                 controlled, team, idOnTeam,
-                x, y, moveAccel,
+                x, y, moveAccel, maxSpeed,
                 ab1, ab2, ab3, sounds);
     }
 
@@ -365,18 +371,18 @@ public class CharacterUtils {
             WorldContainer wc,
             int charId,
             boolean controlled, int team, int idOnTeam,
-            float x, float y, float moveAccel,
+            float x, float y, float moveAccel, float maxSpeed,
             Ability ab1, Ability ab2, Ability ab3,
             List<Sound> soundList) {
 
-        return createCharacter(wc, charId, controlled, team, idOnTeam, x, y, moveAccel, 5f, ab1, ab2, ab3, soundList);
+        return createCharacter(wc, charId, controlled, team, idOnTeam, x, y, moveAccel, 5f, maxSpeed, ab1, ab2, ab3, soundList);
     }
 
     private static int createCharacter(
             WorldContainer wc,
             int charId,
             boolean controlled, int team, int idOnTeam,
-            float x, float y, float moveAccel, float moveFriction,
+            float x, float y, float moveAccel, float moveFriction, float maxSpeed,
             Ability ab1, Ability ab2, Ability ab3,
             List<Sound> soundList) {
 
@@ -385,7 +391,7 @@ public class CharacterUtils {
         //add graphics
         addCharacterGraphicsComps(wc, team, charId, characterEntity);
 
-        wc.addComponent(characterEntity, new CharacterComp(moveAccel));//1500f));
+        wc.addComponent(characterEntity, new CharacterComp(moveAccel, maxSpeed));//1500f));
         wc.addComponent(characterEntity, new PositionComp(x, y, (float) (characterCount++) / 100f)); //z value is a way to make draw ordering and depth positioning correspond. Else alpha images will appear incorrect.
         wc.addComponent(characterEntity, new RotationComp());
 

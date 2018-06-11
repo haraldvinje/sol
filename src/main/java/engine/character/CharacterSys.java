@@ -136,7 +136,7 @@ public class CharacterSys implements Sys {
         float stepY = ( (inputComp.isMoveDown()? 1:0) - (inputComp.isMoveUp()? 1:0) );
 
         //check max speed
-        float maxSpeed = 500;
+        float maxSpeed = charComp.getMaxSpeed();
         if (phComp.getVelocity().getLengthSquared() > maxSpeed * maxSpeed) {
             return;
         }
@@ -157,7 +157,8 @@ public class CharacterSys implements Sys {
         float diffAngle = TrigUtils.shortesAngleBetween(rotComp.getAngle(), newAngle);
 
         //add a portion of diffAngle
-        rotComp.addAngle(diffAngle * 0.3f);
+        float deltaAngleRatio = 1f;
+        rotComp.addAngle(diffAngle * deltaAngleRatio);
     }
 
     private void updateAbilities(int entity, CharacterComp charComp, AbilityComp abComp, CharacterInputComp inputComp, PositionComp posComp, RotationComp rotComp) {
