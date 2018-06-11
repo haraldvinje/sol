@@ -230,6 +230,8 @@ public class CharacterUtils {
             boolean controlled, int team, int idOnTeam,
             float x, float y) {
 
+        float moveAccel = 6000f;
+
         Sound snd1 = new Sound("audio/click4.ogg");
         Sound snd2 = new Sound("audio/laser02.ogg");
         Sound snd3 = new Sound("audio/boom-bang.ogg");
@@ -246,12 +248,12 @@ public class CharacterUtils {
 
         //chagger
         int chaggProjectile = ProjectileUtils.allocateSinglecolorProjectileAbility(wc, 64f, purple,null); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
-        ProjectileAbility ab2 = new ProjectileAbility(wc, ab2CharSnd, chaggProjectile, 10, 6, 120, 650, 40);
+        ProjectileAbility ab2 = new ProjectileAbility(wc, ab2CharSnd, chaggProjectile, 10, 6, 120, 1050, 30);
         ab2.setDamagerValues(wc, 300, 400, 0.8f, 64, false);
 
         //merge
-        MeleeAbility ab3 = new MeleeAbility(wc, ab3CharSnd, 10, 2, 8, 60, new Circle(160), 128, null);
-        ab3.setDamagerValues(wc, 20, 800, 0.4f, 0, true);
+        MeleeAbility ab3 = new MeleeAbility(wc, ab3CharSnd, 10, 2, 0, 60, new Circle(230), 128, null);
+        ab3.setDamagerValues(wc, 100, 1000, 0.4f, 0, true);
 
         List<Sound> sounds = new ArrayList<>();
         sounds.add( snd1 );
@@ -260,7 +262,7 @@ public class CharacterUtils {
 
         return createCharacter(wc, charId,
                 controlled, team, idOnTeam,
-                x, y, 2000,
+                x, y, moveAccel,
                 ab1, ab2, ab3, sounds);
     }
 
