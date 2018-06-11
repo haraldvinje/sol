@@ -45,8 +45,8 @@ import java.util.List;
 public class GameUtils {
 
 
-    public static float SMALL_MAP_WIDTH = 1600f,
-            SMALL_MAP_HEIGHT = 900f;
+    public static float SMALL_MAP_WIDTH = 1600f*1.5f,
+            SMALL_MAP_HEIGHT = 900f*1.5f;
 
     public static float LARGE_MAP_WIDTH = 2034;//3200f;
     public static float LARGE_MAP_HEIGHT = 1087; //1800f;
@@ -54,7 +54,7 @@ public class GameUtils {
     public static float LARGE_MAP_WIN_LINES_X[];
     public static Vec2 LARGE_MAP_WIN_LINES_Y;
 
-    public static float VIEW_WIDTH = SMALL_MAP_WIDTH, VIEW_HEIGHT = SMALL_MAP_HEIGHT;
+    public static float VIEW_WIDTH = 1600f, VIEW_HEIGHT = 900f;
 
     public static Vec2[][] teamStartPos;
 
@@ -201,6 +201,7 @@ public class GameUtils {
 
     public static void createMap(WorldContainer wc) {
 
+
         Vec2[][] startPositions = {
                 { new Vec2(100, SMALL_MAP_HEIGHT/2), new Vec2(100, SMALL_MAP_HEIGHT/2+100) },
                 { new Vec2(SMALL_MAP_WIDTH-100, SMALL_MAP_HEIGHT/2), new Vec2(SMALL_MAP_WIDTH-100, SMALL_MAP_HEIGHT/2+100) }
@@ -208,7 +209,7 @@ public class GameUtils {
         GameUtils.teamStartPos = startPositions;
 
         //create background
-        createBackground(wc);
+        createBackground(wc, SMALL_MAP_WIDTH, SMALL_MAP_HEIGHT);
 
         //create walls
         float wallThickness = 64f;
@@ -471,10 +472,10 @@ public class GameUtils {
         return w;
     }
 
-    private static int createBackground(WorldContainer wc) {
+    private static int createBackground(WorldContainer wc, float width, float height) {
         int bg = wc.createEntity("background");
         wc.addComponent(bg, new PositionComp(0, 0, -0.5f));
-        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", 1600, 900)));
+        wc.addComponent(bg, new TexturedMeshComp(TexturedMeshUtils.createRectangle("background_difuse.png", width, height)));
 
         return bg;
     }
