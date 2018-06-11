@@ -135,6 +135,12 @@ public class CharacterSys implements Sys {
         float stepX = ( (inputComp.isMoveRight()? 1:0) - (inputComp.isMoveLeft()? 1:0) );
         float stepY = ( (inputComp.isMoveDown()? 1:0) - (inputComp.isMoveUp()? 1:0) );
 
+        //check max speed
+        float maxSpeed = 500;
+        if (phComp.getVelocity().getLengthSquared() > maxSpeed * maxSpeed) {
+            return;
+        }
+
         phComp.addAcceleration(new Vec2(stepX, stepY).normalize().scale(accel));
     }
 

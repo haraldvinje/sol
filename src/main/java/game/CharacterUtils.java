@@ -152,19 +152,19 @@ public class CharacterUtils {
 
         float[] color1 = {1, 1, 0};
         float[] color2 = {1, 0, 1};
-        int proj1Entity = ProjectileUtils.allocateSinglecolorProjectileAbility(wc, 8, color1, sndBoom);
-        int proj2Entity = ProjectileUtils.allocateSinglecolorProjectileAbility(wc, 20, color2, sndHit);
+        int proj1Entity = ProjectileUtils.allocateSinglecolorProjectileAbility(wc, 12, color1, sndBoom);
+        int proj2Entity = ProjectileUtils.allocateSinglecolorProjectileAbility(wc, 30, color2, sndHit);
 
         int rapidShotSoundIndex = 0;
         int powershotSoundIndex = 1;
         int boomSoundIndex = 2;
 
         //rapidshot
-        ProjectileAbility abRapidshot = new ProjectileAbility(wc, rapidShotSoundIndex, proj1Entity, 2, 2, 30, 1200, 30 );
+        ProjectileAbility abRapidshot = new ProjectileAbility(wc, rapidShotSoundIndex, proj1Entity, 2, 2, 30, 1500, 30 );
         abRapidshot.setDamagerValues(wc, 100, 180, 0.5f, -128, false);
 
         //hyperbeam3
-        ProjectileAbility abHyperbeam = new ProjectileAbility(wc, powershotSoundIndex, proj2Entity, 15, 10, 120, 1500, 120);
+        ProjectileAbility abHyperbeam = new ProjectileAbility(wc, powershotSoundIndex, proj2Entity, 15, 10, 120, 2000, 120);
         abHyperbeam.setDamagerValues( wc, 350,900, 1.1f, -256, false);
 
         //puffer
@@ -180,7 +180,7 @@ public class CharacterUtils {
 
         return createCharacter(wc, charId,
                 controlled, team, idOnTeam,
-                x, y, 1800f,
+                x, y, 10000f,
                 abRapidshot, abHyperbeam, abPuffer,
                 soundList);
     }
@@ -189,6 +189,9 @@ public class CharacterUtils {
             WorldContainer wc, int charId,
             boolean controlled, int team, int idOnTeam,
             float x, float y) {
+
+        float moveAccel = 12000f;
+        float moveFriction = 5f;
 
         //frogpunch
         int frogPunchSoundIndex = 0;
@@ -201,8 +204,8 @@ public class CharacterUtils {
         abFrogpunch.setDamagerValues(wc, 150, 700, 0.8f, -48f, false);
 
         //hook
-        int hookProjEntity = ProjectileUtils.allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 24, new Sound("audio/hook_hit.ogg")); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
-        ProjectileAbility abHook = new ProjectileAbility(wc, hookInitSoundIndex, hookProjEntity, 5, 18, 50, 900, 30);
+        int hookProjEntity = ProjectileUtils.allocateImageProjectileEntity(wc, "hook.png", 256/2, 512, 256, 32, new Sound("audio/hook_hit.ogg")); //both knockback angle and image angle depends on rotation comp. Cheat by setting rediusOnImage negative
+        ProjectileAbility abHook = new ProjectileAbility(wc, hookInitSoundIndex, hookProjEntity, 5, 8, 40, 2500, 20);
         abHook.setDamagerValues(wc, 200f, 1400f, 0.2f, -128, true);
 
         //meteorpunch
@@ -217,7 +220,8 @@ public class CharacterUtils {
 
         return createCharacter(wc, charId,
                 controlled, team, idOnTeam,
-                x, y, 2000f,
+                x, y, moveAccel,//2000f,
+                moveFriction,
                 abFrogpunch, abHook, abMeteorpunch, soundList);
     }
 
@@ -352,13 +356,22 @@ public class CharacterUtils {
         return e;
     }
 
-
-
     private static int createCharacter(
             WorldContainer wc,
             int charId,
             boolean controlled, int team, int idOnTeam,
             float x, float y, float moveAccel,
+            Ability ab1, Ability ab2, Ability ab3,
+            List<Sound> soundList) {
+
+        return createCharacter(wc, charId, controlled, team, idOnTeam, x, y, moveAccel, 5f, ab1, ab2, ab3, soundList);
+    }
+
+    private static int createCharacter(
+            WorldContainer wc,
+            int charId,
+            boolean controlled, int team, int idOnTeam,
+            float x, float y, float moveAccel, float moveFriction,
             Ability ab1, Ability ab2, Ability ab3,
             List<Sound> soundList) {
 
@@ -377,7 +390,7 @@ public class CharacterUtils {
         wc.addComponent(characterEntity, new TeamComp(team, idOnTeam));
 
         //server and offline
-        wc.addComponent(characterEntity, new PhysicsComp(80, 5f, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
+        wc.addComponent(characterEntity, new PhysicsComp(80, moveFriction, 0.3f, PhysicsUtil.FRICTION_MODEL_VICIOUS));
         wc.addComponent(characterEntity, new CollisionComp(new Circle( CHARACTER_RADIUS[charId] )));
         wc.addComponent(characterEntity, new NaturalResolutionComp());
 
